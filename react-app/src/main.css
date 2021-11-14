@@ -1,0 +1,372 @@
+.select-test-form {
+	margin: 15px 20px;
+	display: flex;
+	justify-content: space-around;
+	gap: 10px;
+}
+
+.select-test-form select {
+	width: 100%;
+}
+
+.select-test-form select:disabled {
+	opacity: 0.5;
+	background: var(--vscode-input-background);
+}
+
+hr {
+	color: var(--vscode-input-foreground);
+}
+
+.workspaces-form-group {
+	flex-grow: 1;
+	flex-shrink: 1;
+	flex-basis: 33%;
+}
+
+.endpoints-form-group {
+	flex-grow: 2;
+	flex-shrink: 2;
+	flex-basis: 66%;
+}
+
+.tests-list-container {
+	
+}
+
+.test-row {
+	margin-top: 20px;
+	height: 38px;
+	line-height: 38px;
+	vertical-align: middle;
+	/* color: var(--vscode-input-foreground);
+	background: var(--vscode-menubar-selectionBackground); */
+}
+
+
+*,
+*:before,
+*:after {
+	box-sizing: border-box;
+}
+
+::-webkit-scrollbar {
+	background-color: var(--vscode-scrollbarSlider-background);
+}
+::-webkit-scrollbar-thumb {
+    background-color: var(--vscode-scrollbarSlider-hoverBackground);
+}
+
+::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+html,
+body {
+	background-color: var(--vscode-editor-background);
+	font-family: var(--vscode-font-family);
+	height: 100%;
+	width: 100%;
+	overflow: hidden;
+	color: var(--vscode-editor-foreground)
+}
+
+.hidden {
+	display: none !important;
+}
+
+.disabled {
+	pointer-events: none;
+}
+
+.btnx {
+	cursor: pointer;
+	margin: 0;
+	padding: 0;
+	border-style: none;
+}
+
+.media {
+	display: flex;
+	align-items: flex-start;
+}
+
+.media .media-image {
+	margin: 0 1em 0 0;
+}
+
+.media .media-content {
+	flex: 1;
+}
+
+.media.right {
+	flex-direction: row-reverse;
+	justify-content: flex-end;
+}
+
+.media.right .media-image {
+	margin: 0.8em 0.3em 0 0;
+}
+
+div.appRootParent {
+	height: 100vh;
+	overflow: hidden;
+}
+div.appRoot {
+	display: flex;
+	flex-direction: column;
+	justify-content: stretch;
+}
+
+div.appRoot > header {
+	z-index: 1000;
+}
+
+.Resizer {
+	background: var(--vscode-scrollbarSlider-hoverBackground);
+	z-index: 1;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	-moz-background-clip: padding;
+	-webkit-background-clip: padding;
+	background-clip: padding-box;
+  }
+  
+  .Resizer:hover {
+	-webkit-transition: all 2s ease;
+	transition: all 2s ease;
+  }
+  
+  .Resizer.horizontal {
+	height: 10px;
+	border-top: 3px solid rgba(255, 255, 255, 0);
+	border-bottom: 3px solid rgba(255, 255, 255, 0);
+	cursor: row-resize;
+	width: 100%;
+  }
+  
+  .Resizer.horizontal:hover {
+	border-top: 2px solid rgba(0, 0, 0, 0.5);
+	border-bottom: 2px solid rgba(0, 0, 0, 0.5);
+  }
+  
+  .Resizer.vertical {
+	width: 10px;
+	border-left: 3px solid rgba(255, 255, 255, 0);
+	border-right: 3px solid rgba(255, 255, 255, 0);
+	cursor: col-resize;
+  }
+  
+  .Resizer.vertical:hover {
+	border-left: 2px solid rgba(0, 0, 0, 0.5);
+	border-right: 2px solid rgba(0, 0, 0, 0.5);
+  }
+  .Resizer.disabled {
+	cursor: not-allowed;
+  }
+  .Resizer.disabled:hover {
+	border-color: transparent;
+  }
+
+
+#history-navbar {
+	text-align: right;
+	
+	margin: 0.5em 1em;
+	position: absolute;
+	bottom: 0px;
+	right: 0px;
+}
+
+#history-navbar .navbar {
+	list-style: none;
+	display: inline-flex;
+	font-size: 12px;
+	border: 1px solid hsla(0, 0%, 0%, 0.2);
+	background-color: hsla(204, 70%, 40%, 1);
+	padding: 0;
+    margin: 0;
+    min-height: inherit;
+    border-radius: 0;
+}
+
+.navbar .navbar-item {
+	text-align: center;
+	color: white;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+.navbar-item .navbar-link {
+	color: currentcolor;
+	text-decoration: none;
+	cursor: pointer;
+	display: block;
+	line-height: 22px;
+	padding: 0 1em;
+}
+
+.navbar-item .navbar-link:hover {
+	
+	background-color: hsla(0, 0%, 100%, 0.12);
+}
+
+.navbar-item.previous .navbar-link {
+	border-right: 1px solid hsla(0, 0%, 100%, 0.5);
+}
+
+.navbar-item .octicon {
+	
+	vertical-align: -10%;
+}
+
+.navbar-item.previous .octicon {
+	margin: 0 5px 0 0;
+}
+
+.navbar-item.next .octicon {
+	margin: 0 -5px 0 5px;
+}
+
+.navbar-item.disabled {
+	color: hsla(0, 0%, 100%, 0.5);
+}
+
+
+#dialog {
+	position: fixed;
+	top: 0px;
+	width: 100%;
+	height: 100%;
+	background-color: var(--vscode-scrollbarSlider-background);
+	z-index: 99999;
+}
+
+#dialog hr {
+	border-top: 1px solid var(--vscode-editorGroup-border);
+}
+
+#dialog > div {
+	padding: 1em;
+	border: 2px solid var(--vscode-editorGroup-border);
+	background-color: var(--vscode-editor-background);
+	width: 50%;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	max-width: 800px;
+}
+
+#dialog .dialog-content, #dialog .dialog-footer {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+#dialog .dialog-content > img {
+	margin-right: 1em;
+}
+
+.hidden {
+	display:none;
+}
+
+.Pane2 {
+	background-color: var(--vscode-editor-background);
+	overflow-y: auto;
+}
+
+
+
+.dropdown {
+	position: relative;
+	display: inline-block;
+}
+
+.dropdown-content {
+	display: none;
+	position: absolute;
+	background-color: #f9f9f9;
+	min-width: 160px;
+	box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+	z-index: 999;
+}
+
+.dropdown-content a {
+	color: black;
+	padding: 0.2em;
+	text-decoration: none;
+	display: block;
+	white-space: nowrap;
+}
+
+.dropdown-content a:hover {
+	background-color: #f1f1f1
+}
+
+.dropdown:hover .dropdown-content {
+	display: block;
+}
+
+.dropdown-menu {
+    max-height: 500px;
+    overflow-y: auto;
+	overflow-x: hidden;
+	background-color: var(--vscode-input-background);
+}
+
+.dropdown-menu>li>a {
+	color: var(--vscode-input-foreground);
+}
+
+.dropdown-menu>li>a:hover {
+	background-color: var(--vscode-menubar-selectionBackground);
+	color: var(--vscode-input-foreground);
+}
+
+.dropdown-menu>li.divider {
+	background-color: #888888;
+}
+.dropdown-menu > .dropdown-header {
+	padding: 0px 0px;
+}
+
+.form-select {
+	appearance: menulist;
+}
+
+.btn, .form-select {
+    color: var(--vscode-input-foreground);
+	background: var(--vscode-input-background);
+	border: 1px solid var(--vscode-input-background);
+	border-radius: 0;
+}
+
+.btn-group-sm>.btn, .btn-sm {
+    border-radius: 0;
+}
+
+.btn:hover, btn:focus {
+    color: var(--vscode-breadcrumb-focusForeground);
+    background: var(--vscode-input-background);
+    border: 1px solid var(--vscode-focusBorder);
+}
+
+.textInput {
+    position: relative;
+    font-size: 12px;
+	padding: 5px 10px;
+	vertical-align: top;
+	width: 250px;
+    color: var(--vscode-input-foreground);
+    background: var(--vscode-input-background);
+    border: 1px solid var(--vscode-input-background);
+    border-radius: 0;
+}
+
+.textInput:focus {
+    outline: none;
+    border: 1px solid var(--vscode-focusBorder);
+}
