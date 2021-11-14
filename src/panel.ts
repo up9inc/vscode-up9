@@ -10,6 +10,8 @@ import {
 import {
     UP9ApiProvider
 } from "./up9Api";
+import { clientIdConfigKey, clientSecretConfigKey, envConfigKey, up9ConfigSectionName } from './consts';
+import { readUP9CredsFromConfig, saveUP9CredsToConfig } from './utils';
 
 const panelId = "up9BrowserPanel";
 const panelTitle = "UP9 Test Browser";
@@ -87,11 +89,12 @@ export class UP9Panel {
                     case 'startAuth':
                         try {
                             this.startNewAuthForPanel(message.up9Env, message.clientId, message.clientSecret)
-                            this._context.globalState.update("auth", {
-                                up9Env: message.up9Env,
-                                clientId: message.clientId,
-                                clientSecret: message.clientSecret
-                            });
+                            // this._context.globalState.update("auth", {
+                            //     up9Env: message.up9Env,
+                            //     clientId: message.clientId,
+                            //     clientSecret: message.clientSecret
+                            // });
+                            saveUP9CredsToConfig(message.up9Env, message.clientId, message.clientSecret);
                         } catch (error) {
                             this._panel.webview.postMessage({
                                 command: 'authError',
@@ -109,16 +112,19 @@ export class UP9Panel {
             this._disposables
         );
 
-        const storedAuthCredentials = this._context.globalState.get("auth") as any
-        if (storedAuthCredentials) {
-            this._panel.webview.postMessage({
-                command: 'savedData',
-                data: {
-                    auth: storedAuthCredentials
+        //const storedAuthCredentials = this._context.globalState.get("auth") as any
+        readUP9CredsFromConfig()
+            .then(storedAuthCredentials => {
+                if (storedAuthCredentials.clientId) {
+                    this._panel.webview.postMessage({
+                        command: 'savedData',
+                        data: {
+                            auth: storedAuthCredentials
+                        }
+                    });
+                    this.startNewAuthForPanel(storedAuthCredentials.up9Env, storedAuthCredentials.clientId, storedAuthCredentials.clientSecret)
                 }
             });
-            this.startNewAuthForPanel(storedAuthCredentials.up9Env, storedAuthCredentials.clientId, storedAuthCredentials.clientSecret)
-        }
     }
 
     private handlePanelUP9APIRequest = async (messageData) => {

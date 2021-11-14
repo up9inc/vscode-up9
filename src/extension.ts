@@ -1,17 +1,25 @@
 import * as vscode from 'vscode';
+import { CloudRunner } from './commands/runInCloud';
 import {
     UP9Panel
 } from './panel';
 
-const startCommandName = 'up9.openTestsBrowser';
+const testBrowserCommandName = 'up9.openTestsBrowser';
+const runTestInCloudCommandName = 'up9.runTest';
 
 
-function onCommand(context: vscode.ExtensionContext): void {
+function onShowTestBrowserCommand(context: vscode.ExtensionContext): void {
     UP9Panel.createOrShow(context)
 }
 
-export function activate(context: vscode.ExtensionContext) {
-    const startCommand = vscode.commands.registerCommand(startCommandName, () => onCommand(context));
+function onRunCodeInCloudCommand(context :vscode.ExtensionContext): void {
+    const cloudRunner = new CloudRunner(context, vscode.window.activeTextEditor.document.getText());
+}
 
-    context.subscriptions.push(startCommand);
+export function activate(context: vscode.ExtensionContext) {
+    const openTestBrowserCommand = vscode.commands.registerCommand(testBrowserCommandName, () => onShowTestBrowserCommand(context));
+    const runCodeInCloudCommand = vscode.commands.registerCommand(runTestInCloudCommandName, () => onRunCodeInCloudCommand(context));
+
+    context.subscriptions.push(openTestBrowserCommand);
+    context.subscriptions.push(runCodeInCloudCommand);
 }

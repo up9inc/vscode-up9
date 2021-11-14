@@ -30,4 +30,9 @@ export class UP9ApiProvider {
         raiseForBadResponse(response);
         return response.data;
     }
+
+    public testRunSingle = async(workspaceId: string, testCode: string, token: string) => {
+        const serializedCode = `data:text/plain;base64,${btoa(testCode)}`;
+        const response = await axios.post<any>(`${this.up9Env}/agents/runSingleTest`, {model: workspaceId, code: serializedCode}, {headers: {'Authorization': `Bearer ${token}`}});
+    }
 }

@@ -20,14 +20,16 @@ export class UP9Auth {
         this.clientSecret = clientSecret;
         this.newTokenCallback = onNewToken;
         this.errorCallback = onError;
-        this.scheduleNewTokenRequest(0);
+        this.scheduleNewTokenRequest(0, true);
     }
 
     public stop = () => {
         clearTimeout(this.timeout);
     };
 
-    public getNewToken = async (): Promise <string> => {
+
+    //TODO: replace isFirstTime with a test auth func
+    public getNewToken = async (isFirstTime?: boolean): Promise <string> => {
         try {
             const params = new URLSearchParams();
             params.append('grant_type', 'client_credentials');
@@ -50,7 +52,8 @@ export class UP9Auth {
         } catch (err) {
             console.log(err);
             this.errorCallback(err);
-            this.scheduleNewTokenRequest(retryMs);
+            if (!isFirstTime)
+                this.scheduleNewTokenRequest(retryMs);
             throw err;
         }
     };
@@ -68,7 +71,11 @@ export class UP9Auth {
         return response.data;
     }
 
-    private scheduleNewTokenRequest = (timeFromNowMs: number) => {
-        this.timeout = setTimeout(() => this.getNewToken(), timeFromNowMs);
+    public getEnv = (): string => {
+        return this.env;
+    }
+
+    private scheduleNewTokenRequest = (timeFromNowMs: number, isFirstTime?: boolean) => {
+        this.timeout = setTimeout(() => this.getNewToken(isFirstTime), timeFromNowMs);
     };
 }

@@ -645,21 +645,25 @@ window.addEventListener('message', event => {
     const message = event.data;
     switch (message.command) {
         case 'authError':
+            console.log('received authError', message);
             up9AuthStore.setAuthError(message.authError?.message ?? "unknown error occured");
             up9AuthStore.setIsAuthConfigured(false);
             break;
         case 'authResponse':
+            console.log('received authResponse', message);
             up9AuthStore.setToken(message.token);
             up9AuthStore.setAuthError(null);
             up9AuthStore.setIsAuthConfigured(true);
             break;
         case 'savedData':
+            console.log('received savedData', message);
             up9AuthStore.setUP9Env(message.data.auth.up9Env);
             up9AuthStore.setClientId(message.data.auth.clientId);
             up9AuthStore.setClientSecret(message.data.auth.clientSecret);
             up9AuthStore.setIsAuthConfigured(true);
             break;
         case 'apiResponse':
+            console.log('received apiResponse', message);
             const requestMessage = openApiRequests[message.data.requestId];
             if (!requestMessage) {
                 console.error("received message from extension with no local message object", message);
