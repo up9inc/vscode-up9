@@ -12,8 +12,9 @@ function onShowTestBrowserCommand(context: vscode.ExtensionContext): void {
     UP9Panel.createOrShow(context)
 }
 
-function onRunCodeInCloudCommand(context :vscode.ExtensionContext): void {
-    const cloudRunner = new CloudRunner(context, vscode.window.activeTextEditor.document.getText());
+async function onRunCodeInCloudCommand(context: vscode.ExtensionContext): Promise<void> {
+    const cloudRunner = new CloudRunner(context);
+    await cloudRunner.startTestRun(vscode.window.activeTextEditor.document.getText());
 }
 
 export function activate(context: vscode.ExtensionContext) {
