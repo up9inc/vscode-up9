@@ -3,6 +3,8 @@ import * as vscode from 'vscode';
 import { UP9Auth } from "../up9Auth";
 import { UP9ApiProvider } from "../up9Api";
 
+const openUP9SettingsDialogOption = "Open UP9 Settings";
+
 export class CloudRunner {
     private context: vscode.ExtensionContext;
 
@@ -15,7 +17,7 @@ export class CloudRunner {
             const up9Auth = await this.getStoredUP9Auth(this.context);
             let token: string;
             if (!up9Auth) {
-                vscode.window.showErrorMessage('UP9 authentication hasn\'t been configured yet, please configure the up9 extension in vscode configuration');
+                this.showSettingsError('UP9 authentication hasn\'t been configured yet, please configure the up9 extension in vscode configuration');
                 return reject(Error("up9 auth not configured"));
             }
 
@@ -23,13 +25,14 @@ export class CloudRunner {
                 token = await up9Auth.getNewToken();
             } catch (error) {
                 console.error(error);
-                vscode.window.showErrorMessage('UP9 authentication failed, check console for more details or check up9 extension configuration for errors');
+                this.showSettingsError('UP9 authentication failed, check console for more details or check up9 extension configuration for errors');
+                
                 return reject(error);
             }
 
             const defaultWorkspace = await getDefaultWorkspace();
             if (!defaultWorkspace) {
-                vscode.window.showErrorMessage('No default workspace has been configured for test runs, please configure a default workspace in the up9 extension configuration');
+                this.showSettingsError('No default workspace has been configured for test runs, please configure a default workspace in the up9 extension configuration');
                 return reject(new Error("default workspace not configured"));
             }
 
@@ -102,7 +105,11 @@ export class CloudRunner {
 
         return logOutput;
     }
-    
 
-
+    private showSettingsError = async (message: string): Promise<void> => {
+        const res = await vscode.window.showErrorMessage(message, openUP9SettingsDialogOption);
+        if (res === openUP9SettingsDialogOption) {
+            vscode.commands.executeCommand('workbench.action.openSettings', 'up9'); //opens settings with `up9` search query
+        }
+    }
 }

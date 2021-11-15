@@ -15,6 +15,7 @@ import { readUP9CredsFromConfig, saveUP9CredsToConfig } from './utils';
 
 const panelId = "up9BrowserPanel";
 const panelTitle = "UP9 Test Browser";
+const panelColumn = vscode.ViewColumn.Two;
 
 
 //TODO: Refactor this god class
@@ -33,7 +34,8 @@ export class UP9Panel {
     public static createOrShow(context: vscode.ExtensionContext) {
         // If we already have a panel, show it.
         if (UP9Panel.currentPanel) {
-            UP9Panel.currentPanel._panel.reveal(vscode.ViewColumn.Two);
+            UP9Panel.currentPanel._panel.reveal(panelColumn);
+            UP9Panel.currentPanel.initializePanelAuth();
             return;
         }
 
@@ -41,9 +43,10 @@ export class UP9Panel {
         const panel = vscode.window.createWebviewPanel(
             panelId,
             panelTitle,
-            vscode.ViewColumn.Two, {
+            panelColumn,
+            {
                 enableScripts: true
-            },
+            }
         );
 
         UP9Panel.currentPanel = new UP9Panel(panel, context);
@@ -78,18 +81,17 @@ export class UP9Panel {
         // Handle messages from the webview
         this._panel.webview.onDidReceiveMessage(
             message => {
+                console.log('received message', message);
                 switch (message.command) {
                     case 'alert':
                         vscode.window.showErrorMessage(message.text);
-                        return;
+                        break;
+                    case 'infoAlert':
+                        vscode.window.showInformationMessage(message.text);
+                        break;
                     case 'startAuth':
                         try {
                             this.startNewAuthForPanel(message.up9Env, message.clientId, message.clientSecret)
-                            // this._context.globalState.update("auth", {
-                            //     up9Env: message.up9Env,
-                            //     clientId: message.clientId,
-                            //     clientSecret: message.clientSecret
-                            // });
                             saveUP9CredsToConfig(message.up9Env, message.clientId, message.clientSecret);
                         } catch (error) {
                             this._panel.webview.postMessage({
@@ -97,30 +99,20 @@ export class UP9Panel {
                                 authError: error
                             });
                         }
-                        return;
+                        break;
                     case 'apiRequest':
                         this.handlePanelUP9APIRequest(message);
+                        break;
                     case 'createAndOpenTempFile':
                         this.createAndOpenTempFile(message.fileContents, message.fileExtension);
+                        break;
                 }
             },
             null,
             this._disposables
         );
 
-        //const storedAuthCredentials = this._context.globalState.get("auth") as any
-        readUP9CredsFromConfig()
-            .then(storedAuthCredentials => {
-                if (storedAuthCredentials.clientId) {
-                    this._panel.webview.postMessage({
-                        command: 'savedData',
-                        data: {
-                            auth: storedAuthCredentials
-                        }
-                    });
-                    this.startNewAuthForPanel(storedAuthCredentials.up9Env, storedAuthCredentials.clientId, storedAuthCredentials.clientSecret)
-                }
-            });
+        this.initializePanelAuth();
     }
 
     private handlePanelUP9APIRequest = async (messageData) => {
@@ -181,6 +173,21 @@ export class UP9Panel {
                 vscode.window.showTextDocument(doc, vscode.ViewColumn.One);
               });
         }); 
+    }
+
+    private initializePanelAuth() {
+        readUP9CredsFromConfig()
+            .then(storedAuthCredentials => {
+                if (storedAuthCredentials.clientId) {
+                    this._panel.webview.postMessage({
+                        command: 'savedData',
+                        data: {
+                            auth: storedAuthCredentials
+                        }
+                    });
+                    this.startNewAuthForPanel(storedAuthCredentials.up9Env, storedAuthCredentials.clientId, storedAuthCredentials.clientSecret);
+                }
+            });
     }
 
     private startNewAuthForPanel(up9Env: string, clientId: string, clientSecret: string) {

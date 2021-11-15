@@ -31,18 +31,36 @@ hr {
 }
 
 .tests-list-container {
-	
+	margin: 15px 20px;
+}
+
+.ace_print-margin {
+	visibility: hidden !important;
+}
+
+.code-preview-container {
+	margin-top: 30px
 }
 
 .test-row {
-	margin-top: 20px;
-	height: 38px;
+	border: none;
+	background: inherit;
+	/* margin-top: 20px; */
+	/* height: 38px;
 	line-height: 38px;
-	vertical-align: middle;
+	vertical-align: middle; */
 	/* color: var(--vscode-input-foreground);
 	background: var(--vscode-menubar-selectionBackground); */
 }
 
+.test-row-card-header {
+	background: inherit;
+	border: none;
+}
+
+.ace_editor {
+	background: var(--vscode-editor-background);
+}
 
 *,
 *:before,
@@ -337,11 +355,13 @@ div.appRoot > header {
 	appearance: menulist;
 }
 
-.btn, .form-select {
+.btn, .btn:focus, .btn:active:focus, .form-select {
     color: var(--vscode-input-foreground);
 	background: var(--vscode-input-background);
 	border: 1px solid var(--vscode-input-background);
 	border-radius: 0;
+	outline: var(--vscode-input-background);
+	box-shadow: none;
 }
 
 .btn-group-sm>.btn, .btn-sm {

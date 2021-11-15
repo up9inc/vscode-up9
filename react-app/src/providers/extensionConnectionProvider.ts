@@ -639,6 +639,13 @@ export const startNewAuth = (up9Env: string, clientId: string, clientSecret: str
     });
 }
 
+export const SendInfoToast = (text: string) => {
+  vsCodeApi.postMessage({
+    command: 'infoAlert',
+    text
+});
+}
+
 //handle messages incoming from the extension
 window.addEventListener('message', event => {
     console.log('received message', event.data);
