@@ -88,15 +88,18 @@ export class UP9Panel {
                         vscode.window.showInformationMessage(message.text);
                         break;
                     case 'startAuth':
-                        try {
-                            this.startNewAuthForPanel(message.up9Env, message.clientId, message.clientSecret)
-                            saveUP9CredsToConfig(message.up9Env, message.clientId, message.clientSecret);
-                        } catch (error) {
-                            this._panel.webview.postMessage({
-                                command: 'authError',
-                                authError: error
-                            });
-                        }
+                        (async () => {
+                            try {
+                                this.startNewAuthForPanel(message.up9Env, message.clientId, message.clientSecret)
+                                await saveUP9CredsToConfig(message.up9Env, message.clientId, message.clientSecret);
+                                await this.initializePanelAuth();
+                            } catch (error) {
+                                this._panel.webview.postMessage({
+                                    command: 'authError',
+                                    authError: error
+                                });
+                            }
+                        })();
                         break;
                     case 'apiRequest':
                         this.handlePanelUP9APIRequest(message);

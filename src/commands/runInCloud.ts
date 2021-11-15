@@ -37,11 +37,13 @@ export class CloudRunner {
             }
 
             //TODO: reuse the same terminal (will require having only 1 simultaneous test run)
-            const consoleOutput = this.createAndShowTerminal("Running test through UP9...");
+            const consoleOutput = this.createAndShowTerminal("Running test through UP9...\n\r");
             const up9Api = new UP9ApiProvider(up9Auth.getEnv());
             try {
                 const res = await up9Api.testRunSingle(defaultWorkspace, indentString(code, 4), token);
-
+                if (!res.testLog) {
+                    throw "UP9 API returned empty response, does this workspace have a live agent?";
+                }
                 const log = res.testLog + `\n${this.getLogOutputForRCA(res.rcaData)}`
                 const formattedLog = log.replace(/\n/g, "\r\n");
                 
@@ -49,6 +51,7 @@ export class CloudRunner {
                 resolve(null);
             } catch (err) {
                 console.error(err);
+                consoleOutput.fire(err);
                 reject(err);
             }
             
