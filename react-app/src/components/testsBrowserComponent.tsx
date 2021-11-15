@@ -112,18 +112,6 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             <Container>
                 <Accordion>
                     {tests.tests.map(test => {
-                    // return <Row key={test.uuid} className="test-row">
-                    //         <Col xs="9" md="9" lg="9">{test.variantDisplayName}</Col>
-                    //         <Col xs="1" md="1" lg="1" style={{"padding": "0", "margin": "0px 2px"}}>
-                    //             <CustomAccordionTrigger eventKey={test.uuid} />
-                    //         </Col>
-                    //         <Col xs="1" md="1" lg="1" style={{"padding": "0", "margin": "0px 2px"}}>
-                    //             <Button variant="primary" onClick={_ => navigator.clipboard.writeText(test.code)}>Copy</Button>
-                    //         </Col>
-                    //         <Accordion.Collapse eventKey={test.uuid}>
-                    //             <Row><AceEditor width="100%" mode="python" theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={test.code}/></Row>
-                    //         </Accordion.Collapse>
-                    // </Row>
                         return <Card key={test.uuid} className="test-row">
                             <Card.Header className="test-row-card-header">
                                 <Container>
@@ -140,32 +128,13 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                             </Card.Header>
                             <Accordion.Collapse eventKey={test.uuid}>
                                 <Card.Body>
-                                    <AceEditor width="100%" mode="python" theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={test.code} setOptions={{showGutter: false, hScrollBarAlwaysVisible: false, highlightActiveLine: false}}/>
+                                    <AceEditor width="100%" mode="python" fontSize="14px" theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={test.code} setOptions={{showGutter: false, hScrollBarAlwaysVisible: false, highlightActiveLine: false}}/>
                                 </Card.Body>
                             </Accordion.Collapse>
                             </Card>;
                     })}
                 </Accordion>
             </Container>
-                {/* <Container>
-                        {tests.tests.map((test) => {
-                            return <Row key={test.uuid} className="test-row">
-                                <Col xs="9" md="9" lg="9">{test.variantDisplayName}</Col>
-                                <Col xs="1" md="1" lg="1" style={{"padding": "0", "margin": "0px 2px"}}>
-                                    <Button variant="primary" onClick={_ => setSelectedTestForPreview(test)}>View</Button>
-                                </Col>
-                                <Col xs="1" md="1" lg="1" style={{"padding": "0", "margin": "0px 2px"}}>
-                                    <Button variant="primary" onClick={_ => navigator.clipboard.writeText(test.code)}>Copy</Button>
-                                </Col>
-                        </Row>
-                        })}
-                        {selectedTestForPreview && <Row className="code-preview-container">
-                            <Form.Group>
-                                <Form.Label>Preview</Form.Label>
-                            </Form.Group>
-                            <AceEditor width="100%" mode="python" theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={selectedTestForPreview.code}/>
-                        </Row>}
-                </Container> */}
             </div>
             </>}
             {(tests && !tests.tests) && <p>No tests found for this endpoint</p>}

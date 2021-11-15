@@ -35,7 +35,6 @@ export class UP9Panel {
         // If we already have a panel, show it.
         if (UP9Panel.currentPanel) {
             UP9Panel.currentPanel._panel.reveal(panelColumn);
-            UP9Panel.currentPanel.initializePanelAuth();
             return;
         }
 
@@ -116,7 +115,6 @@ export class UP9Panel {
     }
 
     private handlePanelUP9APIRequest = async (messageData) => {
-        console.log('received up9 api request from panel', messageData);
         if (!UP9Panel.up9ApiProvider || !UP9Panel.up9Auth) {
             console.error('panel attempted to send http request when apiProvider or auth provider are null');
             return;
@@ -234,6 +232,8 @@ export class UP9Panel {
 
     private _update() {
         const webview = this._panel.webview;
+        //the panel's react app is reset when this occurs, we need to send it the user auth config again
+        UP9Panel.currentPanel.initializePanelAuth();
     }
 
     private _getHtmlForWebview(): string {
