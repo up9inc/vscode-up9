@@ -29,16 +29,20 @@ const AuthComponent: React.FC<{}> = observer(() => {
 
 
     return <Container className="auth-container">
-        <Form.Group>
+        <Form.Group className="auth-form-group">
             <Form.Label>UP9 Env</Form.Label>
             <Form.Control type="text" value={up9EnvInput} onChange={e => setUP9EnvInput(e.target.value)} />
+            <Form.Text className="text-muted">
+                Must contain protocol (http:// or https://)
+            </Form.Text>
         </Form.Group>
-        <Form.Group>
+
+        <Form.Group className="auth-form-group">
             <Form.Label>Client ID</Form.Label>
             <Form.Control type="text" value={clientIdInput} onChange={e => setClientIdInput(e.target.value)} />
         </Form.Group>
         
-        <Form.Group>
+        <Form.Group className="auth-form-group">
             <Form.Label>Client Secret</Form.Label>
             <Form.Control type="text" value={clientSecretInput} onChange={e => setClientSecretInput(e.target.value)} />
         </Form.Group>
@@ -46,7 +50,7 @@ const AuthComponent: React.FC<{}> = observer(() => {
         {up9AuthStore.authError && <p style={{"color": "red"}}>{up9AuthStore.authError}</p>}
         {up9AuthStore.token && up9AuthStore.setIsAuthConfigured && <p style={{"color": "green"}}>Authenticated successfully</p>}
 
-        <Button onClick={doAuth}>Start new Authentication</Button>
+        <Button onClick={doAuth} className="login-button">Login</Button>
     </Container>;
 });
 

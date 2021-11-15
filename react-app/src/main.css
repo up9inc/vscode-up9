@@ -69,6 +69,15 @@ hr {
 .auth-container {
 	display: flex;
 	flex-direction: column;
+	max-width: 500px;
+}
+
+.login-button {
+	margin-top: 45px;
+}
+
+.auth-form-group {
+	margin-top: 20px;
 }
 
 *,
