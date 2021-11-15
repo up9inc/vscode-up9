@@ -51,7 +51,19 @@ export class CloudRunner {
                 resolve(null);
             } catch (err) {
                 console.error(err);
-                consoleOutput.fire(err);
+                let consoleErrorMessage: string;
+                if (typeof err === 'string') {
+                    consoleErrorMessage = err;
+                } else {
+                    if (err?.response) {
+                        const responseBody = JSON.stringify(err?.response?.data, null, 4).replace('\n', '\n\r');
+                        consoleErrorMessage = `API returned error: ${err.response.status} ${responseBody}`
+                    } else {
+                        consoleErrorMessage = `Unknown error occured: ${JSON.stringify(err)}`;
+                    }
+                    consoleOutput.fire(consoleErrorMessage.replace(/\n/g, "\r\n")); //TODO: move all these replaces to a single func
+                }
+                
                 reject(err);
             }
             
