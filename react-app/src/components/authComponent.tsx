@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import {observer} from "mobx-react";
 import {up9AuthStore} from "../stores/up9AuthStore";
 import {startNewAuth} from "../providers/extensionConnectionProvider";
+import {Container, Form, Button} from "react-bootstrap";
 
 
 
@@ -27,15 +28,26 @@ const AuthComponent: React.FC<{}> = observer(() => {
     }, [up9AuthStore.up9Env, up9AuthStore.clientId, up9AuthStore.clientSecret]);
 
 
-    return <div>
-        UP9 Env: <input value={up9EnvInput} onChange={e => setUP9EnvInput(e.target.value)}/> <br/>
-        Client ID: <input value={clientIdInput} onChange={e => setClientIdInput(e.target.value)}/> <br/>
-        Client Secret: <input value={clientSecretInput} onChange={e => setClientSecretInput(e.target.value)}/> <br/>
+    return <Container className="auth-container">
+        <Form.Group>
+            <Form.Label>UP9 Env</Form.Label>
+            <Form.Control type="text" value={up9EnvInput} onChange={e => setUP9EnvInput(e.target.value)} />
+        </Form.Group>
+        <Form.Group>
+            <Form.Label>Client ID</Form.Label>
+            <Form.Control type="text" value={clientIdInput} onChange={e => setClientIdInput(e.target.value)} />
+        </Form.Group>
+        
+        <Form.Group>
+            <Form.Label>Client Secret</Form.Label>
+            <Form.Control type="text" value={clientSecretInput} onChange={e => setClientSecretInput(e.target.value)} />
+        </Form.Group>
+        
         {up9AuthStore.authError && <p style={{"color": "red"}}>{up9AuthStore.authError}</p>}
         {up9AuthStore.token && up9AuthStore.setIsAuthConfigured && <p style={{"color": "green"}}>Authenticated successfully</p>}
 
-        <button onClick={doAuth}>Start new Authentication</button>
-    </div>;
+        <Button onClick={doAuth}>Start new Authentication</Button>
+    </Container>;
 });
 
 

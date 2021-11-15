@@ -38,6 +38,10 @@ hr {
 	visibility: hidden !important;
 }
 
+.ace_scrollbar {
+    display: none;
+}
+
 .code-preview-container {
 	margin-top: 30px
 }
@@ -60,6 +64,11 @@ hr {
 
 .ace_editor {
 	background: var(--vscode-editor-background);
+}
+
+.auth-container {
+	display: flex;
+	flex-direction: column;
 }
 
 *,
