@@ -3,8 +3,6 @@ import * as vscode from 'vscode';
 import { UP9Auth } from "../up9Auth";
 import { UP9ApiProvider } from "../up9Api";
 
-const terminalEscapeSequence = "00091";
-
 export class CloudRunner {
     private context: vscode.ExtensionContext;
 
@@ -35,6 +33,7 @@ export class CloudRunner {
                 return reject(new Error("default workspace not configured"));
             }
 
+            //TODO: reuse the same terminal (will require having only 1 simultaneous test run)
             const consoleOutput = this.createAndShowTerminal("Running test through UP9...");
             const up9Api = new UP9ApiProvider(up9Auth.getEnv());
             try {

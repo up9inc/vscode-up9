@@ -31,13 +31,9 @@ export class UP9Panel {
     private _disposables: vscode.Disposable[] = [];
 
     public static createOrShow(context: vscode.ExtensionContext) {
-        const column = vscode.window.activeTextEditor ?
-            vscode.window.activeTextEditor.viewColumn :
-            undefined;
-
         // If we already have a panel, show it.
         if (UP9Panel.currentPanel) {
-            UP9Panel.currentPanel._panel.reveal(column);
+            UP9Panel.currentPanel._panel.reveal(vscode.ViewColumn.Two);
             return;
         }
 
@@ -45,7 +41,7 @@ export class UP9Panel {
         const panel = vscode.window.createWebviewPanel(
             panelId,
             panelTitle,
-            column || vscode.ViewColumn.Two, {
+            vscode.ViewColumn.Two, {
                 enableScripts: true
             },
         );
