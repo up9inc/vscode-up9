@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as tmp from 'tmp';
 
 
 import {
@@ -102,9 +101,6 @@ export class UP9Panel {
                     case 'apiRequest':
                         this.handlePanelUP9APIRequest(message);
                         break;
-                    case 'createAndOpenTempFile':
-                        this.createAndOpenTempFile(message.fileContents, message.fileExtension);
-                        break;
                 }
             },
             null,
@@ -158,19 +154,6 @@ export class UP9Panel {
             command: 'apiResponse',
             data: replyMessage
         });
-    }
-
-    private createAndOpenTempFile = (fileContents: string, extension: string) => {
-        const path = tmp.tmpNameSync({postfix: extension});
-        fs.writeFile(path, fileContents, function(err) {
-            if(err) {
-                return console.log(err);
-            }
-            const openPath = vscode.Uri.parse("file://" + path);
-            vscode.workspace.openTextDocument(openPath).then(doc => {
-                vscode.window.showTextDocument(doc, vscode.ViewColumn.One);
-              });
-        }); 
     }
 
     private initializePanelAuth() {

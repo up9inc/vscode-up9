@@ -621,15 +621,6 @@ export const getDebugReply = (requestType: ApiRequestTypes): Promise < any > => 
     return Promise.resolve(response);
 }
 
-export const sendOpenFileMessage = (fileContents: string, fileExtension: string) => {
-    vsCodeApi.postMessage({
-        command: 'createAndOpenTempFile',
-        fileContents,
-        fileExtension
-    });
-}
-
-
 export const startNewAuth = (up9Env: string, clientId: string, clientSecret: string) => {
     vsCodeApi.postMessage({
         command: 'startAuth',
