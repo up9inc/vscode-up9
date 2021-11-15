@@ -53,8 +53,8 @@
         "properties": {
           "up9.authEnv": {
             "type": "string",
-            "description": "UP9 URL",
-            "default": "auth.up9.app"
+            "description": "UP9 auth url (must begin with http:// or https://)",
+            "default": "https://auth.up9.app"
           },
           "up9.clientId": {
             "type": "string",
