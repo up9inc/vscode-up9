@@ -80,6 +80,10 @@ hr {
 	margin-top: 20px;
 }
 
+.ace_hidden-cursors {
+  opacity: 0;
+}
+
 *,
 *:before,
 *:after {

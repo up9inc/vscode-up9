@@ -128,7 +128,9 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                             </Card.Header>
                             <Accordion.Collapse eventKey={test.uuid}>
                                 <Card.Body>
-                                    <AceEditor width="100%" mode="python" fontSize="14px" theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={test.code} setOptions={{showGutter: false, hScrollBarAlwaysVisible: false, highlightActiveLine: false}}/>
+                                    <AceEditor width="100%" mode="python" fontSize="14px" maxLines={1000} height={`${14 * test.code.split(/\r\n|\r|\n/).length}px`}
+                                    theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={test.code}
+                                     setOptions={{showGutter: false, hScrollBarAlwaysVisible: false, highlightActiveLine: false}}/>
                                 </Card.Body>
                             </Accordion.Collapse>
                             </Card>;
