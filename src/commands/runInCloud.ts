@@ -61,8 +61,9 @@ export class CloudRunner {
                     } else {
                         consoleErrorMessage = `Unknown error occured: ${JSON.stringify(err)}`;
                     }
-                    consoleOutput.fire(consoleErrorMessage.replace(/\n/g, "\r\n")); //TODO: move all these replaces to a single func
                 }
+
+                consoleOutput.fire(consoleErrorMessage.replace(/\n/g, "\r\n")); //TODO: move all these replaces to a single func
                 
                 reject(err);
             }
