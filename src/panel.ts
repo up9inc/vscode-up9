@@ -76,6 +76,11 @@ export class UP9Panel {
             this._disposables
         );
 
+        this._panel.iconPath = {
+            dark: vscode.Uri.file(`${this._context.extensionPath}/images/ui_logo.svg`),
+            light: vscode.Uri.file(`${this._context.extensionPath}/images/ui_logo.svg`)
+        }
+
         // Handle messages from the webview
         this._panel.webview.onDidReceiveMessage(
             message => {
