@@ -1,8 +1,8 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {observer} from "mobx-react";
 import { up9AuthStore } from "../stores/up9AuthStore";
 import {ApiRequestTypes, sendApiRequest, SendInfoToast} from "../providers/extensionConnectionProvider";
-import {Form, Container, Row, Col, Button, Accordion, useAccordionButton, Card, AccordionContext} from 'react-bootstrap';
+import {Form, Container, Row, Col, Button, Card} from 'react-bootstrap';
 import { isHexColorDark, unindentString } from "../utils";
 import { v4 as uuidv4 } from 'uuid';
 
@@ -20,7 +20,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
     const [endpoints, setEndpoints] = useState(null);
     const [selectedEndpoint, setSelectedEndpoint] = useState("");
 
-    const [tests, setTests] = useState(null);
+    const [endpointTest, setEndpointTest] = useState(null);
 
     const editorBackgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--vscode-editor-background');
 
@@ -56,15 +56,23 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
 
     useEffect(() => {
         (async () => {
-            setTests(null);
+            setEndpointTest(null);
             if (selectedEndpoint) {
                 try {
                     const tests = await sendApiRequest(ApiRequestTypes.EndpointTests, {workspaceId: selectedWorkspace, spanGuid: selectedEndpoint});
-                    for (const test of tests?.tests ?? []) {
-                        test.code = unindentString(test.code); // tests from up9 come over indented by 4 spaces
-                        test.uuid = uuidv4(); //for react Key prop
+                    if (tests?.tests?.length < 1) {
+                        setEndpointTest({}); //TODO: find better way to mark no test found
                     }
-                    setTests(tests);
+                    let test = tests.tests.find(t => t.tag == "minimal");
+                    if (!test) {
+                        test = tests.tests[0];
+                    }
+
+                    test.code = unindentString(test.code); // tests from up9 come over indented by 4 spaces
+                    test.uuid = uuidv4(); //for react Key prop
+
+                    setEndpointTest(test);
+                    console.log('test', test);
                 } catch (error) {
                     console.log('error loading tests', error);
                 }
@@ -103,56 +111,35 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                     </Form.Select>
                 </Form.Group>
             </div>
-            {tests?.tests && <>
+            {endpointTest && <>
             <hr/>
             <div className="tests-list-container">
             <Form.Group>
-                <Form.Label>Tests</Form.Label>
-            </Form.Group>
+                <Form.Label>Test code</Form.Label>
+            </Form.Group> 
             <Container>
-                <Accordion>
-                    {tests.tests.map(test => {
-                        return <Card key={test.uuid} className="test-row">
-                            <Card.Header className="test-row-card-header">
-                                <Container>
-                                    <Row key={test.uuid}>
-                                        <Col xs="9" md="9" lg="9">{test.variantDisplayName}</Col>
-                                        <Col xs="1" md="1" lg="1" style={{"padding": "0", "margin": "0px 15px 0 0"}}>
-                                            <CustomAccordionTrigger eventKey={test.uuid} />
-                                        </Col>
-                                        <Col xs="1" md="1" lg="1" style={{"padding": "0"}}>
-                                            <Button variant="primary" onClick={_ => copyToClipboard(test.code)}>Copy</Button>
-                                        </Col>
-                                    </Row>
-                                </Container>
-                            </Card.Header>
-                            <Accordion.Collapse eventKey={test.uuid}>
-                                <Card.Body>
-                                    <AceEditor width="100%" mode="python" fontSize="14px" maxLines={1000} height={`${14 * test.code.split(/\r\n|\r|\n/).length}px`}
-                                    theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={test.code}
-                                     setOptions={{showGutter: false, hScrollBarAlwaysVisible: false, highlightActiveLine: false}}/>
-                                </Card.Body>
-                            </Accordion.Collapse>
-                            </Card>;
-                    })}
-                </Accordion>
+                <Card className="test-row">
+                    <Card.Header className="test-row-card-header">
+                        <Container>
+                            <Row>
+                                <Col xs="10" md="10" lg="10" style={{"paddingLeft": "5px"}}>{endpointTest.variantDisplayName}</Col>
+                                <Col xs="1" md="1" lg="1" style={{"padding": "0"}}>
+                                    <Button variant="primary" onClick={_ => copyToClipboard(endpointTest.code)}>Copy</Button>
+                                </Col>
+                            </Row>
+                        </Container>
+                    </Card.Header>
+                    <Card.Body>
+                            <AceEditor width="100%" mode="python" fontSize="14px" maxLines={1000} height={`${14 * endpointTest.code.split(/\r\n|\r|\n/).length}px`}
+                            theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={endpointTest.code}
+                                setOptions={{showGutter: false, hScrollBarAlwaysVisible: false, highlightActiveLine: false}}/>
+                    </Card.Body>
+                </Card>
             </Container>
             </div>
             </>}
-            {(tests && !tests.tests) && <p>No tests found for this endpoint</p>}
+            {endpointTest == {} && <p>No test code found for this endpoint</p>}
         </div>;
 });
-
-function CustomAccordionTrigger({eventKey}) {
-    const { activeEventKey } = useContext(AccordionContext);
-    const decoratedOnClick = useAccordionButton(eventKey);
-
-    const isThisButtonActive = activeEventKey == eventKey;
-  
-    return (
-        <Button variant="primary" onClick={_ => decoratedOnClick(eventKey)}>{isThisButtonActive ? "Close" : "View"}</Button>
-    );
-  }
-
 
 export default TestsBrowserComponent;
