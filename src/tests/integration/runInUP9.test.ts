@@ -39,8 +39,12 @@ suite('Run In UP9 Command', () => {
     extensionContext = await extension.activate();
   });
 
-  after(() => {
-    vscode.window.showInformationMessage('All tests done!');
+  after(async () => {
+    const up9ConfigSection = vscode.workspace.getConfiguration(up9ConfigSectionName);
+    await up9ConfigSection.update(envConfigKey, null, vscode.ConfigurationTarget.Global);
+    await up9ConfigSection.update(clientIdConfigKey, null, vscode.ConfigurationTarget.Global);
+    await up9ConfigSection.update(clientSecretConfigKey, null, vscode.ConfigurationTarget.Global);
+    await up9ConfigSection.update(defaultWorkspaceConfigKey, null, vscode.ConfigurationTarget.Global);
   });
 
   test('Run passing tests', async function() { 
