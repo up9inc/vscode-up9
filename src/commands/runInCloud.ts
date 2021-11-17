@@ -5,11 +5,16 @@ import { UP9ApiProvider } from "../up9Api";
 
 const openUP9SettingsDialogOption = "Open UP9 Settings";
 
+export const terminalLineDelimeter = '\r\n';
+
 export class CloudRunner {
     private context: vscode.ExtensionContext;
+    // used for tests as there is no way to get terminal contents via vscode api
+    private onTerminalEmitCallback: (terminalMessage: string) => void; 
 
-    public constructor(context: vscode.ExtensionContext) {
+    public constructor(context: vscode.ExtensionContext, onTerminalEmit?: (terminalMessage: string) => void) {
         this.context = context;
+        this.onTerminalEmitCallback = onTerminalEmit;
     }
 
     public startTestRun = (code: string): Promise<void> => {
@@ -37,7 +42,7 @@ export class CloudRunner {
             }
 
             //TODO: reuse the same terminal (will require having only 1 simultaneous test run)
-            const consoleOutput = this.createAndShowTerminal("Running test through UP9...\n\r");
+            const terminalOutputter = this.createAndShowTerminal("Running test through UP9...\n\r");
             const up9Api = new UP9ApiProvider(up9Auth.getEnv());
             try {
                 const res = await up9Api.testRunSingle(defaultWorkspace, indentString(code, 4), token);
@@ -45,25 +50,23 @@ export class CloudRunner {
                     throw "UP9 API returned empty response, does this workspace have a live agent?";
                 }
                 const log = res.testLog + `\n${this.getLogOutputForRCA(res.rcaData)}`
-                const formattedLog = log.replace(/\n/g, "\r\n");
-                
-                consoleOutput.fire(formattedLog);
+                this.processTerminalOutputAndPrint(log, terminalOutputter);
                 resolve(null);
             } catch (err) {
                 console.error(err);
-                let consoleErrorMessage: string;
+                let terminalErrorMessage: string;
                 if (typeof err === 'string') {
-                    consoleErrorMessage = err;
+                    terminalErrorMessage = err;
                 } else {
                     if (err?.response) {
                         const responseBody = JSON.stringify(err?.response?.data, null, 4).replace('\n', '\n\r');
-                        consoleErrorMessage = `API returned error: ${err.response.status} ${responseBody}`
+                        terminalErrorMessage = `API returned error: ${err.response.status} ${responseBody}`
                     } else {
-                        consoleErrorMessage = `Unknown error occured: ${JSON.stringify(err)}`;
+                        terminalErrorMessage = `Unknown error occured: ${JSON.stringify(err)}`;
                     }
                 }
-
-                consoleOutput.fire(consoleErrorMessage.replace(/\n/g, "\r\n")); //TODO: move all these replaces to a single func
+                
+                this.processTerminalOutputAndPrint(terminalErrorMessage, terminalOutputter);
                 
                 reject(err);
             }
@@ -75,7 +78,7 @@ export class CloudRunner {
         const statusTerminalEmitter = new vscode.EventEmitter<string>();
         const terminalHandlers = {
             onDidWrite: statusTerminalEmitter.event,
-            open: () => {statusTerminalEmitter.fire(initialMessage);},
+            open: () => {this.processTerminalOutputAndPrint(initialMessage, statusTerminalEmitter);},
             close: () => { /* noop*/ },
             handleInput: (_: string) => {} //seal terminal to user input
         };
@@ -126,6 +129,15 @@ export class CloudRunner {
         const res = await vscode.window.showErrorMessage(message, openUP9SettingsDialogOption);
         if (res === openUP9SettingsDialogOption) {
             vscode.commands.executeCommand('workbench.action.openSettings', 'up9'); //opens settings with `up9` search query
+        }
+    }
+
+    private processTerminalOutputAndPrint = (text: string, terminalEmitter: vscode.EventEmitter<string>) => {
+        const formattedMessage = text.replace(/\n/g, terminalLineDelimeter);
+        terminalEmitter.fire(formattedMessage);
+
+        if (this.onTerminalEmitCallback) {
+            this.onTerminalEmitCallback(formattedMessage);
         }
     }
 }
