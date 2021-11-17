@@ -5,10 +5,10 @@ import * as path from 'path';
 
 import {
     UP9Auth
-} from "./up9Auth";
+} from "./providers/up9Auth";
 import {
     UP9ApiProvider
-} from "./up9Api";
+} from "./providers/up9Api";
 import { clientIdConfigKey, clientSecretConfigKey, envConfigKey, up9ConfigSectionName } from './consts';
 import { readUP9CredsFromConfig, saveUP9CredsToConfig } from './utils';
 

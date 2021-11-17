@@ -659,7 +659,7 @@ window.addEventListener('message', event => {
             break;
         case 'apiResponse':
             console.log('received apiResponse', message);
-            const requestMessage = openApiMessages[message.data.messageId];
+            const requestMessage = openApiMessages[message.data.apiMessageId];
             if (!requestMessage) {
                 console.error("received message from extension with no local message object", message);
             } else {

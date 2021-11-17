@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { Workspace, TestResponse, Endpoint } from './model';
-import {raiseForBadResponse} from'./utils';
+import { Workspace, TestResponse, Endpoint } from '../models/up9';
+import {raiseForBadResponse} from'../utils';
 
 export class UP9ApiProvider {
     private readonly up9Env: string

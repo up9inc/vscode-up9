@@ -1,7 +1,7 @@
 import { getDefaultWorkspace, indentString, readUP9CredsFromConfig } from "../utils";
 import * as vscode from 'vscode';
-import { UP9Auth } from "../up9Auth";
-import { UP9ApiProvider } from "../up9Api";
+import { UP9Auth } from "../providers/up9Auth";
+import { UP9ApiProvider } from "../providers/up9Api";
 
 const openUP9SettingsDialogOption = "Open UP9 Settings";
 
