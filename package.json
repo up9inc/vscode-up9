@@ -77,7 +77,7 @@
     "vscode:prepublish": "npm run compile",
     "compile": "cd react-app && npm run build && cd ../ && tsc -p ./ && cp ./react-app/dist/index.html ./out/",
     "test-compile": "tsc -p ./",
-    "pretest": "mkdir -p ./out/tests/integration/resources/ && cp -r ./src/tests/integration/resources/* ./out/tests/integration/resources/",
+    "pretest": "test-compile && mkdir -p ./out/tests/integration/resources/ && cp -r ./src/tests/integration/resources/* ./out/tests/integration/resources/",
     "test": "node ./out/tests/integration/runIntegrationTests.js"
   },
   "devDependencies": {
