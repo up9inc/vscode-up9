@@ -12,6 +12,8 @@ jobs:
       with:
         node-version: '16.13.x'
     - run: npm install
+    - name: Setup webview depedencies
+      run: npm run setup-browser
     - name: Compile
       run: npm run compile
     - name: Start xvfb
