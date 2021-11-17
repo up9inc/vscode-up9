@@ -153,7 +153,7 @@ export class UP9Panel {
 
     private handlePanelUP9ApiResponse = (panelMessageData, apiResponse, error) => {
         const replyMessage = {
-            messageId: panelMessageData.messageId,
+            apiMessageId: panelMessageData.apiMessageId,
             messageType: panelMessageData.messageType,
             params: panelMessageData.params,
             apiResponse: apiResponse,
