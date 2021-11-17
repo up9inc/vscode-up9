@@ -43,7 +43,8 @@ export class UP9Panel {
             panelTitle,
             panelColumn,
             {
-                enableScripts: true
+                enableScripts: true,
+                retainContextWhenHidden: true
             }
         );
 

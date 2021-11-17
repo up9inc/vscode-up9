@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {observer} from "mobx-react";
 import { up9AuthStore } from "../stores/up9AuthStore";
-import {ApiRequestTypes, sendApiRequest, SendInfoToast} from "../providers/extensionConnectionProvider";
+import {ApiMessageTypes, sendApiMessage, SendInfoToast} from "../providers/extensionConnectionProvider";
 import {Form, Container, Row, Col, Button, Card} from 'react-bootstrap';
 import { isHexColorDark, unindentString } from "../utils";
 import { v4 as uuidv4 } from 'uuid';
@@ -33,7 +33,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
 
     const refreshWorkspaces = async () => {
         try {
-            const workspaces = await sendApiRequest(ApiRequestTypes.WorkspacesList, null);
+            const workspaces = await sendApiMessage(ApiMessageTypes.WorkspacesList, null);
             setWorkspaces(workspaces);
         } catch(error) {
             console.log(error);
@@ -46,7 +46,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             setEndpoints(null);
             if (selectedWorkspace) {
                 try {
-                    const endpoints = await sendApiRequest(ApiRequestTypes.EndpointsList, {workspaceId: selectedWorkspace});
+                    const endpoints = await sendApiMessage(ApiMessageTypes.EndpointsList, {workspaceId: selectedWorkspace});
                     setEndpoints(endpoints);
                 } catch (error) {
                     console.log('error loading endpoints', error);
@@ -61,7 +61,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             setTestsLoaded(false);
             if (selectedEndpoint) {
                 try {
-                    const tests = await sendApiRequest(ApiRequestTypes.EndpointTests, {workspaceId: selectedWorkspace, spanGuid: selectedEndpoint});
+                    const tests = await sendApiMessage(ApiMessageTypes.EndpointTests, {workspaceId: selectedWorkspace, spanGuid: selectedEndpoint});
                     setTestsLoaded(true);
                     if (tests?.tests?.length < 1) {
                         return;

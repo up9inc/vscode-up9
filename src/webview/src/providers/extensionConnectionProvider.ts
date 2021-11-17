@@ -11,11 +11,11 @@ if (!("acquireVsCodeApi" in window)) {
 
 
     // for development
-    // up9AuthStore.setIsAuthConfigured(true);
-    // up9AuthStore.setToken("aaaaaa");
-    // up9AuthStore.setUP9Env("auth.stg.testr.io");
-    // up9AuthStore.setClientId("aaaaaa");
-    // up9AuthStore.setClientSecret("aaaaaa");
+    up9AuthStore.setIsAuthConfigured(true);
+    up9AuthStore.setToken("aaaaaa");
+    up9AuthStore.setUP9Env("auth.stg.testr.io");
+    up9AuthStore.setClientId("aaaaaa");
+    up9AuthStore.setClientSecret("aaaaaa");
     isDebug = true;
 }
 
