@@ -29,34 +29,31 @@ we try to make it more convinient by handling requests with promises using this 
 these contain events for resolving/rejecting their parent promises.
 This way we can work with normal async functions despite us having to use one event listener for all panel <-> extension communications
 */
+const openApiMessages = {};
 
-//TODO: change terminology to `message` to be less confusing with http requests
-const openApiRequests = {};
-
-export enum ApiRequestTypes {
+export enum ApiMessageTypes {
     WorkspacesList = "workspaceList",
     EndpointsList = "endpointList",
     EndpointTests = "endpointTests"
 }
 
-export const sendApiRequest = (requestType: ApiRequestTypes, params: object): Promise<any> => {
+export const sendApiMessage = (messageType: ApiMessageTypes, params: object): Promise<any> => {
     if (isDebug) {
-        return getDebugReply(requestType);
+        return getDebugReply(messageType);
     }
     return new Promise<any>((resolve, reject) => {
-        const requestId = uuidv4(); //unique identifier is later used by the `window.addEventListener` to trigger the correct request's callbacks
-        const request = {
-            requestId,
-            requestType,
+        const apiMessageId = uuidv4(); //unique identifier is later used by the `window.addEventListener` to trigger the correct messages's callbacks
+        const apiMessage = {
+            apiMessageId,
+            messageType,
             params,
             onComplete: (apiResponse: any) => resolve(apiResponse),
             onError: (error: any) => reject(error)
         };
-        console.log('request', request);
-        openApiRequests[requestId] = request;
+        openApiMessages[apiMessageId] = apiMessage;
         vsCodeApi.postMessage({
-            requestId,
-            requestType,
+            apiMessageId,
+            messageType,
             params,
             command: 'apiRequest' //used by the "background" extension to tell what kind of command this is
         });
@@ -64,10 +61,10 @@ export const sendApiRequest = (requestType: ApiRequestTypes, params: object): Pr
 }
 
 
-export const getDebugReply = (requestType: ApiRequestTypes): Promise < any > => {
+export const getDebugReply = (apiMessageType: ApiMessageTypes): Promise < any > => {
     let response;
-    switch (requestType) {
-        case ApiRequestTypes.EndpointTests:
+    switch (apiMessageType) {
+        case ApiMessageTypes.EndpointTests:
             response = {
                 "headerCode": "from up9lib import *\nfrom authentication import authenticate\n\n# logging.basicConfig(level=logging.DEBUG)\n\n",
                 "tests": [{
@@ -123,7 +120,7 @@ export const getDebugReply = (requestType: ApiRequestTypes): Promise < any > => 
                 ]
             };
             break;
-        case ApiRequestTypes.EndpointsList:
+        case ApiMessageTypes.EndpointsList:
             response = [
                 {
                   "ctype": "text/html",
@@ -614,7 +611,7 @@ export const getDebugReply = (requestType: ApiRequestTypes): Promise < any > => 
                 }
               ]
             break;
-        case ApiRequestTypes.WorkspacesList:
+        case ApiMessageTypes.WorkspacesList:
             response = ["rb-reg", "test", "workspace-b"];
             break;
     }
@@ -662,7 +659,7 @@ window.addEventListener('message', event => {
             break;
         case 'apiResponse':
             console.log('received apiResponse', message);
-            const requestMessage = openApiRequests[message.data.requestId];
+            const requestMessage = openApiMessages[message.data.messageId];
             if (!requestMessage) {
                 console.error("received message from extension with no local message object", message);
             } else {

@@ -130,7 +130,7 @@ export class UP9Panel {
         }
         try {
             //TODO: fix loose typings and magic strings
-            switch (messageData.requestType) {
+            switch (messageData.messageType) {
                 case "workspaceList":
                     const workspaces = await UP9Panel.up9ApiProvider.getWorkspaces(token);
                     this.handlePanelUP9ApiResponse(messageData, workspaces, null);
@@ -152,8 +152,8 @@ export class UP9Panel {
 
     private handlePanelUP9ApiResponse = (panelMessageData, apiResponse, error) => {
         const replyMessage = {
-            requestId: panelMessageData.requestId,
-            requestType: panelMessageData.requestType,
+            messageId: panelMessageData.messageId,
+            messageType: panelMessageData.messageType,
             params: panelMessageData.params,
             apiResponse: apiResponse,
             error: error
