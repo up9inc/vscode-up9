@@ -43,10 +43,10 @@ suite('Run In UP9 Command', () => {
   after(async () => {
     // reset extension config
     const up9ConfigSection = vscode.workspace.getConfiguration(up9ConfigSectionName);
-    await up9ConfigSection.update(envConfigKey, null, vscode.ConfigurationTarget.Global);
-    await up9ConfigSection.update(clientIdConfigKey, null, vscode.ConfigurationTarget.Global);
-    await up9ConfigSection.update(clientSecretConfigKey, null, vscode.ConfigurationTarget.Global);
-    await up9ConfigSection.update(defaultWorkspaceConfigKey, null, vscode.ConfigurationTarget.Global);
+    await up9ConfigSection.update(envConfigKey, "", vscode.ConfigurationTarget.Global);
+    await up9ConfigSection.update(clientIdConfigKey, "", vscode.ConfigurationTarget.Global);
+    await up9ConfigSection.update(clientSecretConfigKey, "", vscode.ConfigurationTarget.Global);
+    await up9ConfigSection.update(defaultWorkspaceConfigKey, "", vscode.ConfigurationTarget.Global);
   });
 
   test('Run passing tests', async function() { 
