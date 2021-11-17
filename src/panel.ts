@@ -13,7 +13,7 @@ import { clientIdConfigKey, clientSecretConfigKey, envConfigKey, up9ConfigSectio
 import { readUP9CredsFromConfig, saveUP9CredsToConfig } from './utils';
 
 const panelId = "up9BrowserPanel";
-const panelTitle = "UP9 Test Browser";
+const panelTitle = "UP9 Code Browser";
 const panelColumn = vscode.ViewColumn.Two;
 
 

@@ -3,7 +3,7 @@
   "displayName": "UP9",
   "publisher": "up9",
   "description": "",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "engines": {
     "vscode": "^1.61.0"
   },
@@ -24,7 +24,7 @@
     "commands": [
       {
         "command": "up9.openTestsBrowser",
-        "title": "UP9: Open Tests Browser"
+        "title": "UP9: Open Code Browser"
       },
       {
         "command": "up9.runTest",
