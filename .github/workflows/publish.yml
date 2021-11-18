@@ -1,0 +1,31 @@
+name: publish
+
+on:
+  push:
+    branches:
+      - 'develop'
+      - 'main'
+
+jobs:
+  Make_VSIX:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '16.13.x'
+    - run: npm install -g vsce
+    - run: npm install
+    - name: Setup webview depedencies
+      run: npm run setup-browser
+    - name: Make vsix
+      run: vsce package
+    - name: publish
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: "./*.vsix"
+          commit: $GITHUB_SHA
+          tag: prerelease
+          prerelease: true
+          bodyFile: './README.md'
