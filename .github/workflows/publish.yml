@@ -15,9 +15,6 @@ jobs:
       with:
         node-version: '16.13.x'
     - run: npm install -g vsce
-    - run: npm install
-    - name: Setup webview depedencies
-      run: npm run setup-browser
     - name: Make vsix
       run: vsce package
     - name: publish
@@ -26,6 +23,4 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         artifacts: "./*.vsix"
         commit: $GITHUB_SHA
-        tag: prerelease
         prerelease: true
-        bodyFile: './README.md'
