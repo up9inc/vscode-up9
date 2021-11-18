@@ -21,11 +21,11 @@ jobs:
     - name: Make vsix
       run: vsce package
     - name: publish
-        uses: ncipollo/release-action@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: "./*.vsix"
-          commit: $GITHUB_SHA
-          tag: prerelease
-          prerelease: true
-          bodyFile: './README.md'
+      uses: ncipollo/release-action@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        artifacts: "./*.vsix"
+        commit: $GITHUB_SHA
+        tag: prerelease
+        prerelease: true
+        bodyFile: './README.md'
