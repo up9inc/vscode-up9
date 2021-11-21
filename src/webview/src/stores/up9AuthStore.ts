@@ -4,9 +4,7 @@ class UP9AuthStore {
     up9Env: string;
     clientId: string;
     clientSecret: string;
-    token: string;
     authError: string;
-    isAuthOk: boolean;
     isAuthConfigured: boolean; //indicates whether user intervention is necessary for authentication
 
     constructor() {
@@ -14,14 +12,12 @@ class UP9AuthStore {
             up9Env: observable,
             clientId: observable,
             clientSecret: observable,
-            token: observable,
             authError: observable,
             isAuthConfigured: observable,
 
             setUP9Env: action,
             setClientId: action,
             setClientSecret: action,
-            setToken: action,
             setAuthError: action,
             setIsAuthConfigured: action
         });
@@ -37,10 +33,6 @@ class UP9AuthStore {
 
     setClientSecret(clientSecret: string) {
         this.clientSecret = clientSecret;
-    }
-
-    setToken(token: string) {
-        this.token = token;
     }
 
     setAuthError(authError: string) {

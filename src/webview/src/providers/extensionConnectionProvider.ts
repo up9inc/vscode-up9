@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import {up9AuthStore} from "../stores/up9AuthStore";
+import { WebViewApiMessage, MessageCommandType, ApiMessageType } from "../../../models/internal";
 
 let isDebug = false;
 
@@ -11,11 +12,10 @@ if (!("acquireVsCodeApi" in window)) {
 
 
     // for development
-    // up9AuthStore.setIsAuthConfigured(true);
-    // up9AuthStore.setToken("aaaaaa");
-    // up9AuthStore.setUP9Env("auth.stg.testr.io");
-    // up9AuthStore.setClientId("aaaaaa");
-    // up9AuthStore.setClientSecret("aaaaaa");
+    up9AuthStore.setIsAuthConfigured(true);
+    up9AuthStore.setUP9Env("auth.stg.testr.io");
+    up9AuthStore.setClientId("aaaaaa");
+    up9AuthStore.setClientSecret("aaaaaa");
     isDebug = true;
 }
 
@@ -29,45 +29,36 @@ we try to make it more convinient by handling requests with promises using this 
 these contain events for resolving/rejecting their parent promises.
 This way we can work with normal async functions despite us having to use one event listener for all panel <-> extension communications
 */
+const openApiMessages = {};
 
-//TODO: change terminology to `message` to be less confusing with http requests
-const openApiRequests = {};
-
-export enum ApiRequestTypes {
-    WorkspacesList = "workspaceList",
-    EndpointsList = "endpointList",
-    EndpointTests = "endpointTests"
-}
-
-export const sendApiRequest = (requestType: ApiRequestTypes, params: object): Promise<any> => {
+export const sendApiMessage = (messageType: ApiMessageType, params: object): Promise<any> => {
     if (isDebug) {
-        return getDebugReply(requestType);
+        return getDebugReply(messageType);
     }
     return new Promise<any>((resolve, reject) => {
-        const requestId = uuidv4(); //unique identifier is later used by the `window.addEventListener` to trigger the correct request's callbacks
-        const request = {
-            requestId,
-            requestType,
+        const apiMessageId = uuidv4(); //unique identifier is later used by the `window.addEventListener` to trigger the correct messages's callbacks
+        const apiMessage = {
+            apiMessageId,
+            messageType,
             params,
             onComplete: (apiResponse: any) => resolve(apiResponse),
             onError: (error: any) => reject(error)
         };
-        console.log('request', request);
-        openApiRequests[requestId] = request;
+        openApiMessages[apiMessageId] = apiMessage;
         vsCodeApi.postMessage({
-            requestId,
-            requestType,
+            apiMessageId,
+            messageType,
             params,
-            command: 'apiRequest' //used by the "background" extension to tell what kind of command this is
-        });
+            command: MessageCommandType.ApiRequest //used by the "background" extension to tell what kind of command this is
+        } as WebViewApiMessage);
     });
 }
 
 
-export const getDebugReply = (requestType: ApiRequestTypes): Promise < any > => {
+export const getDebugReply = (apiMessageType: ApiMessageType): Promise < any > => {
     let response;
-    switch (requestType) {
-        case ApiRequestTypes.EndpointTests:
+    switch (apiMessageType) {
+        case ApiMessageType.EndpointTests:
             response = {
                 "headerCode": "from up9lib import *\nfrom authentication import authenticate\n\n# logging.basicConfig(level=logging.DEBUG)\n\n",
                 "tests": [{
@@ -123,7 +114,7 @@ export const getDebugReply = (requestType: ApiRequestTypes): Promise < any > => 
                 ]
             };
             break;
-        case ApiRequestTypes.EndpointsList:
+        case ApiMessageType.EndpointsList:
             response = [
                 {
                   "ctype": "text/html",
@@ -614,7 +605,7 @@ export const getDebugReply = (requestType: ApiRequestTypes): Promise < any > => 
                 }
               ]
             break;
-        case ApiRequestTypes.WorkspacesList:
+        case ApiMessageType.WorkspacesList:
             response = ["rb-reg", "test", "workspace-b"];
             break;
     }
@@ -623,7 +614,7 @@ export const getDebugReply = (requestType: ApiRequestTypes): Promise < any > => 
 
 export const startNewAuth = (up9Env: string, clientId: string, clientSecret: string) => {
     vsCodeApi.postMessage({
-        command: 'startAuth',
+        command: MessageCommandType.StartAuth,
         up9Env,
         clientId,
         clientSecret
@@ -632,7 +623,7 @@ export const startNewAuth = (up9Env: string, clientId: string, clientSecret: str
 
 export const SendInfoToast = (text: string) => {
   vsCodeApi.postMessage({
-    command: 'infoAlert',
+    command: MessageCommandType.InfoAlert,
     text
 });
 }
@@ -642,27 +633,26 @@ window.addEventListener('message', event => {
     console.log('received message', event.data);
     const message = event.data;
     switch (message.command) {
-        case 'authError':
+        case MessageCommandType.AuthError:
             console.log('received authError', message);
             up9AuthStore.setAuthError(message.authError?.message ?? "unknown error occured");
             up9AuthStore.setIsAuthConfigured(false);
             break;
-        case 'authResponse':
+        case MessageCommandType.AuthSuccess:
             console.log('received authResponse', message);
-            up9AuthStore.setToken(message.token);
             up9AuthStore.setAuthError(null);
             up9AuthStore.setIsAuthConfigured(true);
             break;
-        case 'savedData':
+        case MessageCommandType.SavedData:
             console.log('received savedData', message);
             up9AuthStore.setUP9Env(message.data.auth.up9Env);
             up9AuthStore.setClientId(message.data.auth.clientId);
             up9AuthStore.setClientSecret(message.data.auth.clientSecret);
             up9AuthStore.setIsAuthConfigured(true);
             break;
-        case 'apiResponse':
+        case MessageCommandType.ApiResponse:
             console.log('received apiResponse', message);
-            const requestMessage = openApiRequests[message.data.requestId];
+            const requestMessage = openApiMessages[message.data.apiMessageId];
             if (!requestMessage) {
                 console.error("received message from extension with no local message object", message);
             } else {

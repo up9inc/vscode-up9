@@ -1,5 +1,4 @@
 import { AxiosResponse } from 'axios';
-import { UP9Auth } from './up9Auth';
 import * as vscode from 'vscode';
 import { clientIdConfigKey, clientSecretConfigKey, defaultWorkspaceConfigKey, envConfigKey, up9ConfigSectionName } from './consts';
 

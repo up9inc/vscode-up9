@@ -4,14 +4,15 @@ import {up9AuthStore} from "../stores/up9AuthStore";
 import {startNewAuth} from "../providers/extensionConnectionProvider";
 import {Container, Form, Button} from "react-bootstrap";
 
-
-
 const AuthComponent: React.FC<{}> = observer(() => {
-    const [up9EnvInput, setUP9EnvInput] = useState("");
-    const [clientIdInput, setClientIdInput] = useState("");
-    const [clientSecretInput, setClientSecretInput] = useState("");
+    const [up9EnvInput, setUP9EnvInput] = useState(up9AuthStore.up9Env ?? "");
+    const [clientIdInput, setClientIdInput] = useState(up9AuthStore.clientId ?? "");
+    const [clientSecretInput, setClientSecretInput] = useState(up9AuthStore.clientSecret ?? "");
 
     const doAuth = () => {
+        up9AuthStore.setUP9Env(up9EnvInput);
+        up9AuthStore.setClientId(clientIdInput);
+        up9AuthStore.setClientSecret(clientSecretInput);
         startNewAuth(up9EnvInput, clientIdInput, clientSecretInput);
     };
 
@@ -48,7 +49,7 @@ const AuthComponent: React.FC<{}> = observer(() => {
         </Form.Group>
         
         {up9AuthStore.authError && <p style={{"color": "red"}}>{up9AuthStore.authError}</p>}
-        {up9AuthStore.token && up9AuthStore.setIsAuthConfigured && <p style={{"color": "green"}}>Authenticated successfully</p>}
+        {up9AuthStore.isAuthConfigured && <p style={{"color": "green"}}>Authenticated successfully</p>}
 
         <Button onClick={doAuth} className="login-button">Login</Button>
     </Container>;

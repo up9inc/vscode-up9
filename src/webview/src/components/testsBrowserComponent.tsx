@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import {observer} from "mobx-react";
 import { up9AuthStore } from "../stores/up9AuthStore";
-import {ApiRequestTypes, sendApiRequest, SendInfoToast} from "../providers/extensionConnectionProvider";
+import {sendApiMessage, SendInfoToast} from "../providers/extensionConnectionProvider";
+import { ApiMessageType } from "../../../models/internal";
 import {Form, Container, Row, Col, Button, Card} from 'react-bootstrap';
 import { isHexColorDark, unindentString } from "../utils";
 import { v4 as uuidv4 } from 'uuid';
@@ -20,11 +21,12 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
     const [endpoints, setEndpoints] = useState(null);
     const [selectedEndpoint, setSelectedEndpoint] = useState("");
 
+    const [testsLoaded, setTestsLoaded] = useState(false);
     const [endpointTest, setEndpointTest] = useState(null);
 
     const editorBackgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--vscode-editor-background');
 
-    const [isThemeDark, setIsThemeDark] = useState(isHexColorDark(editorBackgroundColor));
+    const [isThemeDark, setIsThemeDark] = useState(null);
 
     useEffect(() => {
         setIsThemeDark(isHexColorDark(editorBackgroundColor))
@@ -32,7 +34,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
 
     const refreshWorkspaces = async () => {
         try {
-            const workspaces = await sendApiRequest(ApiRequestTypes.WorkspacesList, null);
+            const workspaces = await sendApiMessage(ApiMessageType.WorkspacesList, null);
             setWorkspaces(workspaces);
         } catch(error) {
             console.log(error);
@@ -45,7 +47,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             setEndpoints(null);
             if (selectedWorkspace) {
                 try {
-                    const endpoints = await sendApiRequest(ApiRequestTypes.EndpointsList, {workspaceId: selectedWorkspace});
+                    const endpoints = await sendApiMessage(ApiMessageType.EndpointsList, {workspaceId: selectedWorkspace});
                     setEndpoints(endpoints);
                 } catch (error) {
                     console.log('error loading endpoints', error);
@@ -57,11 +59,13 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
     useEffect(() => {
         (async () => {
             setEndpointTest(null);
+            setTestsLoaded(false);
             if (selectedEndpoint) {
                 try {
-                    const tests = await sendApiRequest(ApiRequestTypes.EndpointTests, {workspaceId: selectedWorkspace, spanGuid: selectedEndpoint});
+                    const tests = await sendApiMessage(ApiMessageType.EndpointTests, {workspaceId: selectedWorkspace, spanGuid: selectedEndpoint});
+                    setTestsLoaded(true);
                     if (tests?.tests?.length < 1) {
-                        setEndpointTest({}); //TODO: find better way to mark no test found
+                        return;
                     }
                     let test = tests.tests.find(t => t.tag == "minimal");
                     if (!test) {
@@ -72,21 +76,20 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                     test.uuid = uuidv4(); //for react Key prop
 
                     setEndpointTest(test);
-                    console.log('test', test);
                 } catch (error) {
                     console.log('error loading tests', error);
+                    setTestsLoaded(false);
                 }
             }
         })()
     }, [selectedEndpoint]);
 
     useEffect(() => {
-        if (up9AuthStore.up9Env) {
-            setSelectedWorkspace("");
-
+        setSelectedWorkspace("");
+        if (up9AuthStore.up9Env && up9AuthStore.isAuthConfigured) {
             refreshWorkspaces()
         }
-    }, [up9AuthStore.up9Env]);
+    }, [up9AuthStore.up9Env, up9AuthStore.isAuthConfigured]);
 
     const copyToClipboard = (text: string) => {
         SendInfoToast("Test code copied to clipboard");
@@ -138,7 +141,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             </Container>
             </div>
             </>}
-            {endpointTest == {} && <p>No test code found for this endpoint</p>}
+            {(testsLoaded && !endpointTest) && <p>No test code found for this endpoint</p>}
         </div>;
 });
 
