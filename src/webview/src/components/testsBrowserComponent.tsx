@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {observer} from "mobx-react";
 import { up9AuthStore } from "../stores/up9AuthStore";
 import {sendApiMessage, SendInfoToast} from "../providers/extensionConnectionProvider";
 import { ApiMessageType } from "../../../models/internal";
-import {Form, Container, Row, Col, Button, Card} from 'react-bootstrap';
+import {Form, FormControl, Dropdown, Container, Row, Col, Button, Card} from 'react-bootstrap';
 import { isHexColorDark, unindentString } from "../utils";
 import { v4 as uuidv4 } from 'uuid';
 
@@ -13,12 +13,13 @@ import "ace-builds/src-noconflict/mode-python";
 import "ace-builds/src-noconflict/theme-chaos";
 import "ace-builds/src-noconflict/theme-chrome";
 
-
 const TestsBrowserComponent: React.FC<{}> = observer(() => {
     const [workspaces, setWorkspaces] = useState(null);
+    const [workspaceFilterInput, setWorkspaceFilterInput] = useState("");
     const [selectedWorkspace, setSelectedWorkspace] = useState("");
 
     const [endpoints, setEndpoints] = useState(null);
+    const [endpointFilterInput, setendpointFilterInput] = useState("");
     const [selectedEndpoint, setSelectedEndpoint] = useState("");
 
     const [testsLoaded, setTestsLoaded] = useState(false);
@@ -28,11 +29,30 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
 
     const [isThemeDark, setIsThemeDark] = useState(null);
 
+    const getEndpointDisplayText = (endpoint) => {
+        return `${endpoint.method.toUpperCase()} ${endpoint.service}${endpoint.path}`;
+    }
+
+    const filteredEndpoints = useMemo(() => {
+        if (!endpoints || !endpointFilterInput) {
+            return endpoints;
+        }
+        return endpoints.filter(endpoint => getEndpointDisplayText(endpoint).toLocaleLowerCase().indexOf(endpointFilterInput) > -1);
+    }, [endpoints, endpointFilterInput]);
+
+    const filteredWorkspaces = useMemo(() => {
+        if (!workspaces || !workspaceFilterInput) {
+            return workspaces;
+        }
+        return workspaces.filter(workspace => workspace.toLocaleLowerCase().indexOf(workspaceFilterInput) > -1);
+    }, [workspaces, workspaceFilterInput]);
+
     useEffect(() => {
         setIsThemeDark(isHexColorDark(editorBackgroundColor))
     }, [editorBackgroundColor]);
 
     const refreshWorkspaces = async () => {
+        setWorkspaceFilterInput("");
         try {
             const workspaces = await sendApiMessage(ApiMessageType.WorkspacesList, null);
             setWorkspaces(workspaces);
@@ -44,6 +64,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
     useEffect(() => {
         (async () => {
             setSelectedEndpoint("");
+            setendpointFilterInput("");
             setEndpoints(null);
             if (selectedWorkspace) {
                 try {
@@ -96,22 +117,41 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
         navigator.clipboard.writeText(text)
     }
 
+    // TODO: refactor this
+    // ugly workaround for having the dropdowns apply focus to the filter form repeatedly
+    const [isWorkspaceDropDownOpen, setIsWorkspaceDropDownOpen] = useState(false);
+    const [isEndpointsDropdownOpen, setIsEndpointsDropdownOpen] = useState(false);
+
     return <div>
             <div className="select-test-form">
                 <Form.Group className="workspaces-form-group">
                     <Form.Label>Workspace</Form.Label>
-                    <Form.Select value={selectedWorkspace} placeholder="Select a workspace..." onChange={e => setSelectedWorkspace(e.target.value)}>
-                        <option hidden>Select a workspace</option>
-                        {workspaces?.map((workspace) => {return <option key={workspace} value={workspace}>{workspace}</option>})}
-                    </Form.Select>
+                    <br/>
+                    <Dropdown className="select-dropdown" onToggle={(isOpen, _) => setIsWorkspaceDropDownOpen(isOpen)}>
+                        <Dropdown.Toggle>
+                            {selectedWorkspace ? selectedWorkspace : "Select a workspace"}
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                            {isWorkspaceDropDownOpen && <FormControl className="dropdown-filter" autoFocus placeholder="Type to filter..." value={workspaceFilterInput} onChange={e => setWorkspaceFilterInput(e.target.value)} />}
+                            <Dropdown.Divider/>
+                            {filteredWorkspaces?.map((workspace) => {return <Dropdown.Item key={workspace} onClick={_ => {setWorkspaceFilterInput(""); setSelectedWorkspace(workspace)}}>{workspace}</Dropdown.Item>})}
+                        </Dropdown.Menu>
+                    </Dropdown>
                 </Form.Group>
 
                 <Form.Group className="endpoints-form-group">
                     <Form.Label>Endpoint</Form.Label>
-                    <Form.Select value={selectedEndpoint} onChange={e => setSelectedEndpoint(e.target.value)} disabled={!selectedWorkspace}>
-                    <option hidden>Select a service endpoint</option>
-                    {endpoints?.map((endpoint) => {return <option key={endpoint.uuid} value={endpoint.uuid}>{`${endpoint.method.toUpperCase()} ${endpoint.service}${endpoint.path}`}</option>})}
-                    </Form.Select>
+                    <br/>
+                    <Dropdown className="select-dropdown" onToggle={(isOpen, _) => setIsEndpointsDropdownOpen(isOpen)}>
+                        <Dropdown.Toggle disabled={!selectedWorkspace}>
+                            {selectedEndpoint ? selectedEndpoint : "Select an endpoint"}
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                            {isEndpointsDropdownOpen && <FormControl className="dropdown-filter" autoFocus placeholder="Type to filter..." value={endpointFilterInput} onChange={e => setendpointFilterInput(e.target.value)} />}
+                            <Dropdown.Divider/>
+                            {filteredEndpoints?.map((endpoint) => {return <Dropdown.Item key={endpoint.uuid} onClick={_ => {setendpointFilterInput(""); setSelectedEndpoint(endpoint.uuid)}}>{getEndpointDisplayText(endpoint)}</Dropdown.Item>})}
+                        </Dropdown.Menu>
+                    </Dropdown>
                 </Form.Group>
             </div>
             {endpointTest && <>
