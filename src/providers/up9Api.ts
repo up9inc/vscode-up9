@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Workspace, TestResponse, Endpoint } from '../model';
+import { Workspace, TestResponse, Endpoint } from '../models/up9';
 import {raiseForBadResponse} from'../utils';
 
 export class UP9ApiProvider {

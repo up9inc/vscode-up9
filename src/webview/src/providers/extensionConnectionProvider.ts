@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import {up9AuthStore} from "../stores/up9AuthStore";
+import { WebViewApiMessage, ApiMessageType } from "../../../models/internal";
 
 let isDebug = false;
 
@@ -30,13 +31,7 @@ This way we can work with normal async functions despite us having to use one ev
 */
 const openApiMessages = {};
 
-export enum ApiMessageTypes {
-    WorkspacesList = "workspaceList",
-    EndpointsList = "endpointList",
-    EndpointTests = "endpointTests"
-}
-
-export const sendApiMessage = (messageType: ApiMessageTypes, params: object): Promise<any> => {
+export const sendApiMessage = (messageType: ApiMessageType, params: object): Promise<any> => {
     if (isDebug) {
         return getDebugReply(messageType);
     }
@@ -55,15 +50,15 @@ export const sendApiMessage = (messageType: ApiMessageTypes, params: object): Pr
             messageType,
             params,
             command: 'apiRequest' //used by the "background" extension to tell what kind of command this is
-        });
+        } as WebViewApiMessage);
     });
 }
 
 
-export const getDebugReply = (apiMessageType: ApiMessageTypes): Promise < any > => {
+export const getDebugReply = (apiMessageType: ApiMessageType): Promise < any > => {
     let response;
     switch (apiMessageType) {
-        case ApiMessageTypes.EndpointTests:
+        case ApiMessageType.EndpointTests:
             response = {
                 "headerCode": "from up9lib import *\nfrom authentication import authenticate\n\n# logging.basicConfig(level=logging.DEBUG)\n\n",
                 "tests": [{
@@ -119,7 +114,7 @@ export const getDebugReply = (apiMessageType: ApiMessageTypes): Promise < any > 
                 ]
             };
             break;
-        case ApiMessageTypes.EndpointsList:
+        case ApiMessageType.EndpointsList:
             response = [
                 {
                   "ctype": "text/html",
@@ -610,7 +605,7 @@ export const getDebugReply = (apiMessageType: ApiMessageTypes): Promise < any > 
                 }
               ]
             break;
-        case ApiMessageTypes.WorkspacesList:
+        case ApiMessageType.WorkspacesList:
             response = ["rb-reg", "test", "workspace-b"];
             break;
     }

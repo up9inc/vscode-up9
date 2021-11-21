@@ -7,7 +7,6 @@ import {
 const testBrowserCommandName = 'up9.openTestsBrowser';
 const runTestInCloudCommandName = 'up9.runTest';
 
-
 function onShowTestBrowserCommand(context: vscode.ExtensionContext): void {
     UP9Panel.createOrShow(context)
 }

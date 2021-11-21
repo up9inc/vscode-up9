@@ -5,7 +5,7 @@ export class UP9ApiProvider {
     private readonly up9Env: string
 
     constructor(up9Env: string) {
-        this.up9Env = up9Env.replace('auth.', 'trcc.'); //TODO: refactor this
+        this.up9Env = up9Env.replace('auth.', 'trcc.'); //TODO: refactor this (will probably be easier following move to user login based auth)
     }
 
     public getWorkspaces = async (token: string): Promise<string[]> => {

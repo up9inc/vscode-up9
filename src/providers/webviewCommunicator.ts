@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { UP9ApiProvider } from './up9Api';
 import { UP9Auth } from './up9Auth';
 import { readUP9CredsFromConfig, saveUP9CredsToConfig } from '../utils';
+import { WebViewApiMessage } from '../models/internal';
 
 
 // this class is the only link the webview has to the "outside world", the webview is limited by CORS which means all up9 api https requests have to go through here where CORS isnt an issue.
@@ -82,14 +83,13 @@ export class UP9WebviewCommunicator {
             });
     }
 
-    private handlePanelUP9APIRequest = async (messageData) => {
+    private handlePanelUP9APIRequest = async (messageData: WebViewApiMessage) => {
         if (!this._apiProvider || !this._authProvider) {
             console.error('panel attempted to send http request when apiProvider or auth provider are null');
             return;
         }
         let token = await this._authProvider.getToken();
         try {
-            //TODO: fix loose typings and magic strings
             switch (messageData.messageType) {
                 case "workspaceList":
                     const workspaces = await this._apiProvider.getWorkspaces(token);
@@ -110,7 +110,7 @@ export class UP9WebviewCommunicator {
         }
     }
 
-    private handlePanelUP9ApiResponse = (panelMessageData, apiResponse, error) => {
+    private handlePanelUP9ApiResponse = (panelMessageData: WebViewApiMessage, apiResponse, error) => {
         const replyMessage = {
             apiMessageId: panelMessageData.apiMessageId,
             messageType: panelMessageData.messageType,
