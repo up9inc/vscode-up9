@@ -29,6 +29,7 @@ suite('Run In UP9 Command', () => {
     const clientSecret = process.env.UP9_CLIENT_SECRET;
     const defaultWorkspace = process.env.DEFAULT_WORKSPACE;
 
+    // initialize extension config
     const up9ConfigSection = vscode.workspace.getConfiguration(up9ConfigSectionName);
     await up9ConfigSection.update(envConfigKey, up9Env, vscode.ConfigurationTarget.Global);
     await up9ConfigSection.update(clientIdConfigKey, clientId, vscode.ConfigurationTarget.Global);
@@ -39,8 +40,13 @@ suite('Run In UP9 Command', () => {
     extensionContext = await extension.activate();
   });
 
-  after(() => {
-    vscode.window.showInformationMessage('All tests done!');
+  after(async () => {
+    // reset extension config
+    const up9ConfigSection = vscode.workspace.getConfiguration(up9ConfigSectionName);
+    await up9ConfigSection.update(envConfigKey, "", vscode.ConfigurationTarget.Global);
+    await up9ConfigSection.update(clientIdConfigKey, "", vscode.ConfigurationTarget.Global);
+    await up9ConfigSection.update(clientSecretConfigKey, "", vscode.ConfigurationTarget.Global);
+    await up9ConfigSection.update(defaultWorkspaceConfigKey, "", vscode.ConfigurationTarget.Global);
   });
 
   test('Run passing tests', async function() { 
