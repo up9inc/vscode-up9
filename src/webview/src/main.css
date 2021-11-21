@@ -18,6 +18,50 @@ hr {
 	color: var(--vscode-input-foreground);
 }
 
+.select-dropdown {
+	width: 100%;
+}
+
+.select-dropdown .dropdown-menu {
+	width: 100%;
+}
+
+.dropdown-filter {
+	width: calc(100% - 24px);
+	margin: 0 12px;
+}
+
+.select-dropdown button {
+	width:100%;
+	text-align: left;
+	padding-right: 4px;
+	outline: none !important;
+	border: none !important;
+}
+
+.show>.btn-primary.dropdown-toggle {
+	background: var(--vscode-input-background);
+	color: var(--vscode-input-foreground);
+}
+
+.select-dropdown button::after {
+	float: right;
+	margin-top: 0.6em;
+}
+
+.select-dropdown .dropdown-item {
+	background: var(--vscode-input-background);
+	color: var(--vscode-input-foreground);
+	border: none !important;
+	box-shadow: none !important;
+	outline: none !important;
+}
+
+.select-dropdown .dropdown-item:focus, .select-dropdown .dropdown-item:hover {
+	background: var(--vscode-button-background);
+	color: var(--vscode-button-foreground);
+}
+
 .workspaces-form-group {
 	flex-grow: 1;
 	flex-shrink: 1;
@@ -390,10 +434,11 @@ div.appRoot > header {
     border-radius: 0;
 }
 
-.btn:hover, btn:focus {
+.btn:hover, btn:focus, .btn-primary:disabled, .btn-primary {
     color: var(--vscode-breadcrumb-focusForeground);
     background: var(--vscode-input-background);
     border: 1px solid var(--vscode-focusBorder);
+	box-shadow: none !important;
 }
 
 .textInput {
