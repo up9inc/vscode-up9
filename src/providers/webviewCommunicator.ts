@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { UP9ApiProvider } from './up9Api';
 import { UP9Auth } from './up9Auth';
 import { readUP9CredsFromConfig, saveUP9CredsToConfig } from '../utils';
-import { WebViewApiMessage } from '../models/internal';
+import { WebViewApiMessage, MessageCommandType, ApiMessageType } from '../models/internal';
 
 
 // this class is the only link the webview has to the "outside world", the webview is limited by CORS which means all up9 api https requests have to go through here where CORS isnt an issue.
@@ -20,26 +20,26 @@ export class UP9WebviewCommunicator {
             message => {
                 console.log('received message', message);
                 switch (message.command) {
-                    case 'alert':
+                    case MessageCommandType.Alert:
                         vscode.window.showErrorMessage(message.text);
                         break;
-                    case 'infoAlert':
+                    case MessageCommandType.InfoAlert:
                         vscode.window.showInformationMessage(message.text);
                         break;
-                    case 'startAuth':
+                    case MessageCommandType.StartAuth:
                         (async () => {
                             try {
                                 await this.applyAuthenticationCredentials(message.up9Env, message.clientId, message.clientSecret)
                                 await saveUP9CredsToConfig(message.up9Env, message.clientId, message.clientSecret);
                             } catch (error) {
                                 this._panel.webview.postMessage({
-                                    command: 'authError',
+                                    command: MessageCommandType.AuthError,
                                     authError: error
                                 });
                             }
                         })();
                         break;
-                    case 'apiRequest':
+                    case MessageCommandType.ApiRequest:
                         this.handlePanelUP9APIRequest(message);
                         break;
                 }
@@ -57,11 +57,11 @@ export class UP9WebviewCommunicator {
             await this._authProvider.getToken();
 
             this._panel.webview.postMessage({
-                command: 'authSuccess'
+                command: MessageCommandType.AuthSuccess
             });
         } catch (error) {
             this._panel.webview.postMessage({
-                command: 'authError',
+                command: MessageCommandType.AuthError,
                 authError: error
             });
             console.error('error getting token with supplied credentials', error);
@@ -73,7 +73,7 @@ export class UP9WebviewCommunicator {
             .then(storedAuthCredentials => {
                 if (storedAuthCredentials.clientId) {
                     this._panel.webview.postMessage({
-                        command: 'savedData',
+                        command: MessageCommandType.SavedData,
                         data: {
                             auth: storedAuthCredentials
                         }
@@ -91,15 +91,15 @@ export class UP9WebviewCommunicator {
         let token = await this._authProvider.getToken();
         try {
             switch (messageData.messageType) {
-                case "workspaceList":
+                case ApiMessageType.WorkspacesList:
                     const workspaces = await this._apiProvider.getWorkspaces(token);
                     this.handlePanelUP9ApiResponse(messageData, workspaces, null);
                     break;
-                case "endpointList":
+                case ApiMessageType.EndpointsList:
                     const endpoints = await this._apiProvider.getWorkspaceEndpoints(messageData.params.workspaceId, token);
                     this.handlePanelUP9ApiResponse(messageData, endpoints, null);
                     break;
-                case "endpointTests":
+                case ApiMessageType.EndpointTests:
                     const tests = await this._apiProvider.getTestsForSpan(messageData.params.workspaceId, messageData.params.spanGuid, token);
                     this.handlePanelUP9ApiResponse(messageData, tests, null);
                     break;
@@ -119,7 +119,7 @@ export class UP9WebviewCommunicator {
             error: error
         };
         this._panel.webview.postMessage({
-            command: 'apiResponse',
+            command: MessageCommandType.ApiResponse,
             data: replyMessage
         });
     }

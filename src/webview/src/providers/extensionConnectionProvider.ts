@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import {up9AuthStore} from "../stores/up9AuthStore";
-import { WebViewApiMessage, ApiMessageType } from "../../../models/internal";
+import { WebViewApiMessage, MessageCommandType, ApiMessageType } from "../../../models/internal";
 
 let isDebug = false;
 
@@ -49,7 +49,7 @@ export const sendApiMessage = (messageType: ApiMessageType, params: object): Pro
             apiMessageId,
             messageType,
             params,
-            command: 'apiRequest' //used by the "background" extension to tell what kind of command this is
+            command: MessageCommandType.ApiRequest //used by the "background" extension to tell what kind of command this is
         } as WebViewApiMessage);
     });
 }
@@ -614,7 +614,7 @@ export const getDebugReply = (apiMessageType: ApiMessageType): Promise < any > =
 
 export const startNewAuth = (up9Env: string, clientId: string, clientSecret: string) => {
     vsCodeApi.postMessage({
-        command: 'startAuth',
+        command: MessageCommandType.StartAuth,
         up9Env,
         clientId,
         clientSecret
@@ -623,7 +623,7 @@ export const startNewAuth = (up9Env: string, clientId: string, clientSecret: str
 
 export const SendInfoToast = (text: string) => {
   vsCodeApi.postMessage({
-    command: 'infoAlert',
+    command: MessageCommandType.InfoAlert,
     text
 });
 }
@@ -633,24 +633,24 @@ window.addEventListener('message', event => {
     console.log('received message', event.data);
     const message = event.data;
     switch (message.command) {
-        case 'authError':
+        case MessageCommandType.AuthError:
             console.log('received authError', message);
             up9AuthStore.setAuthError(message.authError?.message ?? "unknown error occured");
             up9AuthStore.setIsAuthConfigured(false);
             break;
-        case 'authSuccess':
+        case MessageCommandType.AuthSuccess:
             console.log('received authResponse', message);
             up9AuthStore.setAuthError(null);
             up9AuthStore.setIsAuthConfigured(true);
             break;
-        case 'savedData':
+        case MessageCommandType.SavedData:
             console.log('received savedData', message);
             up9AuthStore.setUP9Env(message.data.auth.up9Env);
             up9AuthStore.setClientId(message.data.auth.clientId);
             up9AuthStore.setClientSecret(message.data.auth.clientSecret);
             up9AuthStore.setIsAuthConfigured(true);
             break;
-        case 'apiResponse':
+        case MessageCommandType.ApiResponse:
             console.log('received apiResponse', message);
             const requestMessage = openApiMessages[message.data.apiMessageId];
             if (!requestMessage) {
