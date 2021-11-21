@@ -12,7 +12,6 @@ if (!("acquireVsCodeApi" in window)) {
 
     // for development
     up9AuthStore.setIsAuthConfigured(true);
-    up9AuthStore.setToken("aaaaaa");
     up9AuthStore.setUP9Env("auth.stg.testr.io");
     up9AuthStore.setClientId("aaaaaa");
     up9AuthStore.setClientSecret("aaaaaa");
@@ -644,9 +643,8 @@ window.addEventListener('message', event => {
             up9AuthStore.setAuthError(message.authError?.message ?? "unknown error occured");
             up9AuthStore.setIsAuthConfigured(false);
             break;
-        case 'authResponse':
+        case 'authSuccess':
             console.log('received authResponse', message);
-            up9AuthStore.setToken(message.token);
             up9AuthStore.setAuthError(null);
             up9AuthStore.setIsAuthConfigured(true);
             break;

@@ -27,7 +27,7 @@ export class CloudRunner {
             }
 
             try {
-                token = await up9Auth.getNewToken();
+                token = await up9Auth.getToken();
             } catch (error) {
                 console.error(error);
                 this.showSettingsError('UP9 authentication failed, check console for more details or check up9 extension configuration for errors');
@@ -92,7 +92,7 @@ export class CloudRunner {
     private getStoredUP9Auth = async (context: vscode.ExtensionContext): Promise<UP9Auth> => {
         const storedAuthCredentials = await readUP9CredsFromConfig();
         if (storedAuthCredentials) {
-            return new UP9Auth(storedAuthCredentials.up9Env, storedAuthCredentials.clientId, storedAuthCredentials.clientSecret, () => {}, (err) => {console.error(err)});
+            return new UP9Auth(storedAuthCredentials.up9Env, storedAuthCredentials.clientId, storedAuthCredentials.clientSecret);
         }
         return null;
     }

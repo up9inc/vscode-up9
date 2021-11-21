@@ -1,5 +1,5 @@
 import axios, {Method} from 'axios';
-import {raiseForBadResponse} from'./utils';
+import {raiseForBadResponse} from '../utils';
 
 const retryMs = 5000;
 
@@ -9,27 +9,19 @@ export class UP9Auth {
     private env: string;
     private clientId: string;
     private clientSecret: string;
-    private newTokenCallback: (token: string) => void;
-    private errorCallback: (error: any) => void;
+    private isExpired: boolean;
 
-    private timeout: any;
-
-    constructor(env: string, clientId: string, clientSecret: string, onNewToken: (token: string) => void, onError: (error: any) => void) {
+    constructor(env: string, clientId: string, clientSecret: string) {
         this.env = env;
         this.clientId = clientId;
         this.clientSecret = clientSecret;
-        this.newTokenCallback = onNewToken;
-        this.errorCallback = onError;
-        this.scheduleNewTokenRequest(0, true);
     }
 
-    public stop = () => {
-        clearTimeout(this.timeout);
-    };
+    public getToken = async (): Promise <string> => {
+        if (!this.isExpired && this.lastToken) {
+            return this.lastToken;
+        }
 
-
-    //TODO: replace isFirstTime with a test auth func
-    public getNewToken = async (isFirstTime?: boolean): Promise <string> => {
         try {
             const params = new URLSearchParams();
             params.append('grant_type', 'client_credentials');
@@ -42,40 +34,20 @@ export class UP9Auth {
             });
     
             if (response.status < 300 && response.status > 199) {
-                this.scheduleNewTokenRequest((response.data.expires_in * 1000) / 2);
-                this.newTokenCallback(response.data.access_token);
                 this.lastToken = response.data.access_token;
+                // mark token as expired in half the expiration period
+                setTimeout(() => this.isExpired = true, (response.data.expires_in * 1000) / 2);
                 return response.data.access_token;
             } else {
                 throw response;
             }
         } catch (err) {
             console.log(err);
-            this.errorCallback(err);
-            if (!isFirstTime)
-                this.scheduleNewTokenRequest(retryMs);
             throw err;
         }
     };
 
-    public makeAuthedRequest = async (url: string, method: string, headers: any, body: any): Promise<any> => {
-        const response = await axios.request({
-            url,
-            method: method as Method,
-            headers: {'Authorization': `Bearer ${this.lastToken}`, ...headers || {}},
-            data: body
-        });
-
-        raiseForBadResponse(response);
-
-        return response.data;
-    }
-
     public getEnv = (): string => {
         return this.env;
     }
-
-    private scheduleNewTokenRequest = (timeFromNowMs: number, isFirstTime?: boolean) => {
-        this.timeout = setTimeout(() => this.getNewToken(isFirstTime), timeFromNowMs);
-    };
 }
