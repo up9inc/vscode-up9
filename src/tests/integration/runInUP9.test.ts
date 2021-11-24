@@ -4,7 +4,7 @@ import { after, test, before } from 'mocha';
 import * as vscode from 'vscode';
 import { clientIdConfigKey, clientSecretConfigKey, defaultWorkspaceConfigKey, envConfigKey, up9ConfigSectionName, internalExtensionName } from '../../consts';
 import { onRunCodeInCloudCommand } from '../../extension';
-import { terminalLineDelimeter } from '../../commands/runInCloud';
+import { terminalLineDelimeter } from '../../providers/runInCloud';
 
 const validPythonTestFilePath = "/resources/";
 

@@ -17,7 +17,9 @@
   "icon": "images/logo128x128.png",
   "activationEvents": [
     "onCommand:up9.openTestsBrowser",
-    "onCommand:up9.runTest"
+    "onCommand:up9.runTest",
+    "onCommand:up9.startTelepresence",
+    "onCommand:up9.stopTelepresence"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -29,6 +31,14 @@
       {
         "command": "up9.runTest",
         "title": "UP9: Run Test Code With UP9"
+      },
+      {
+        "command": "up9.startTelepresence",
+        "title": "UP9: Start Telepresence"
+      },
+      {
+        "command": "up9.stopTelepresence",
+        "title": "UP9: Stop Telepresence"
       }
     ],
     "menus": {
