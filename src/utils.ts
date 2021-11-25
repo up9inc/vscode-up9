@@ -1,3 +1,4 @@
+import * as crypto from 'crypto';
 import { AxiosResponse } from 'axios';
 import * as vscode from 'vscode';
 import { clientIdConfigKey, clientSecretConfigKey, defaultWorkspaceConfigKey, envConfigKey, up9ConfigSectionName } from './consts';
@@ -34,3 +35,5 @@ export const getDefaultWorkspace = async (): Promise<string> => {
 }
 
 export const indentString = (str: string, count: number) => str.replace(/^/gm, ' '.repeat(count));
+
+export const randomString = (length: number) => crypto.randomBytes(length).toString('hex');

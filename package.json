@@ -17,7 +17,8 @@
   "icon": "images/logo128x128.png",
   "activationEvents": [
     "onCommand:up9.openTestsBrowser",
-    "onCommand:up9.runTest"
+    "onCommand:up9.runTest",
+    "onCommand:up9.testAuth"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -29,6 +30,10 @@
       {
         "command": "up9.runTest",
         "title": "UP9: Run Test Code With UP9"
+      },
+      {
+        "command": "up9.testAuth",
+        "title": "UP9: Test Auth"
       }
     ],
     "menus": {
@@ -51,18 +56,10 @@
         "title": "UP9 Extension Configuration",
         "order": 1,
         "properties": {
-          "up9.authEnv": {
+          "up9.env": {
             "type": "string",
-            "description": "UP9 auth url (must begin with http:// or https://)",
-            "default": "https://auth.up9.app"
-          },
-          "up9.clientId": {
-            "type": "string",
-            "description": "Client ID"
-          },
-          "up9.clientSecret": {
-            "type": "string",
-            "description": "Client Secret"
+            "description": "UP9 API Hostname",
+            "default": "stg.testr.io"
           },
           "up9.defaultWorkspace": {
             "type": "string",
@@ -75,8 +72,8 @@
   "scripts": {
     "setup-browser": "cd src/webview && npm install && cd ../../",
     "vscode:prepublish": "npm run compile",
-    "compile": "cd src/webview && npm run build && cd ../../ && tsc -p ./ && cp ./src/webview/dist/index.html ./out/",
-    "test-compile": "tsc -p ./",
+    "compile-full": "cd src/webview && npm run build && cd ../../ && tsc -p ./ && cp ./src/webview/dist/index.html ./out/",
+    "compile": "tsc -p ./",
     "pretest": "mkdir -p ./out/tests/integration/resources/ && cp -r ./src/tests/integration/resources/* ./out/tests/integration/resources/",
     "test": "node ./out/tests/integration/runIntegrationTests.js"
   },
@@ -97,6 +94,8 @@
     "webpack-cli": "^4.9.1"
   },
   "dependencies": {
-    "axios": "^0.24.0"
+    "axios": "^0.24.0",
+    "client-oauth2": "^4.3.3",
+    "open": "^8.4.0"
   }
 }
