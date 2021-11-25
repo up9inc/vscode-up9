@@ -1,4 +1,4 @@
-import { getDefaultWorkspace, indentString, readUP9CredsFromConfig } from "../utils";
+import { getDefaultWorkspace, indentString } from "../utils";
 import * as vscode from 'vscode';
 import { UP9Auth } from "../providers/up9Auth";
 import { UP9ApiProvider } from "../providers/up9Api";
@@ -8,26 +8,28 @@ const openUP9SettingsDialogOption = "Open UP9 Settings";
 export const terminalLineDelimeter = '\r\n';
 
 export class CloudRunner {
-    private context: vscode.ExtensionContext;
-    // used for tests as there is no way to get terminal contents via vscode api
-    private onTerminalEmitCallback: (terminalMessage: string) => void; 
+    private _context: vscode.ExtensionContext;
+    private _up9Auth: UP9Auth;
 
-    public constructor(context: vscode.ExtensionContext, onTerminalEmit?: (terminalMessage: string) => void) {
-        this.context = context;
-        this.onTerminalEmitCallback = onTerminalEmit;
+    // used for tests as there is no way to get terminal contents via vscode api
+    private _onTerminalEmitCallback: (terminalMessage: string) => void; 
+
+    public constructor(context: vscode.ExtensionContext, up9Auth: UP9Auth, onTerminalEmit?: (terminalMessage: string) => void) {
+        this._context = context;
+        this._up9Auth = up9Auth;
+        this._onTerminalEmitCallback = onTerminalEmit;
     }
 
     public startTestRun = (code: string): Promise<void> => {
         return new Promise<any>(async (resolve, reject) => {
-            const up9Auth = await this.getStoredUP9Auth(this.context);
             let token: string;
-            if (!up9Auth) {
-                this.showSettingsError('UP9 authentication hasn\'t been configured yet, please configure the up9 extension in vscode configuration');
-                return reject(Error("up9 auth not configured"));
-            }
+            // if (!up9Auth) { TODO: fix this if necessary, should point user to log in
+            //     this.showSettingsError('UP9 authentication hasn\'t been configured yet, please configure the up9 extension in vscode configuration');
+            //     return reject(Error("up9 auth not configured"));
+            // }
 
             try {
-                token = await up9Auth.getToken();
+                token = await this._up9Auth.getToken();
             } catch (error) {
                 console.error(error);
                 this.showSettingsError('UP9 authentication failed, check console for more details or check up9 extension configuration for errors');
@@ -43,7 +45,7 @@ export class CloudRunner {
 
             //TODO: reuse the same terminal (will require having only 1 simultaneous test run)
             const terminalOutputter = this.createAndShowTerminal("Running test through UP9...\n\r");
-            const up9Api = new UP9ApiProvider(up9Auth.getEnv());
+            const up9Api = new UP9ApiProvider(this._up9Auth.getEnv());
             try {
                 const res = await up9Api.testRunSingle(defaultWorkspace, indentString(code, 4), token);
                 if (!res.testLog) {
@@ -136,8 +138,8 @@ export class CloudRunner {
         const formattedMessage = text.replace(/\n/g, terminalLineDelimeter);
         terminalEmitter.fire(formattedMessage);
 
-        if (this.onTerminalEmitCallback) {
-            this.onTerminalEmitCallback(formattedMessage);
+        if (this._onTerminalEmitCallback) {
+            this._onTerminalEmitCallback(formattedMessage);
         }
     }
 }

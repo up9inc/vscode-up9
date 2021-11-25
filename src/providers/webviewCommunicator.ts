@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import { UP9ApiProvider } from './up9Api';
 import { UP9Auth } from './up9Auth';
-import { readUP9CredsFromConfig, saveUP9CredsToConfig } from '../utils';
 import { WebViewApiMessage, MessageCommandType, ApiMessageType } from '../models/internal';
 
 
@@ -11,8 +10,10 @@ export class UP9WebviewCommunicator {
     private _authProvider: UP9Auth;
     private _apiProvider: UP9ApiProvider;
 
-    public constructor(panel: vscode.WebviewPanel) {
+    public constructor(panel: vscode.WebviewPanel, up9Auth: UP9Auth) {
         this._panel = panel;
+        this._authProvider = up9Auth;
+        this._apiProvider = new UP9ApiProvider(up9Auth.getEnv()); //TODO: this has to reload somehow on config change, maybe theres a way to reset the extension completely on config change
     }
 
     public registerOnMessageListeners(disposables: vscode.Disposable[]) {
@@ -29,8 +30,7 @@ export class UP9WebviewCommunicator {
                     case MessageCommandType.StartAuth:
                         (async () => {
                             try {
-                                await this.applyAuthenticationCredentials(message.up9Env, message.clientId, message.clientSecret)
-                                await saveUP9CredsToConfig(message.up9Env, message.clientId, message.clientSecret);
+                                await this._authProvider.startNewAuthentication();
                             } catch (error) {
                                 this._panel.webview.postMessage({
                                     command: MessageCommandType.AuthError,
@@ -49,39 +49,39 @@ export class UP9WebviewCommunicator {
         );
     }
 
-    private applyAuthenticationCredentials = async (up9Env: string, clientId: string, clientSecret: string) => {
-        this._authProvider = new UP9Auth(up9Env, clientId, clientSecret);
-        this._apiProvider = new UP9ApiProvider(up9Env);
-        try {
-            // attempt to get token to verify all credentials work
-            await this._authProvider.getToken();
+    // private applyAuthenticationCredentials = async () => {
+    //     this._authProvider = new UP9Auth(up9Env, clientId, clientSecret);
+    //     this._apiProvider = new UP9ApiProvider(up9Env);
+    //     try {
+    //         // attempt to get token to verify all credentials work
+    //         await this._authProvider.getToken();
 
-            this._panel.webview.postMessage({
-                command: MessageCommandType.AuthSuccess
-            });
-        } catch (error) {
-            this._panel.webview.postMessage({
-                command: MessageCommandType.AuthError,
-                authError: error
-            });
-            console.error('error getting token with supplied credentials', error);
-        }
-    }
+    //         this._panel.webview.postMessage({
+    //             command: MessageCommandType.AuthSuccess
+    //         });
+    //     } catch (error) {
+    //         this._panel.webview.postMessage({
+    //             command: MessageCommandType.AuthError,
+    //             authError: error
+    //         });
+    //         console.error('error getting token with supplied credentials', error);
+    //     }
+    // }
 
-    public syncStoredCredentialsToWebView() {
-        readUP9CredsFromConfig()
-            .then(storedAuthCredentials => {
-                if (storedAuthCredentials.clientId) {
-                    this._panel.webview.postMessage({
-                        command: MessageCommandType.SavedData,
-                        data: {
-                            auth: storedAuthCredentials
-                        }
-                    });
-                    this.applyAuthenticationCredentials(storedAuthCredentials.up9Env, storedAuthCredentials.clientId, storedAuthCredentials.clientSecret);
-                }
-            });
-    }
+    // public syncStoredCredentialsToWebView() {
+    //     readUP9CredsFromConfig()
+    //         .then(storedAuthCredentials => {
+    //             if (storedAuthCredentials.clientId) {
+    //                 this._panel.webview.postMessage({
+    //                     command: MessageCommandType.SavedData,
+    //                     data: {
+    //                         auth: storedAuthCredentials
+    //                     }
+    //                 });
+    //                 this.applyAuthenticationCredentials(storedAuthCredentials.up9Env, storedAuthCredentials.clientId, storedAuthCredentials.clientSecret);
+    //             }
+    //         });
+    // }
 
     private handlePanelUP9APIRequest = async (messageData: WebViewApiMessage) => {
         if (!this._apiProvider || !this._authProvider) {

@@ -9,18 +9,29 @@ const retryMs = 5000;
 export const listenPorts = [3141, 4001, 5002, 6003, 7004, 8005, 9006, 10007];
 
 export class UP9Auth {
+    private static _instance: UP9Auth;
+
+
     private _env: string;
     private _extensionContext: vscode.ExtensionContext;
 
     private _token: ClientOAuth2.Token;
 
 
-    constructor(up9Env: string, extensionContext: vscode.ExtensionContext) {
+    public static async getInstance(up9Env: string, extensionContext: vscode.ExtensionContext): Promise<UP9Auth> {
+        if (!this._instance) {
+            this._instance = new UP9Auth(up9Env, extensionContext);
+            await this._instance.tryToLoadStoredToken();
+        }
+        return this._instance;
+    }
+
+    private constructor(up9Env: string, extensionContext: vscode.ExtensionContext) {
         this._env = up9Env;
         this._extensionContext = extensionContext;
     }
 
-    public getAccessTokenString = async(): Promise<string> => {
+    public getToken = async(): Promise<string> => {
         if (!this._token) {
             throw "not authenticated";
         }
