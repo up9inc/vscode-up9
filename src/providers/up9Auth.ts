@@ -17,7 +17,7 @@ export class UP9Auth {
 
     private _token: ClientOAuth2.Token;
 
-    private _onAuthListeners: (() => void)[] = [];
+    private _onAuthListeners: ((authStatus: boolean) => void)[] = [];
 
     public static async getInstance(up9Env: string, extensionContext: vscode.ExtensionContext): Promise<UP9Auth> {
         if (!this._instance) {
@@ -27,12 +27,12 @@ export class UP9Auth {
         return this._instance;
     }
 
-    public onAuth(listener: () => void) {
+    public onAuth(listener: (authStatus: boolean) => void) {
         this._onAuthListeners.push(listener);
     }
 
-    private callOnAuthListeners() {
-        this._onAuthListeners.forEach(listener => listener());
+    private callOnAuthListeners(authStatus: boolean) {
+        this._onAuthListeners.forEach(listener => listener(authStatus));
     }
 
     private constructor(up9Env: string, extensionContext: vscode.ExtensionContext) {
@@ -80,6 +80,14 @@ export class UP9Auth {
         await this._extensionContext.globalState.update(authEnvStorageKey, null);
     }
 
+    public signOut = async(): Promise<void> => {
+        await this.resetTokenStorage();
+        this._token = null;
+        this.callOnAuthListeners(false);
+
+        vscode.window.showInformationMessage("Signed out successfully");
+    }
+
     public tryToLoadStoredToken = async(): Promise<boolean> => {
         const storedTokenData = await this._extensionContext.globalState.get(authGlobalStorageKey) as ClientOAuth2.Data;
         if (storedTokenData) {
@@ -109,7 +117,7 @@ export class UP9Auth {
         this.saveTokenToStorage();
 
         vscode.window.showInformationMessage("Signed in to UP9 successfully");
-        this.callOnAuthListeners();
+        this.callOnAuthListeners(true);
     };
 
     public getEnv = (): string => {

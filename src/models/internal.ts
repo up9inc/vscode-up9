@@ -5,7 +5,8 @@ export enum MessageCommandType {
     ApiRequest = "apiRequest",
     ApiResponse = "apiResponse",
     AuthError = "authError",
-    AuthSuccess = "authSuccess"
+    AuthSuccess = "authSuccess",
+    AuthSignOut = "authSignOut",
 }
 
 export enum ApiMessageType {

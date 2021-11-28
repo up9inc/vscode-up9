@@ -650,6 +650,11 @@ window.addEventListener('message', event => {
                 }
             }
             break;
+        case MessageCommandType.AuthSignOut:
+            console.log('received authSignOut', message);
+            up9AuthStore.setAuthError(null);
+            up9AuthStore.setIsAuthConfigured(false);
+            break;
     }
 });
 

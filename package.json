@@ -18,7 +18,8 @@
   "activationEvents": [
     "onCommand:up9.openTestsBrowser",
     "onCommand:up9.runTest",
-    "onCommand:up9.testAuth"
+    "onCommand:up9.testAuth",
+    "onCommand:up9.signOut"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -34,6 +35,10 @@
       {
         "command": "up9.webAuth",
         "title": "UP9: Web Authentication"
+      },
+      {
+        "command": "up9.signOut",
+        "title": "UP9: Sign Out"
       }
     ],
     "menus": {
