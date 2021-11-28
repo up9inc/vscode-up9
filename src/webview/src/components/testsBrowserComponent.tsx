@@ -19,8 +19,8 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
     const [selectedWorkspace, setSelectedWorkspace] = useState("");
 
     const [endpoints, setEndpoints] = useState(null);
-    const [endpointFilterInput, setendpointFilterInput] = useState("");
-    const [selectedEndpoint, setSelectedEndpoint] = useState("");
+    const [endpointFilterInput, setEndpointFilterInput] = useState("");
+    const [selectedEndpoint, setSelectedEndpoint] = useState(null);
 
     const [testsLoaded, setTestsLoaded] = useState(false);
     const [endpointTest, setEndpointTest] = useState(null);
@@ -37,14 +37,14 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
         if (!endpoints || !endpointFilterInput) {
             return endpoints;
         }
-        return endpoints.filter(endpoint => getEndpointDisplayText(endpoint).toLocaleLowerCase().indexOf(endpointFilterInput) > -1);
+        return endpoints.filter(endpoint => getEndpointDisplayText(endpoint).toLocaleLowerCase().indexOf(endpointFilterInput.toLowerCase()) > -1);
     }, [endpoints, endpointFilterInput]);
 
     const filteredWorkspaces = useMemo(() => {
         if (!workspaces || !workspaceFilterInput) {
             return workspaces;
         }
-        return workspaces.filter(workspace => workspace.toLocaleLowerCase().indexOf(workspaceFilterInput) > -1);
+        return workspaces.filter(workspace => workspace.toLocaleLowerCase().indexOf(workspaceFilterInput.toLowerCase()) > -1);
     }, [workspaces, workspaceFilterInput]);
 
     useEffect(() => {
@@ -63,8 +63,8 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
 
     useEffect(() => {
         (async () => {
-            setSelectedEndpoint("");
-            setendpointFilterInput("");
+            setSelectedEndpoint(null);
+            setEndpointFilterInput("");
             setEndpoints(null);
             if (selectedWorkspace) {
                 try {
@@ -83,7 +83,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             setTestsLoaded(false);
             if (selectedEndpoint) {
                 try {
-                    const tests = await sendApiMessage(ApiMessageType.EndpointTests, {workspaceId: selectedWorkspace, spanGuid: selectedEndpoint});
+                    const tests = await sendApiMessage(ApiMessageType.EndpointTests, {workspaceId: selectedWorkspace, spanGuid: selectedEndpoint.uuid});
                     setTestsLoaded(true);
                     if (tests?.tests?.length < 1) {
                         return;
@@ -103,7 +103,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                 }
             }
         })()
-    }, [selectedEndpoint]);
+    }, [selectedEndpoint?.uuid]);
 
     useEffect(() => {
         setSelectedWorkspace("");
@@ -151,12 +151,12 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                     <br/>
                     <Dropdown className="select-dropdown" onToggle={(isOpen, _) => setIsEndpointsDropdownOpen(isOpen)}>
                         <Dropdown.Toggle disabled={!selectedWorkspace}>
-                            {selectedEndpoint ? selectedEndpoint : "Select an endpoint"}
+                            {selectedEndpoint ? getEndpointDisplayText(selectedEndpoint) : "Select an endpoint"}
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
-                            {isEndpointsDropdownOpen && <FormControl className="dropdown-filter" autoFocus placeholder="Type to filter..." value={endpointFilterInput} onChange={e => setendpointFilterInput(e.target.value)} />}
+                            {isEndpointsDropdownOpen && <FormControl className="dropdown-filter" autoFocus placeholder="Type to filter..." value={endpointFilterInput} onChange={e => setEndpointFilterInput(e.target.value)} />}
                             <Dropdown.Divider/>
-                            {filteredEndpoints?.map((endpoint) => {return <Dropdown.Item key={endpoint.uuid} onClick={_ => {setendpointFilterInput(""); setSelectedEndpoint(endpoint.uuid)}}>{getEndpointDisplayText(endpoint)}</Dropdown.Item>})}
+                            {filteredEndpoints?.map((endpoint) => {return <Dropdown.Item title={getEndpointDisplayText(endpoint)} key={endpoint.uuid} onClick={_ => {setEndpointFilterInput(""); setSelectedEndpoint(endpoint)}}>{getEndpointDisplayText(endpoint)}</Dropdown.Item>})}
                         </Dropdown.Menu>
                     </Dropdown>
                 </Form.Group>
@@ -165,7 +165,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             <hr/>
             <div className="tests-list-container">
             <Form.Group>
-                <Form.Label>Test code</Form.Label>
+                <Form.Label>Code</Form.Label>
             </Form.Group> 
             <Container>
                 <Card className="test-row">
@@ -188,7 +188,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             </Container>
             </div>
             </>}
-            {(testsLoaded && !endpointTest) && <p>No test code found for this endpoint</p>}
+            {(testsLoaded && !endpointTest) && <p>No code found for this endpoint</p>}
         </div>;
 });
 

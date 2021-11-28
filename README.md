@@ -30,7 +30,7 @@ This extension for Microsoft Visual Studio Code popular IDE allows developers ea
 
 * copy test sample code as it is
 * remove @xxx annotations 
-* right-click and select "UP9: Run Test Code with UP9" from the menu
+* right-click and select "UP9: Run Code with UP9" from the menu
 *  
 
 ## RUNNING CODE locally - Python

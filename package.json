@@ -30,7 +30,7 @@
       },
       {
         "command": "up9.runTest",
-        "title": "UP9: Run Test Code With UP9"
+        "title": "UP9: Run Code With UP9"
       },
       {
         "command": "up9.webAuth",
