@@ -80,8 +80,6 @@ export class UP9Panel {
 
         // Handle messages from the webview
         this._webviewCommunicator.registerOnMessageListeners(this._disposables);
-        // Load stored auth credentials in configuration into web view
-        // this._webviewCommunicator.syncStoredCredentialsToWebView(); //TODO: THIS
     }
 
     public dispose() {
