@@ -17,6 +17,7 @@ export class UP9Auth {
 
     private _token: ClientOAuth2.Token;
 
+    private _onAuthListeners: (() => void)[] = [];
 
     public static async getInstance(up9Env: string, extensionContext: vscode.ExtensionContext): Promise<UP9Auth> {
         if (!this._instance) {
@@ -27,6 +28,14 @@ export class UP9Auth {
             await this._instance.tryToLoadStoredToken();
         }
         return this._instance;
+    }
+
+    public onAuth(listener: () => void) {
+        this._onAuthListeners.push(listener);
+    }
+
+    private callOnAuthListeners() {
+        this._onAuthListeners.forEach(listener => listener());
     }
 
     private constructor(up9Env: string, extensionContext: vscode.ExtensionContext) {
@@ -101,7 +110,9 @@ export class UP9Auth {
     public startNewAuthentication = async(): Promise<void> => {
         this._token = await this.getTokenByWebApp(listenPorts, this._env);
         this.saveTokenToStorage();
+
         vscode.window.showInformationMessage("Signed in to UP9 successfully");
+        this.callOnAuthListeners();
     };
 
     public getEnv = (): string => {

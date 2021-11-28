@@ -14,9 +14,15 @@ export class UP9WebviewCommunicator {
         this._panel = panel;
         this._authProvider = up9Auth;
         this._apiProvider = new UP9ApiProvider(up9Auth.getEnv()); //TODO: this has to reload somehow on config change, maybe theres a way to reset the extension completely on config change
+
+        this._authProvider.onAuth(() => {
+            this._panel.webview.postMessage({
+                command: MessageCommandType.AuthSuccess
+            });
+        });
     }
 
-    public registerOnMessageListeners(disposables: vscode.Disposable[]) {
+    public async registerOnMessageListeners(disposables: vscode.Disposable[]): Promise<void> {
         this._panel.webview.onDidReceiveMessage(
             message => {
                 console.log('received message', message);
@@ -48,6 +54,12 @@ export class UP9WebviewCommunicator {
             null,
             disposables
         );
+
+        if (await this._authProvider.isAuthenticated()) {
+            this._panel.webview.postMessage({
+                command: MessageCommandType.AuthSuccess
+            });
+        }
     }
 
     private handlePanelUP9APIRequest = async (messageData: WebViewApiMessage) => {
