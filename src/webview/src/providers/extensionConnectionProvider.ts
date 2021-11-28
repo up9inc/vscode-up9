@@ -12,10 +12,7 @@ if (!("acquireVsCodeApi" in window)) {
 
 
     // for development
-    up9AuthStore.setIsAuthConfigured(true);
-    up9AuthStore.setUP9Env("auth.stg.testr.io");
-    up9AuthStore.setClientId("aaaaaa");
-    up9AuthStore.setClientSecret("aaaaaa");
+    up9AuthStore.setIsAuthConfigured(false);
     isDebug = true;
 }
 
@@ -612,12 +609,9 @@ export const getDebugReply = (apiMessageType: ApiMessageType): Promise < any > =
     return Promise.resolve(response);
 }
 
-export const startNewAuth = (up9Env: string, clientId: string, clientSecret: string) => {
+export const startNewAuth = () => {
     vsCodeApi.postMessage({
         command: MessageCommandType.StartAuth,
-        up9Env,
-        clientId,
-        clientSecret
     });
 }
 
@@ -641,13 +635,6 @@ window.addEventListener('message', event => {
         case MessageCommandType.AuthSuccess:
             console.log('received authResponse', message);
             up9AuthStore.setAuthError(null);
-            up9AuthStore.setIsAuthConfigured(true);
-            break;
-        case MessageCommandType.SavedData:
-            console.log('received savedData', message);
-            up9AuthStore.setUP9Env(message.data.auth.up9Env);
-            up9AuthStore.setClientId(message.data.auth.clientId);
-            up9AuthStore.setClientSecret(message.data.auth.clientSecret);
             up9AuthStore.setIsAuthConfigured(true);
             break;
         case MessageCommandType.ApiResponse:

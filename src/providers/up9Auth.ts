@@ -1,53 +1,208 @@
-import axios, {Method} from 'axios';
-import {raiseForBadResponse} from '../utils';
+import * as http from 'http';
+import * as open from 'open';
+import * as vscode from 'vscode';
+import { randomString } from '../utils';
+import * as  ClientOAuth2 from 'client-oauth2';
+import { authEnvStorageKey, authGlobalStorageKey } from '../consts';
 
 const retryMs = 5000;
+export const listenPorts = [3141, 4001, 5002, 6003, 7004, 8005, 9006, 10007];
 
 export class UP9Auth {
-    public lastToken: string;
+    private static _instance: UP9Auth;
 
-    private env: string;
-    private clientId: string;
-    private clientSecret: string;
-    private isExpired: boolean;
 
-    constructor(env: string, clientId: string, clientSecret: string) {
-        this.env = env;
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
+    private _env: string;
+    private _extensionContext: vscode.ExtensionContext;
+
+    private _token: ClientOAuth2.Token;
+
+    private _onAuthListeners: (() => void)[] = [];
+
+    public static async getInstance(up9Env: string, extensionContext: vscode.ExtensionContext): Promise<UP9Auth> {
+        if (!this._instance) {
+            this._instance = new UP9Auth(up9Env, extensionContext);
+            await this._instance.tryToLoadStoredToken();
+        }
+        return this._instance;
     }
 
-    public getToken = async (): Promise <string> => {
-        if (!this.isExpired && this.lastToken) {
-            return this.lastToken;
-        }
+    public onAuth(listener: () => void) {
+        this._onAuthListeners.push(listener);
+    }
 
-        try {
-            const params = new URLSearchParams();
-            params.append('grant_type', 'client_credentials');
-            params.append('client_id', this.clientId);
-            params.append('client_secret', this.clientSecret);
-            const response = await axios.post(`auth.${this.env}/auth/realms/testr/protocol/openid-connect/token`, params, {
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                }
-            });
-    
-            if (response.status < 300 && response.status > 199) {
-                this.lastToken = response.data.access_token;
-                // mark token as expired in half the expiration period
-                setTimeout(() => this.isExpired = true, (response.data.expires_in * 1000) / 2);
-                return response.data.access_token;
-            } else {
-                throw response;
-            }
-        } catch (err) {
-            console.log(err);
-            throw err;
+    private callOnAuthListeners() {
+        this._onAuthListeners.forEach(listener => listener());
+    }
+
+    private constructor(up9Env: string, extensionContext: vscode.ExtensionContext) {
+        this._env = up9Env;
+        this._extensionContext = extensionContext;
+    }
+
+    public getToken = async(): Promise<string> => {
+        if (!this._token) {
+            throw "not authenticated";
         }
+        await this.refreshTokenIfNecessary();
+        return this._token.accessToken;
+    }
+
+    public isAuthenticated = async (): Promise<boolean> => {
+        if (!this._token) {
+            return false;
+        }
+        try {
+            await this.refreshTokenIfNecessary();
+        } catch (err) {
+            return false;
+        }
+        return true;
+    }
+
+    private refreshTokenIfNecessary = async(): Promise<void> => {
+        if (!this._token) {
+            throw "not authenticated";
+        }
+        if (this._token.expired()) {
+            await this._token.refresh();
+            await this.saveTokenToStorage();
+        }
+    }
+
+    private saveTokenToStorage = async(): Promise<void> => {
+        await this._extensionContext.globalState.update(authGlobalStorageKey, this._token.data);
+        await this._extensionContext.globalState.update(authEnvStorageKey, this._env);
+    }
+
+    private resetTokenStorage = async(): Promise<void> => {
+        await this._extensionContext.globalState.update(authGlobalStorageKey, null);
+        await this._extensionContext.globalState.update(authEnvStorageKey, null);
+    }
+
+    public tryToLoadStoredToken = async(): Promise<boolean> => {
+        const storedTokenData = await this._extensionContext.globalState.get(authGlobalStorageKey) as ClientOAuth2.Data;
+        if (storedTokenData) {
+            const up9StoredEnv = await this._extensionContext.globalState.get(authEnvStorageKey) as string;
+            if (up9StoredEnv !== this._env) {
+                console.info("UP9 stored token is for a different env than the currently configured one, disposing of stored token");
+                await this.resetTokenStorage();
+                return;
+            }
+
+            const up9AuthClient = this.getOAuth2Client();
+            const parsedToken = up9AuthClient.createToken(storedTokenData);
+
+            try {
+                // refresh to make sure the token credentials are still valid
+                await parsedToken.refresh();
+                this._token = parsedToken;
+            } catch (error) {
+                console.warn('error refreshing stored up9 token');
+            }
+        }
+        return null;
+    };
+
+    public startNewAuthentication = async(): Promise<void> => {
+        this._token = await this.getTokenByWebApp(listenPorts, this._env);
+        this.saveTokenToStorage();
+
+        vscode.window.showInformationMessage("Signed in to UP9 successfully");
+        this.callOnAuthListeners();
     };
 
     public getEnv = (): string => {
-        return this.env;
+        return this._env;
+    }
+
+    private getOAuth2Client = (redirectUri?: string, clientId: string = "cli", clientSecret?: string): ClientOAuth2 => {
+        const tokenHost = `https://auth.${this._env}`;
+        const accessTokenUri = `${tokenHost}/auth/realms/testr/protocol/openid-connect/token`;
+        const authorizationUri = `${tokenHost}/auth/realms/testr/protocol/openid-connect/auth`;
+
+        return new ClientOAuth2({
+            clientId,
+            clientSecret,
+            accessTokenUri,
+            authorizationUri,
+            redirectUri
+        });
+    }
+
+    public authenticateUsingClientCredentials = async (clientId: string, clientSecret: string): Promise<void> => {
+        const up9AuthClient = this.getOAuth2Client(undefined, clientId, clientSecret);
+        const token = await up9AuthClient.credentials.getToken();
+        
+        this._token = token;
+    };
+
+    private getTokenByWebApp = (ports: number[], up9Env: string): Promise<ClientOAuth2.Token> => {
+        const TIMEOUT = 120000;
+        let timeoutHandle: NodeJS.Timeout;
+        let socket: any;
+    
+        return new Promise((resolve, reject) => {
+            const port = ports.pop();
+    
+            if (port === undefined) {
+                reject(new Error('Cannot set up local server'));
+                return;
+            }
+    
+            const redirectUri = `http://localhost:${port}/callback`;
+
+            const up9AuthClient = this.getOAuth2Client(redirectUri);
+    
+            const randomState = randomString(20);
+    
+            const webAuthorizationUri = up9AuthClient.code.getUri({
+                redirectUri,
+                state: randomState
+            });
+    
+            const httpServer = http.createServer(async (req, res) => {
+                if (!req.url || !req.url.startsWith('/callback')) {
+                    return;
+                }
+    
+                try {
+                    const accessToken = await up9AuthClient.code.getToken(req.url);
+                    const data = accessToken.data;
+                    res.writeHead(301, {
+                        Location: `http://${up9Env}/CliLogin`
+                    });
+                    res.end();
+                    resolve(accessToken);
+                    clearTimeout(timeoutHandle);
+                } catch (error) {
+                    reject(error);
+                } finally {
+                    httpServer.close();
+                    socket?.destroy();
+                }
+            });
+    
+            const server = httpServer.listen(port, '127.0.0.1');
+    
+            server.on('error', async (e: any) => {
+                // Retry with other available ports
+                if (e.code === 'EADDRINUSE') {
+                    resolve((await this.getTokenByWebApp(ports, up9Env)));
+                }
+            });
+    
+            server.on('connection', _socket => {
+                socket = _socket;
+            });
+    
+            server.on('listening', () => {
+                open(webAuthorizationUri).then(() => {
+                    timeoutHandle = setTimeout(() => {
+                        reject(new Error('Timed out'));
+                    }, TIMEOUT);
+                });
+            });
+        });
     }
 }

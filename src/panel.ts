@@ -2,6 +2,8 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import { UP9WebviewCommunicator } from './providers/webviewCommunicator';
+import { UP9Auth } from './providers/up9Auth';
+import { MessageCommandType } from './models/internal';
 
 const panelId = "up9BrowserPanel";
 const panelTitle = "UP9 Code Browser";
@@ -18,7 +20,7 @@ export class UP9Panel {
     private readonly _webviewCommunicator: UP9WebviewCommunicator;
     private _disposables: vscode.Disposable[] = [];
 
-    public static createOrShow(context: vscode.ExtensionContext) {
+    public static createOrShow(context: vscode.ExtensionContext, up9Auth: UP9Auth) {
         // If we already have a panel, show it.
         if (UP9Panel.currentPanel) {
             UP9Panel.currentPanel._panel.reveal(panelColumn);
@@ -36,17 +38,13 @@ export class UP9Panel {
             }
         );
 
-        UP9Panel.currentPanel = new UP9Panel(panel, context);
+        UP9Panel.currentPanel = new UP9Panel(panel, context, up9Auth);
     }
 
-    public static revive(panel: vscode.WebviewPanel, context: vscode.ExtensionContext) {
-        UP9Panel.currentPanel = new UP9Panel(panel, context);
-    }
-
-    private constructor(panel: vscode.WebviewPanel, context: vscode.ExtensionContext) {
+    private constructor(panel: vscode.WebviewPanel, context: vscode.ExtensionContext, up9Auth: UP9Auth) {
         this._panel = panel;
         this._context = context;
-        this._webviewCommunicator = new UP9WebviewCommunicator(this._panel);
+        this._webviewCommunicator = new UP9WebviewCommunicator(this._panel, up9Auth);
 
         // Set the webview's initial html content
         this._panel.webview.html = this._getHtmlForWebview();
@@ -73,8 +71,6 @@ export class UP9Panel {
 
         // Handle messages from the webview
         this._webviewCommunicator.registerOnMessageListeners(this._disposables);
-        // Load stored auth credentials in configuration into web view
-        this._webviewCommunicator.syncStoredCredentialsToWebView();
     }
 
     public dispose() {
