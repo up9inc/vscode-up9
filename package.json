@@ -105,6 +105,7 @@
   "dependencies": {
     "axios": "^0.24.0",
     "client-oauth2": "^4.3.3",
+    "jsonwebtoken": "^8.5.1",
     "open": "^8.4.0"
   }
 }

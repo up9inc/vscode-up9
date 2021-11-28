@@ -27,23 +27,13 @@ module.exports = {
                     configFile: 'tsconfig.json',
                 }
             },
-            // {
-            //     test: /\.css$/,
-            //     use: [{
-            //             loader: "style-loader"
-            //         },
-            //         {
-            //             loader: "css-loader"
-            //         }
-            //     ]
-            // }
             {
                 test: /\.css$/,
                 use: [
                   MiniCssExtractPlugin.loader,
                   "css-loader"
                 ]
-            }
+            },
         ],
     },
     plugins: [htmlWebpackPlugin, htmlWebpackInlineSourcePlugin, new MiniCssExtractPlugin({filename: "[name].css",chunkFilename: "[id].css"}), HTMLInlineCSSWebpackPlugin]

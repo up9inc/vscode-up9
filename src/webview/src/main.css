@@ -5,6 +5,30 @@
 	gap: 10px;
 }
 
+.svg-icon {
+	fill: var(--vscode-input-foreground);
+}
+
+.user-info {
+	display: flex;
+	flex-direction: row-reverse;
+	padding-right: 20px;
+}
+
+.clickable {
+	cursor: pointer;
+}
+
+.user-info svg {
+	display: inline-block;
+	margin-left: 8px;
+}
+
+.user-info p {
+	margin: 0;
+	display: inline-block;
+}
+
 .select-test-form select {
 	width: 100%;
 }

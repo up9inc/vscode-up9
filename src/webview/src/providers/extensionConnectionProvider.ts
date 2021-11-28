@@ -12,7 +12,8 @@ if (!("acquireVsCodeApi" in window)) {
 
 
     // for development
-    up9AuthStore.setIsAuthConfigured(false);
+    up9AuthStore.setIsAuthConfigured(true);
+    up9AuthStore.setUsername("testuser@gmail.com");
     isDebug = true;
 }
 
@@ -636,6 +637,7 @@ window.addEventListener('message', event => {
             console.log('received authResponse', message);
             up9AuthStore.setAuthError(null);
             up9AuthStore.setIsAuthConfigured(true);
+            up9AuthStore.setUsername(message.username);
             break;
         case MessageCommandType.ApiResponse:
             console.log('received apiResponse', message);

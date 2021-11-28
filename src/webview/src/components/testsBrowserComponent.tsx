@@ -3,12 +3,12 @@ import {observer} from "mobx-react";
 import { up9AuthStore } from "../stores/up9AuthStore";
 import {sendApiMessage, SendInfoToast} from "../providers/extensionConnectionProvider";
 import { ApiMessageType } from "../../../models/internal";
-import {Form, FormControl, Dropdown, Container, Row, Col, Button, Card} from 'react-bootstrap';
+import {Form, FormControl, Dropdown, Container, Row, Col, Card} from 'react-bootstrap';
 import { isHexColorDark, unindentString } from "../utils";
 import { v4 as uuidv4 } from 'uuid';
+import { copyIcon, userIcon } from "./svgs";
 
 import AceEditor from "react-ace";
-
 import "ace-builds/src-noconflict/mode-python";
 import "ace-builds/src-noconflict/theme-chaos";
 import "ace-builds/src-noconflict/theme-chrome";
@@ -123,6 +123,13 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
     const [isEndpointsDropdownOpen, setIsEndpointsDropdownOpen] = useState(false);
 
     return <div>
+            <div className="user-info">
+                <div>
+                    <p>{up9AuthStore.username}</p>
+                    {/* <img src={userIcon} /> */}
+                    {userIcon}
+                </div>
+            </div>
             <div className="select-test-form">
                 <Form.Group className="workspaces-form-group">
                     <Form.Label>Workspace</Form.Label>
@@ -167,7 +174,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                             <Row>
                                 <Col xs="10" md="10" lg="10" style={{"paddingLeft": "5px"}}>{endpointTest.variantDisplayName}</Col>
                                 <Col xs="1" md="1" lg="1" style={{"padding": "0"}}>
-                                    <Button variant="primary" onClick={_ => copyToClipboard(endpointTest.code)}>Copy</Button>
+                                    <span className="clickable" onClick={_ => copyToClipboard(endpointTest.code)}>{copyIcon}</span>
                                 </Col>
                             </Row>
                         </Container>

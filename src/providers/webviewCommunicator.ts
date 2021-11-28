@@ -15,10 +15,8 @@ export class UP9WebviewCommunicator {
         this._authProvider = up9Auth;
         this._apiProvider = new UP9ApiProvider(up9Auth.getEnv()); //TODO: this has to reload somehow on config change, maybe theres a way to reset the extension completely on config change
 
-        this._authProvider.onAuth((authStatus: boolean) => {
-            this._panel.webview.postMessage({
-                command: authStatus ? MessageCommandType.AuthSuccess : MessageCommandType.AuthSignOut
-            });
+        this._authProvider.onAuth(authStatus => {
+            this.notifyPanelOfAuthStateChange(authStatus);
         });
     }
 
@@ -37,7 +35,7 @@ export class UP9WebviewCommunicator {
                         (async () => {
                             try {
                                 await this._authProvider.startNewAuthentication();
-                                this._panel.webview.postMessage({command: MessageCommandType.AuthSuccess});
+                                this.notifyPanelOfAuthStateChange(true);
                             } catch (error) {
                                 this._panel.webview.postMessage({
                                     command: MessageCommandType.AuthError,
@@ -56,8 +54,19 @@ export class UP9WebviewCommunicator {
         );
 
         if (await this._authProvider.isAuthenticated()) {
+            this.notifyPanelOfAuthStateChange(true);
+        }
+    }
+
+    private notifyPanelOfAuthStateChange(authStatus: boolean): void {
+        if (authStatus) {
             this._panel.webview.postMessage({
-                command: MessageCommandType.AuthSuccess
+                command: MessageCommandType.AuthSuccess,
+                username: this._authProvider.getUsernameFromToken()
+            });
+        } else {
+            this._panel.webview.postMessage({
+                command: MessageCommandType.AuthSignOut,
             });
         }
     }
