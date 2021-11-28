@@ -5,6 +5,7 @@ import * as vscode from 'vscode';
 import { defaultWorkspaceConfigKey, envConfigKey, up9ConfigSectionName, internalExtensionName } from '../../consts';
 import { onRunCodeInCloudCommand } from '../../extension';
 import { terminalLineDelimeter } from '../../commands/runInCloud';
+import { UP9Auth } from '../../providers/up9Auth';
 
 const validPythonTestFilePath = "/resources/";
 
@@ -17,16 +18,18 @@ const runTestFileAndGetTerminalOutput = async (extensionContext: vscode.Extensio
 
     let terminalOutput = "";
 
-    await onRunCodeInCloudCommand(null, terminalMessage => terminalOutput += terminalMessage); //TODO: INITIALIZE AUTH USING API KEYS HERE SOMEHOW
+
+    const up9Auth = await UP9Auth.getInstance(process.env.UP9_ENV, extensionContext);
+    await up9Auth.authenticateUsingClientCredentials(process.env.UP9_CLIENT_ID, process.env.UP9_CLIENT_SECRET);
+
+    await onRunCodeInCloudCommand(up9Auth, terminalMessage => terminalOutput += terminalMessage);
 
     return terminalOutput.split(terminalLineDelimeter)
 };
 
 suite('Run In UP9 Command', () => {
   before(async () => {
-    const up9Env = process.env.UP9_AUTH_ENV; 
-    const clientId = process.env.UP9_CLIENT_ID;
-    const clientSecret = process.env.UP9_CLIENT_SECRET;
+    const up9Env = process.env.UP9_ENV; 
     const defaultWorkspace = process.env.DEFAULT_WORKSPACE;
 
     // initialize extension config

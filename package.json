@@ -32,8 +32,8 @@
         "title": "UP9: Run Test Code With UP9"
       },
       {
-        "command": "up9.testAuth",
-        "title": "UP9: Test Auth"
+        "command": "up9.webAuth",
+        "title": "UP9: Web Authentication"
       }
     ],
     "menus": {
@@ -47,6 +47,10 @@
       "commandPalette": [
         {
           "command": "up9.runTest",
+          "when": "false"
+        },
+        {
+          "command": "up9.webAuth",
           "when": "false"
         }
       ]
@@ -72,8 +76,8 @@
   "scripts": {
     "setup-browser": "cd src/webview && npm install && cd ../../",
     "vscode:prepublish": "npm run compile",
-    "compile-full": "cd src/webview && npm run build && cd ../../ && tsc -p ./ && cp ./src/webview/dist/index.html ./out/",
-    "compile": "tsc -p ./",
+    "compile": "cd src/webview && npm run build && cd ../../ && tsc -p ./ && cp ./src/webview/dist/index.html ./out/",
+    "compile-no-gui": "tsc -p ./",
     "pretest": "mkdir -p ./out/tests/integration/resources/ && cp -r ./src/tests/integration/resources/* ./out/tests/integration/resources/",
     "test": "node ./out/tests/integration/runIntegrationTests.js"
   },

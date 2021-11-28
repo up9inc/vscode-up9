@@ -108,19 +108,26 @@ export class UP9Auth {
         return this._env;
     }
 
-    private getOAuth2Client = (redirectUri?: string): ClientOAuth2 => {
+    private getOAuth2Client = (redirectUri?: string, clientId: string = "cli", clientSecret?: string): ClientOAuth2 => {
         const tokenHost = `https://auth.${this._env}`;
         const accessTokenUri = `${tokenHost}/auth/realms/testr/protocol/openid-connect/token`;
         const authorizationUri = `${tokenHost}/auth/realms/testr/protocol/openid-connect/auth`;
 
         return new ClientOAuth2({
-            clientId: 'cli',
-            clientSecret: undefined,
+            clientId,
+            clientSecret,
             accessTokenUri,
             authorizationUri,
             redirectUri
         });
     }
+
+    public authenticateUsingClientCredentials = async (clientId: string, clientSecret: string): Promise<void> => {
+        const up9AuthClient = this.getOAuth2Client(undefined, clientId, clientSecret);
+        const token = await up9AuthClient.credentials.getToken();
+        
+        this._token = token;
+    };
 
     private getTokenByWebApp = (ports: number[], up9Env: string): Promise<ClientOAuth2.Token> => {
         const TIMEOUT = 120000;

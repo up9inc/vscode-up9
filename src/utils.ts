@@ -1,7 +1,7 @@
 import * as crypto from 'crypto';
 import { AxiosResponse } from 'axios';
 import * as vscode from 'vscode';
-import { defaultWorkspaceConfigKey, envConfigKey, up9ConfigSectionName } from './consts';
+import { defaultWorkspaceConfigKey, up9ConfigSectionName } from './consts';
 
 export const raiseForBadResponse = (response: AxiosResponse): void => {
     if (response.status > 299 || response.status < 200) {
