@@ -6,3 +6,4 @@ export const internalExtensionName = "up9.up9";
 export const internalRunTestCommandName = "up9.runTest";
 
 export const authGlobalStorageKey = "up9.auth.data";
+export const authEnvStorageKey = "up9.auth.env";

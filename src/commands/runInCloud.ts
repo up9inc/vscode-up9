@@ -2,20 +2,20 @@ import { getDefaultWorkspace, indentString } from "../utils";
 import * as vscode from 'vscode';
 import { UP9Auth } from "../providers/up9Auth";
 import { UP9ApiProvider } from "../providers/up9Api";
+import { startAuthCommandName } from "../extension";
 
-const openUP9SettingsDialogOption = "Open UP9 Settings";
+const openUP9SettingsDialogOption = 'Open UP9 Settings';
+const openUP9SignInDialogOption = 'Sign In To UP9';
 
 export const terminalLineDelimeter = '\r\n';
 
 export class CloudRunner {
-    private _context: vscode.ExtensionContext;
     private _up9Auth: UP9Auth;
 
     // used for tests as there is no way to get terminal contents via vscode api
     private _onTerminalEmitCallback: (terminalMessage: string) => void; 
 
-    public constructor(context: vscode.ExtensionContext, up9Auth: UP9Auth, onTerminalEmit?: (terminalMessage: string) => void) {
-        this._context = context;
+    public constructor(up9Auth: UP9Auth, onTerminalEmit?: (terminalMessage: string) => void) {
         this._up9Auth = up9Auth;
         this._onTerminalEmitCallback = onTerminalEmit;
     }
@@ -23,10 +23,11 @@ export class CloudRunner {
     public startTestRun = (code: string): Promise<void> => {
         return new Promise<any>(async (resolve, reject) => {
             let token: string;
-            // if (!up9Auth) { TODO: fix this if necessary, should point user to log in
-            //     this.showSettingsError('UP9 authentication hasn\'t been configured yet, please configure the up9 extension in vscode configuration');
-            //     return reject(Error("up9 auth not configured"));
-            // }
+
+            if (!(await this._up9Auth.isAuthenticated())) {
+                this.showAuthenticationError('You must sign in to UP9 first');
+                return;
+            }
 
             try {
                 token = await this._up9Auth.getToken();
@@ -89,15 +90,6 @@ export class CloudRunner {
 
         return statusTerminalEmitter;
     }
-    
-
-    private getStoredUP9Auth = async (context: vscode.ExtensionContext): Promise<UP9Auth> => {
-        const storedAuthCredentials = await readUP9CredsFromConfig();
-        if (storedAuthCredentials) {
-            return new UP9Auth(storedAuthCredentials.up9Env, storedAuthCredentials.clientId, storedAuthCredentials.clientSecret);
-        }
-        return null;
-    }
 
     private getLogOutputForRCA = (rca: any): string => {
         let logOutput = "";
@@ -131,6 +123,13 @@ export class CloudRunner {
         const res = await vscode.window.showErrorMessage(message, openUP9SettingsDialogOption);
         if (res === openUP9SettingsDialogOption) {
             vscode.commands.executeCommand('workbench.action.openSettings', 'up9'); //opens settings with `up9` search query
+        }
+    }
+
+    private showAuthenticationError = async (message: string): Promise<void> => {
+        const res = await vscode.window.showErrorMessage(message, openUP9SignInDialogOption);
+        if (res === openUP9SignInDialogOption) {
+            vscode.commands.executeCommand(startAuthCommandName);
         }
     }
 

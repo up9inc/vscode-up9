@@ -107,10 +107,10 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
 
     useEffect(() => {
         setSelectedWorkspace("");
-        if (up9AuthStore.up9Env && up9AuthStore.isAuthConfigured) {
-            refreshWorkspaces()
+        if (up9AuthStore.isAuthConfigured) {
+            refreshWorkspaces();
         }
-    }, [up9AuthStore.up9Env, up9AuthStore.isAuthConfigured]);
+    }, [up9AuthStore.isAuthConfigured]);
 
     const copyToClipboard = (text: string) => {
         SendInfoToast("Test code copied to clipboard");

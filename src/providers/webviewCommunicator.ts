@@ -31,6 +31,7 @@ export class UP9WebviewCommunicator {
                         (async () => {
                             try {
                                 await this._authProvider.startNewAuthentication();
+                                this._panel.webview.postMessage({command: MessageCommandType.AuthSuccess});
                             } catch (error) {
                                 this._panel.webview.postMessage({
                                     command: MessageCommandType.AuthError,
@@ -48,40 +49,6 @@ export class UP9WebviewCommunicator {
             disposables
         );
     }
-
-    // private applyAuthenticationCredentials = async () => {
-    //     this._authProvider = new UP9Auth(up9Env, clientId, clientSecret);
-    //     this._apiProvider = new UP9ApiProvider(up9Env);
-    //     try {
-    //         // attempt to get token to verify all credentials work
-    //         await this._authProvider.getToken();
-
-    //         this._panel.webview.postMessage({
-    //             command: MessageCommandType.AuthSuccess
-    //         });
-    //     } catch (error) {
-    //         this._panel.webview.postMessage({
-    //             command: MessageCommandType.AuthError,
-    //             authError: error
-    //         });
-    //         console.error('error getting token with supplied credentials', error);
-    //     }
-    // }
-
-    // public syncStoredCredentialsToWebView() {
-    //     readUP9CredsFromConfig()
-    //         .then(storedAuthCredentials => {
-    //             if (storedAuthCredentials.clientId) {
-    //                 this._panel.webview.postMessage({
-    //                     command: MessageCommandType.SavedData,
-    //                     data: {
-    //                         auth: storedAuthCredentials
-    //                     }
-    //                 });
-    //                 this.applyAuthenticationCredentials(storedAuthCredentials.up9Env, storedAuthCredentials.clientId, storedAuthCredentials.clientSecret);
-    //             }
-    //         });
-    // }
 
     private handlePanelUP9APIRequest = async (messageData: WebViewApiMessage) => {
         if (!this._apiProvider || !this._authProvider) {

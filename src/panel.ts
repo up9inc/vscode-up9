@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { UP9WebviewCommunicator } from './providers/webviewCommunicator';
 import { UP9Auth } from './providers/up9Auth';
+import { MessageCommandType } from './models/internal';
 
 const panelId = "up9BrowserPanel";
 const panelTitle = "UP9 Code Browser";
@@ -19,10 +20,15 @@ export class UP9Panel {
     private readonly _webviewCommunicator: UP9WebviewCommunicator;
     private _disposables: vscode.Disposable[] = [];
 
-    public static createOrShow(context: vscode.ExtensionContext, up9Auth: UP9Auth) {
+    public static async createOrShow(context: vscode.ExtensionContext, up9Auth: UP9Auth): Promise<void> {
+        const isAuthenticated = await up9Auth.isAuthenticated();
+
         // If we already have a panel, show it.
         if (UP9Panel.currentPanel) {
             UP9Panel.currentPanel._panel.reveal(panelColumn);
+            if (isAuthenticated) {
+                UP9Panel.currentPanel._panel.webview.postMessage({command: MessageCommandType.AuthSuccess});
+            }
             return;
         }
 
@@ -38,6 +44,10 @@ export class UP9Panel {
         );
 
         UP9Panel.currentPanel = new UP9Panel(panel, context, up9Auth);
+
+        if (isAuthenticated) { //TODO: make this occur in one place, right now its duplicated code
+            panel.webview.postMessage({command: MessageCommandType.AuthSuccess});
+        }
     }
 
     private constructor(panel: vscode.WebviewPanel, context: vscode.ExtensionContext, up9Auth: UP9Auth) {

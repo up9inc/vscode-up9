@@ -9,30 +9,12 @@ class UP9AuthStore {
 
     constructor() {
         makeObservable(this, {
-            up9Env: observable,
-            clientId: observable,
-            clientSecret: observable,
             authError: observable,
             isAuthConfigured: observable,
 
-            setUP9Env: action,
-            setClientId: action,
-            setClientSecret: action,
             setAuthError: action,
             setIsAuthConfigured: action
         });
-    }
-
-    setUP9Env(up9Env: string) {
-        this.up9Env = up9Env;
-    }
-
-    setClientId(clientId: string) {
-        this.clientId = clientId;
-    }
-
-    setClientSecret(clientSecret: string) {
-        this.clientSecret = clientSecret;
     }
 
     setAuthError(authError: string) {

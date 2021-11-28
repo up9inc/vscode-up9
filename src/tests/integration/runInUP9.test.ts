@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as assert from 'assert';
 import { after, test, before } from 'mocha';
 import * as vscode from 'vscode';
-import { clientIdConfigKey, clientSecretConfigKey, defaultWorkspaceConfigKey, envConfigKey, up9ConfigSectionName, internalExtensionName } from '../../consts';
+import { defaultWorkspaceConfigKey, envConfigKey, up9ConfigSectionName, internalExtensionName } from '../../consts';
 import { onRunCodeInCloudCommand } from '../../extension';
 import { terminalLineDelimeter } from '../../commands/runInCloud';
 
@@ -17,7 +17,7 @@ const runTestFileAndGetTerminalOutput = async (extensionContext: vscode.Extensio
 
     let terminalOutput = "";
 
-    await onRunCodeInCloudCommand(extensionContext, terminalMessage => terminalOutput += terminalMessage);
+    await onRunCodeInCloudCommand(null, terminalMessage => terminalOutput += terminalMessage); //TODO: INITIALIZE AUTH USING API KEYS HERE SOMEHOW
 
     return terminalOutput.split(terminalLineDelimeter)
 };
@@ -32,8 +32,6 @@ suite('Run In UP9 Command', () => {
     // initialize extension config
     const up9ConfigSection = vscode.workspace.getConfiguration(up9ConfigSectionName);
     await up9ConfigSection.update(envConfigKey, up9Env, vscode.ConfigurationTarget.Global);
-    await up9ConfigSection.update(clientIdConfigKey, clientId, vscode.ConfigurationTarget.Global);
-    await up9ConfigSection.update(clientSecretConfigKey, clientSecret, vscode.ConfigurationTarget.Global);
     await up9ConfigSection.update(defaultWorkspaceConfigKey, defaultWorkspace, vscode.ConfigurationTarget.Global);
 
     const extension = await vscode.extensions.getExtension(internalExtensionName);
@@ -44,8 +42,6 @@ suite('Run In UP9 Command', () => {
     // reset extension config
     const up9ConfigSection = vscode.workspace.getConfiguration(up9ConfigSectionName);
     await up9ConfigSection.update(envConfigKey, "", vscode.ConfigurationTarget.Global);
-    await up9ConfigSection.update(clientIdConfigKey, "", vscode.ConfigurationTarget.Global);
-    await up9ConfigSection.update(clientSecretConfigKey, "", vscode.ConfigurationTarget.Global);
     await up9ConfigSection.update(defaultWorkspaceConfigKey, "", vscode.ConfigurationTarget.Global);
   });
 

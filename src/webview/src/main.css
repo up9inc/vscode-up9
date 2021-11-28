@@ -114,6 +114,7 @@ hr {
 	display: flex;
 	flex-direction: column;
 	max-width: 500px;
+	margin-top: 8px;
 }
 
 .login-button {
@@ -434,7 +435,7 @@ div.appRoot > header {
     border-radius: 0;
 }
 
-.btn:hover, btn:focus, .btn-primary:disabled, .btn-primary {
+.btn:hover, btn:focus, .btn-primary:disabled {
     color: var(--vscode-breadcrumb-focusForeground);
     background: var(--vscode-input-background);
     border: 1px solid var(--vscode-focusBorder);
@@ -456,4 +457,13 @@ div.appRoot > header {
 .textInput:focus {
     outline: none;
     border: 1px solid var(--vscode-focusBorder);
+}
+
+.sign-in-button {
+	background: var(--vscode-button-background);
+	color: var(--vscode-button-foreground);
+}
+
+.sign-in-button:hover {
+	background: var(--vscode-button-hoverBackground);
 }

@@ -3,7 +3,7 @@ import * as open from 'open';
 import * as vscode from 'vscode';
 import { randomString } from '../utils';
 import * as  ClientOAuth2 from 'client-oauth2';
-import { authGlobalStorageKey } from '../consts';
+import { authEnvStorageKey, authGlobalStorageKey } from '../consts';
 
 const retryMs = 5000;
 export const listenPorts = [3141, 4001, 5002, 6003, 7004, 8005, 9006, 10007];
@@ -21,6 +21,9 @@ export class UP9Auth {
     public static async getInstance(up9Env: string, extensionContext: vscode.ExtensionContext): Promise<UP9Auth> {
         if (!this._instance) {
             this._instance = new UP9Auth(up9Env, extensionContext);
+
+            await this._instance.resetTokenStorage(); //TODO: REMOVE BEFORE PR
+
             await this._instance.tryToLoadStoredToken();
         }
         return this._instance;
@@ -63,11 +66,24 @@ export class UP9Auth {
 
     private saveTokenToStorage = async(): Promise<void> => {
         await this._extensionContext.globalState.update(authGlobalStorageKey, this._token.data);
+        await this._extensionContext.globalState.update(authEnvStorageKey, this._env);
+    }
+
+    private resetTokenStorage = async(): Promise<void> => {
+        await this._extensionContext.globalState.update(authGlobalStorageKey, null);
+        await this._extensionContext.globalState.update(authEnvStorageKey, null);
     }
 
     public tryToLoadStoredToken = async(): Promise<boolean> => {
         const storedTokenData = await this._extensionContext.globalState.get(authGlobalStorageKey) as ClientOAuth2.Data;
         if (storedTokenData) {
+            const up9StoredEnv = await this._extensionContext.globalState.get(authEnvStorageKey) as string;
+            if (up9StoredEnv !== this._env) {
+                console.info("UP9 stored token is for a different env than the currently configured one, disposing of stored token");
+                await this.resetTokenStorage();
+                return;
+            }
+
             const up9AuthClient = this.getOAuth2Client();
             const parsedToken = up9AuthClient.createToken(storedTokenData);
 
@@ -85,6 +101,7 @@ export class UP9Auth {
     public startNewAuthentication = async(): Promise<void> => {
         this._token = await this.getTokenByWebApp(listenPorts, this._env);
         this.saveTokenToStorage();
+        vscode.window.showInformationMessage("Signed in to UP9 successfully");
     };
 
     public getEnv = (): string => {
