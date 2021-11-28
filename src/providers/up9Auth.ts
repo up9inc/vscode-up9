@@ -22,9 +22,6 @@ export class UP9Auth {
     public static async getInstance(up9Env: string, extensionContext: vscode.ExtensionContext): Promise<UP9Auth> {
         if (!this._instance) {
             this._instance = new UP9Auth(up9Env, extensionContext);
-
-            await this._instance.resetTokenStorage(); //TODO: REMOVE BEFORE PR
-
             await this._instance.tryToLoadStoredToken();
         }
         return this._instance;
