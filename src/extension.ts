@@ -12,6 +12,7 @@ var http = require('http');
 const testBrowserCommandName = 'up9.openTestsBrowser';
 const runTestInCloudCommandName = 'up9.runTest';
 export const startAuthCommandName = 'up9.webAuth';
+const signOutCommandName = 'up9.signOut';
 
 
 // onTerminalEmit is used by tests to intercept terminal contents, theres no way to directly get terminal contents otherwise sadly
@@ -27,10 +28,13 @@ export async function activate(context: vscode.ExtensionContext): Promise<vscode
     const openTestBrowserCommand = vscode.commands.registerCommand(testBrowserCommandName, () => UP9Panel.createOrShow(context, up9Auth));
     const runCodeInCloudCommand = vscode.commands.registerCommand(runTestInCloudCommandName, () => onRunCodeInCloudCommand(up9Auth));
     const startAuthCommand = vscode.commands.registerCommand(startAuthCommandName, () => up9Auth.startNewAuthentication());
+    const signOutCommand = vscode.commands.registerCommand(signOutCommandName, () => up9Auth.signOut());
+    
 
     context.subscriptions.push(openTestBrowserCommand);
     context.subscriptions.push(runCodeInCloudCommand);
     context.subscriptions.push(startAuthCommand);
+    context.subscriptions.push(signOutCommand);
 
     // return the context so its usable by tests
     return context;
