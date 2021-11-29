@@ -23,7 +23,7 @@
         "strict": true,
         "noFallthroughCasesInSwitch": true,
         "noImplicitThis": true,
-        "noUnusedLocals": true,
+        "noUnusedLocals": false,
         "noUnusedParameters": false,
         "suppressImplicitAnyIndexErrors": true,
         "baseUrl": ".",

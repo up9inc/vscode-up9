@@ -12,7 +12,8 @@ if (!("acquireVsCodeApi" in window)) {
 
 
     // for development
-    up9AuthStore.setIsAuthConfigured(false);
+    up9AuthStore.setIsAuthConfigured(true);
+    up9AuthStore.setUsername("testuser@gmail.com");
     isDebug = true;
 }
 
@@ -603,7 +604,7 @@ export const getDebugReply = (apiMessageType: ApiMessageType): Promise < any > =
               ]
             break;
         case ApiMessageType.WorkspacesList:
-            response = ["rb-reg", "test", "workspace-b"];
+            response = ["rb-reg", "test", "workspace-b", "super-long-name-that-doesnt-end"];
             break;
     }
     return Promise.resolve(response);
@@ -615,10 +616,24 @@ export const startNewAuth = () => {
     });
 }
 
-export const SendInfoToast = (text: string) => {
+export const sendInfoToast = (text: string) => {
   vsCodeApi.postMessage({
     command: MessageCommandType.InfoAlert,
     text
+});
+}
+
+export const sendErrorToast = (text: string) => {
+  vsCodeApi.postMessage({
+    command: MessageCommandType.Alert,
+    text
+});
+}
+
+export const setExtensionDefaultWorkspace = (workspaceId: string) => {
+    vsCodeApi.postMessage({
+        command: MessageCommandType.SetDefaultWorkspace,
+        workspaceId
 });
 }
 
@@ -636,6 +651,7 @@ window.addEventListener('message', event => {
             console.log('received authResponse', message);
             up9AuthStore.setAuthError(null);
             up9AuthStore.setIsAuthConfigured(true);
+            up9AuthStore.setUsername(message.username);
             break;
         case MessageCommandType.ApiResponse:
             console.log('received apiResponse', message);
@@ -655,6 +671,8 @@ window.addEventListener('message', event => {
             up9AuthStore.setAuthError(null);
             up9AuthStore.setIsAuthConfigured(false);
             break;
+        case MessageCommandType.StoredData:
+            console.log('received storedData', message);
+            up9AuthStore.setDefaultWorkspace(message.defaultWorkspace);
     }
 });
-

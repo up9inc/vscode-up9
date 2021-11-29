@@ -1,8 +1,9 @@
-import { getDefaultWorkspace, indentString } from "../utils";
+import { indentString, readConfigValue } from "../utils";
 import * as vscode from 'vscode';
 import { UP9Auth } from "../providers/up9Auth";
 import { UP9ApiProvider } from "../providers/up9Api";
 import { startAuthCommandName } from "../extension";
+import { defaultWorkspaceConfigKey } from "../consts";
 
 const openUP9SettingsDialogOption = 'Open UP9 Settings';
 const openUP9SignInDialogOption = 'Sign In To UP9';
@@ -38,7 +39,7 @@ export class CloudRunner {
                 return reject(error);
             }
 
-            const defaultWorkspace = await getDefaultWorkspace();
+            const defaultWorkspace = await readConfigValue(defaultWorkspaceConfigKey);
             if (!defaultWorkspace) {
                 this.showSettingsError('No default workspace has been configured for test runs, please configure a default workspace in the up9 extension configuration');
                 return reject(new Error("default workspace not configured"));

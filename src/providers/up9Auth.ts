@@ -4,6 +4,7 @@ import * as vscode from 'vscode';
 import { randomString } from '../utils';
 import * as  ClientOAuth2 from 'client-oauth2';
 import { authEnvStorageKey, authGlobalStorageKey } from '../consts';
+import * as jwt from 'jsonwebtoken';
 
 const retryMs = 5000;
 export const listenPorts = [3141, 4001, 5002, 6003, 7004, 8005, 9006, 10007];
@@ -78,6 +79,14 @@ export class UP9Auth {
     private resetTokenStorage = async(): Promise<void> => {
         await this._extensionContext.globalState.update(authGlobalStorageKey, null);
         await this._extensionContext.globalState.update(authEnvStorageKey, null);
+    }
+
+    public getUsernameFromToken = (): string => {
+        if (!this._token) {
+            throw "not authenticated";
+        }
+        const decodedToken = jwt.decode(this._token.accessToken);
+        return decodedToken.preferred_username;
     }
 
     public signOut = async(): Promise<void> => {

@@ -1,26 +1,29 @@
 import React, { useEffect, useState, useMemo } from "react";
 import {observer} from "mobx-react";
 import { up9AuthStore } from "../stores/up9AuthStore";
-import {sendApiMessage, SendInfoToast} from "../providers/extensionConnectionProvider";
+import {sendApiMessage, sendInfoToast, setExtensionDefaultWorkspace} from "../providers/extensionConnectionProvider";
 import { ApiMessageType } from "../../../models/internal";
-import {Form, FormControl, Dropdown, Container, Row, Col, Button, Card} from 'react-bootstrap';
+import {Form, FormControl, Dropdown, Container, Row, Col, Card} from 'react-bootstrap';
 import { isHexColorDark, unindentString } from "../utils";
 import { v4 as uuidv4 } from 'uuid';
+import { copyIcon, userIcon } from "./svgs";
 
 import AceEditor from "react-ace";
-
 import "ace-builds/src-noconflict/mode-python";
 import "ace-builds/src-noconflict/theme-chaos";
 import "ace-builds/src-noconflict/theme-chrome";
+import { LoadingOverlay } from "./loadingOverlay";
 
+
+// TODO: split this into multiple components
 const TestsBrowserComponent: React.FC<{}> = observer(() => {
     const [workspaces, setWorkspaces] = useState(null);
     const [workspaceFilterInput, setWorkspaceFilterInput] = useState("");
     const [selectedWorkspace, setSelectedWorkspace] = useState("");
 
     const [endpoints, setEndpoints] = useState(null);
-    const [endpointFilterInput, setendpointFilterInput] = useState("");
-    const [selectedEndpoint, setSelectedEndpoint] = useState("");
+    const [endpointFilterInput, setEndpointFilterInput] = useState("");
+    const [selectedEndpoint, setSelectedEndpoint] = useState(null);
 
     const [testsLoaded, setTestsLoaded] = useState(false);
     const [endpointTest, setEndpointTest] = useState(null);
@@ -28,6 +31,8 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
     const editorBackgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--vscode-editor-background');
 
     const [isThemeDark, setIsThemeDark] = useState(null);
+
+    const [isLoading, setIsLoading] = useState(true);
 
     const getEndpointDisplayText = (endpoint) => {
         return `${endpoint.method.toUpperCase()} ${endpoint.service}${endpoint.path}`;
@@ -37,14 +42,14 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
         if (!endpoints || !endpointFilterInput) {
             return endpoints;
         }
-        return endpoints.filter(endpoint => getEndpointDisplayText(endpoint).toLocaleLowerCase().indexOf(endpointFilterInput) > -1);
+        return endpoints.filter(endpoint => getEndpointDisplayText(endpoint).toLocaleLowerCase().indexOf(endpointFilterInput.toLowerCase()) > -1);
     }, [endpoints, endpointFilterInput]);
 
     const filteredWorkspaces = useMemo(() => {
         if (!workspaces || !workspaceFilterInput) {
             return workspaces;
         }
-        return workspaces.filter(workspace => workspace.toLocaleLowerCase().indexOf(workspaceFilterInput) > -1);
+        return workspaces.filter(workspace => workspace.toLocaleLowerCase().indexOf(workspaceFilterInput.toLowerCase()) > -1);
     }, [workspaces, workspaceFilterInput]);
 
     useEffect(() => {
@@ -52,19 +57,28 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
     }, [editorBackgroundColor]);
 
     const refreshWorkspaces = async () => {
+        setIsLoading(true);
         setWorkspaceFilterInput("");
         try {
             const workspaces = await sendApiMessage(ApiMessageType.WorkspacesList, null);
             setWorkspaces(workspaces);
         } catch(error) {
             console.log(error);
+        } finally {
+            setIsLoading(false);
         }
     }
 
     useEffect(() => {
+        if (workspaces && up9AuthStore.defaultWorkspace && workspaces.indexOf(up9AuthStore.defaultWorkspace) > -1) {
+            setSelectedWorkspace(up9AuthStore.defaultWorkspace);
+        }
+    }, [workspaces, up9AuthStore.defaultWorkspace]);
+
+    useEffect(() => {
         (async () => {
-            setSelectedEndpoint("");
-            setendpointFilterInput("");
+            setSelectedEndpoint(null);
+            setEndpointFilterInput("");
             setEndpoints(null);
             if (selectedWorkspace) {
                 try {
@@ -83,7 +97,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             setTestsLoaded(false);
             if (selectedEndpoint) {
                 try {
-                    const tests = await sendApiMessage(ApiMessageType.EndpointTests, {workspaceId: selectedWorkspace, spanGuid: selectedEndpoint});
+                    const tests = await sendApiMessage(ApiMessageType.EndpointTests, {workspaceId: selectedWorkspace, spanGuid: selectedEndpoint.uuid});
                     setTestsLoaded(true);
                     if (tests?.tests?.length < 1) {
                         return;
@@ -103,7 +117,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                 }
             }
         })()
-    }, [selectedEndpoint]);
+    }, [selectedEndpoint?.uuid]);
 
     useEffect(() => {
         setSelectedWorkspace("");
@@ -113,8 +127,13 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
     }, [up9AuthStore.isAuthConfigured]);
 
     const copyToClipboard = (text: string) => {
-        SendInfoToast("Test code copied to clipboard");
+        sendInfoToast("Test code copied to clipboard");
         navigator.clipboard.writeText(text)
+    }
+
+    const setDefaultWorkspace = (workspace: string) => {
+        setExtensionDefaultWorkspace(workspace);
+        up9AuthStore.setDefaultWorkspace(workspace);
     }
 
     // TODO: refactor this
@@ -122,10 +141,21 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
     const [isWorkspaceDropDownOpen, setIsWorkspaceDropDownOpen] = useState(false);
     const [isEndpointsDropdownOpen, setIsEndpointsDropdownOpen] = useState(false);
 
+    if (isLoading) {
+        return <LoadingOverlay />;
+    }
+
     return <div>
+            <div className="user-info">
+                <div>
+                    <p>{up9AuthStore.username}</p>
+                    {/* <img src={userIcon} /> */}
+                    {userIcon}
+                </div>
+            </div>
             <div className="select-test-form">
                 <Form.Group className="workspaces-form-group">
-                    <Form.Label>Workspace</Form.Label>
+                    <Form.Label>Workspace {(selectedWorkspace && selectedWorkspace != up9AuthStore.defaultWorkspace) && <a className="anchor-button clickable" onClick={_ => setDefaultWorkspace(selectedWorkspace)}>Make Default</a>}</Form.Label>
                     <br/>
                     <Dropdown className="select-dropdown" onToggle={(isOpen, _) => setIsWorkspaceDropDownOpen(isOpen)}>
                         <Dropdown.Toggle>
@@ -144,12 +174,12 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                     <br/>
                     <Dropdown className="select-dropdown" onToggle={(isOpen, _) => setIsEndpointsDropdownOpen(isOpen)}>
                         <Dropdown.Toggle disabled={!selectedWorkspace}>
-                            {selectedEndpoint ? selectedEndpoint : "Select an endpoint"}
+                            {selectedEndpoint ? getEndpointDisplayText(selectedEndpoint) : "Select an endpoint"}
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
-                            {isEndpointsDropdownOpen && <FormControl className="dropdown-filter" autoFocus placeholder="Type to filter..." value={endpointFilterInput} onChange={e => setendpointFilterInput(e.target.value)} />}
+                            {isEndpointsDropdownOpen && <FormControl className="dropdown-filter" autoFocus placeholder="Type to filter..." value={endpointFilterInput} onChange={e => setEndpointFilterInput(e.target.value)} />}
                             <Dropdown.Divider/>
-                            {filteredEndpoints?.map((endpoint) => {return <Dropdown.Item key={endpoint.uuid} onClick={_ => {setendpointFilterInput(""); setSelectedEndpoint(endpoint.uuid)}}>{getEndpointDisplayText(endpoint)}</Dropdown.Item>})}
+                            {filteredEndpoints?.map((endpoint) => {return <Dropdown.Item title={getEndpointDisplayText(endpoint)} key={endpoint.uuid} onClick={_ => {setEndpointFilterInput(""); setSelectedEndpoint(endpoint)}}>{getEndpointDisplayText(endpoint)}</Dropdown.Item>})}
                         </Dropdown.Menu>
                     </Dropdown>
                 </Form.Group>
@@ -158,7 +188,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             <hr/>
             <div className="tests-list-container">
             <Form.Group>
-                <Form.Label>Test code</Form.Label>
+                <Form.Label>Code</Form.Label>
             </Form.Group> 
             <Container>
                 <Card className="test-row">
@@ -167,7 +197,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                             <Row>
                                 <Col xs="10" md="10" lg="10" style={{"paddingLeft": "5px"}}>{endpointTest.variantDisplayName}</Col>
                                 <Col xs="1" md="1" lg="1" style={{"padding": "0"}}>
-                                    <Button variant="primary" onClick={_ => copyToClipboard(endpointTest.code)}>Copy</Button>
+                                    <span className="clickable" onClick={_ => copyToClipboard(endpointTest.code)}>{copyIcon}</span>
                                 </Col>
                             </Row>
                         </Container>
@@ -181,7 +211,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             </Container>
             </div>
             </>}
-            {(testsLoaded && !endpointTest) && <p>No test code found for this endpoint</p>}
+            {(testsLoaded && !endpointTest) && <p>No code found for this endpoint</p>}
         </div>;
 });
 
