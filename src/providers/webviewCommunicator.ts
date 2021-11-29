@@ -2,6 +2,8 @@ import * as vscode from 'vscode';
 import { UP9ApiProvider } from './up9Api';
 import { UP9Auth } from './up9Auth';
 import { WebViewApiMessage, MessageCommandType, ApiMessageType } from '../models/internal';
+import { defaultWorkspaceConfigKey } from '../consts';
+import { readConfigValue, setConfigValue } from '../utils';
 
 
 // this class is the only link the webview has to the "outside world", the webview is limited by CORS which means all up9 api https requests have to go through here where CORS isnt an issue.
@@ -47,6 +49,11 @@ export class UP9WebviewCommunicator {
                     case MessageCommandType.ApiRequest:
                         this.handlePanelUP9APIRequest(message);
                         break;
+                    case MessageCommandType.SetDefaultWorkspace:
+                        (async () => {
+                            await setConfigValue(defaultWorkspaceConfigKey, message.workspaceId);
+                            vscode.window.showInformationMessage(`Successfully set ${message.workspaceId} as the default workspace.`);
+                        })();
                 }
             },
             null,
@@ -56,6 +63,7 @@ export class UP9WebviewCommunicator {
         if (await this._authProvider.isAuthenticated()) {
             this.notifyPanelOfAuthStateChange(true);
         }
+        await this.sendStoredDataToPanel();
     }
 
     private notifyPanelOfAuthStateChange(authStatus: boolean): void {
@@ -69,6 +77,14 @@ export class UP9WebviewCommunicator {
                 command: MessageCommandType.AuthSignOut,
             });
         }
+    }
+
+    private async sendStoredDataToPanel(): Promise<void> {
+        const defaultWorkspace = await readConfigValue(defaultWorkspaceConfigKey);
+        this._panel.webview.postMessage({
+            command: MessageCommandType.StoredData,
+            defaultWorkspace: defaultWorkspace
+        });
     }
 
     private handlePanelUP9APIRequest = async (messageData: WebViewApiMessage) => {

@@ -17,6 +17,7 @@
 
 .clickable {
 	cursor: pointer;
+	user-select: none;
 }
 
 .user-info svg {
@@ -31,6 +32,16 @@
 
 .select-test-form select {
 	width: 100%;
+}
+
+.anchor-button {
+	color: var(--vscode-textLink-foreground);
+	text-decoration: none;
+	font-size: 0.8em;
+}
+
+.anchor-button:active, .anchor-button:hover, .anchor-button:focus {
+	color: var(--vscode-textLink-activeForeground);
 }
 
 .select-test-form select:disabled {
@@ -58,7 +69,7 @@ hr {
 .select-dropdown button {
 	width:100%;
 	text-align: left;
-	padding-right: 4px;
+	padding-right: 8px;
 	outline: none !important;
 	border: none !important;
 }
@@ -71,6 +82,7 @@ hr {
 .select-dropdown button::after {
 	float: right;
 	margin-top: 0.6em;
+	position: absolute;
 }
 
 .select-dropdown .dropdown-item {
@@ -491,3 +503,54 @@ div.appRoot > header {
 .sign-in-button:hover {
 	background: var(--vscode-button-hoverBackground);
 }
+
+.loading-overlay-container {
+	position: absolute;
+	display: flex;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	align-items: center;
+	justify-content: center;
+	background-color: rgba(25, 25, 25, 0.5); }
+
+.loading-overlay-spinner {
+	width: 60px;
+	height: 60px;
+	top: 50%;
+	left: 50%;
+	z-index: 1000;
+	-webkit-animation: rotation .6s infinite linear;
+	-moz-animation: rotation .6s infinite linear;
+	-o-animation: rotation .6s infinite linear;
+	animation: rotation .6s infinite linear;
+	border-left: 6px solid rgba(0, 174, 239, 0.15);
+	border-right: 6px solid rgba(0, 174, 239, 0.15);
+	border-bottom: 6px solid rgba(0, 174, 239, 0.15);
+	border-top: 6px solid rgba(0, 174, 239, 0.8);
+	border-radius: 100%; }
+
+@-webkit-keyframes rotation {
+	from {
+	  -webkit-transform: rotate(0deg); }
+	to {
+	  -webkit-transform: rotate(359deg); } }
+
+@-moz-keyframes rotation {
+	from {
+	  -moz-transform: rotate(0deg); }
+	to {
+	  -moz-transform: rotate(359deg); } }
+
+@-o-keyframes rotation {
+	from {
+	  -o-transform: rotate(0deg); }
+	to {
+	  -o-transform: rotate(359deg); } }
+
+@keyframes rotation {
+	from {
+	  transform: rotate(0deg); }
+	to {
+	  transform: rotate(359deg); } }

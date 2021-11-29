@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import {observer} from "mobx-react";
 import { up9AuthStore } from "../stores/up9AuthStore";
-import {sendApiMessage, SendInfoToast} from "../providers/extensionConnectionProvider";
+import {sendApiMessage, sendInfoToast, setExtensionDefaultWorkspace} from "../providers/extensionConnectionProvider";
 import { ApiMessageType } from "../../../models/internal";
 import {Form, FormControl, Dropdown, Container, Row, Col, Card} from 'react-bootstrap';
 import { isHexColorDark, unindentString } from "../utils";
@@ -12,7 +12,10 @@ import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-python";
 import "ace-builds/src-noconflict/theme-chaos";
 import "ace-builds/src-noconflict/theme-chrome";
+import { LoadingOverlay } from "./loadingOverlay";
 
+
+// TODO: split this into multiple components
 const TestsBrowserComponent: React.FC<{}> = observer(() => {
     const [workspaces, setWorkspaces] = useState(null);
     const [workspaceFilterInput, setWorkspaceFilterInput] = useState("");
@@ -28,6 +31,8 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
     const editorBackgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--vscode-editor-background');
 
     const [isThemeDark, setIsThemeDark] = useState(null);
+
+    const [isLoading, setIsLoading] = useState(true);
 
     const getEndpointDisplayText = (endpoint) => {
         return `${endpoint.method.toUpperCase()} ${endpoint.service}${endpoint.path}`;
@@ -52,14 +57,23 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
     }, [editorBackgroundColor]);
 
     const refreshWorkspaces = async () => {
+        setIsLoading(true);
         setWorkspaceFilterInput("");
         try {
             const workspaces = await sendApiMessage(ApiMessageType.WorkspacesList, null);
             setWorkspaces(workspaces);
         } catch(error) {
             console.log(error);
+        } finally {
+            setIsLoading(false);
         }
     }
+
+    useEffect(() => {
+        if (workspaces && up9AuthStore.defaultWorkspace && workspaces.indexOf(up9AuthStore.defaultWorkspace) > -1) {
+            setSelectedWorkspace(up9AuthStore.defaultWorkspace);
+        }
+    }, [workspaces, up9AuthStore.defaultWorkspace]);
 
     useEffect(() => {
         (async () => {
@@ -113,14 +127,23 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
     }, [up9AuthStore.isAuthConfigured]);
 
     const copyToClipboard = (text: string) => {
-        SendInfoToast("Test code copied to clipboard");
+        sendInfoToast("Test code copied to clipboard");
         navigator.clipboard.writeText(text)
+    }
+
+    const setDefaultWorkspace = (workspace: string) => {
+        setExtensionDefaultWorkspace(workspace);
+        up9AuthStore.setDefaultWorkspace(workspace);
     }
 
     // TODO: refactor this
     // ugly workaround for having the dropdowns apply focus to the filter form repeatedly
     const [isWorkspaceDropDownOpen, setIsWorkspaceDropDownOpen] = useState(false);
     const [isEndpointsDropdownOpen, setIsEndpointsDropdownOpen] = useState(false);
+
+    if (isLoading) {
+        return <LoadingOverlay />;
+    }
 
     return <div>
             <div className="user-info">
@@ -132,7 +155,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             </div>
             <div className="select-test-form">
                 <Form.Group className="workspaces-form-group">
-                    <Form.Label>Workspace</Form.Label>
+                    <Form.Label>Workspace {(selectedWorkspace && selectedWorkspace != up9AuthStore.defaultWorkspace) && <a className="anchor-button clickable" onClick={_ => setDefaultWorkspace(selectedWorkspace)}>Make Default</a>}</Form.Label>
                     <br/>
                     <Dropdown className="select-dropdown" onToggle={(isOpen, _) => setIsWorkspaceDropDownOpen(isOpen)}>
                         <Dropdown.Toggle>
