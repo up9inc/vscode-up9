@@ -49,7 +49,7 @@ export class CloudRunner {
             const terminalOutputter = this.createAndShowTerminal("Running test through UP9...\n\r");
             const up9Api = new UP9ApiProvider(this._up9Auth.getEnv());
             try {
-                const res = await up9Api.testRunSingle(defaultWorkspace, indentString(code, 4), token);
+                const res = await up9Api.testRunSingle(defaultWorkspace, code, token);
                 if (!res.testLog) {
                     throw "UP9 API returned empty response, does this workspace have a live agent?";
                 }

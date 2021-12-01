@@ -14,3 +14,11 @@ export const isHexColorDark = (hexColor: string) => {
     }
     return false;
 }
+
+export const transformTest = (test: any) => {
+    test.code = test.code.replace('def ', 'def test_');
+    test.code = test.code.replaceAll('self.base_url', `"${test.target}"`);
+    test.code = test.code.replaceAll('resp = self.', 'resp = requests.');
+
+    return test;
+}
