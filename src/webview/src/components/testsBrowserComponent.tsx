@@ -4,10 +4,10 @@ import { up9AuthStore } from "../stores/up9AuthStore";
 import {sendApiMessage, sendInfoToast, setExtensionDefaultWorkspace} from "../providers/extensionConnectionProvider";
 import { ApiMessageType } from "../../../models/internal";
 import {Form, FormControl, Dropdown, Container, Row, Col, Card} from 'react-bootstrap';
-import { isHexColorDark } from "../utils";
+import { isHexColorDark, transformTest } from "../utils";
 import { v4 as uuidv4 } from 'uuid';
 import { copyIcon, userIcon } from "./svgs";
-import { microTestsHeader } from "../../../utils";
+import { microTestsHeader } from "../../../consts";
 
 import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-python";
