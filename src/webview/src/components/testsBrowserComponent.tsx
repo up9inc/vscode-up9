@@ -14,6 +14,11 @@ import "ace-builds/src-noconflict/theme-chaos";
 import "ace-builds/src-noconflict/theme-chrome";
 import { LoadingOverlay } from "./loadingOverlay";
 
+enum TestCodeMode {
+    Code = "code",
+    Test = "test"
+}
+
 
 // TODO: split this into multiple components
 const TestsBrowserComponent: React.FC<{}> = observer(() => {
@@ -33,6 +38,8 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
     const [isThemeDark, setIsThemeDark] = useState(null);
 
     const [isLoading, setIsLoading] = useState(true);
+
+    const [testCodeMode, setTestCodeMode] = useState(TestCodeMode.Test);
 
     const getEndpointDisplayText = (endpoint) => {
         return `${endpoint.method.toUpperCase()} ${endpoint.service}${endpoint.path}`;
@@ -55,6 +62,18 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
     useEffect(() => {
         setIsThemeDark(isHexColorDark(editorBackgroundColor))
     }, [editorBackgroundColor]);
+
+    const testCode = useMemo(() => {
+        if (!endpointTest) {
+            return null;
+        }
+
+        if (testCodeMode === TestCodeMode.Test) {
+            return `${microTestsHeader}\n${endpointTest.code}`;
+        }
+
+        return endpointTest.code;
+    }, [endpointTest, testCodeMode]);
 
     const refreshWorkspaces = async () => {
         setIsLoading(true);
@@ -102,12 +121,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                     if (tests?.tests?.length < 1) {
                         return;
                     }
-                    let test = tests.tests.find(t => t.tag == "minimal");
-                    if (!test) {
-                        test = tests.tests[0];
-                    }
-
-                    test.code = unindentString(test.code); // tests from up9 come over indented by 4 spaces
+                    const test = transformTest(tests.tests[0]);
                     test.uuid = uuidv4(); //for react Key prop
 
                     setEndpointTest(test);
@@ -188,7 +202,8 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             <hr/>
             <div className="tests-list-container">
             <Form.Group>
-                <Form.Label>Code</Form.Label>
+                <Form.Check inline label="Test" name="group1" type="radio" checked={testCodeMode == TestCodeMode.Test} onClick={_ => setTestCodeMode(TestCodeMode.Test)} />
+                <Form.Check inline label="Code" name="group1" type="radio" checked={testCodeMode == TestCodeMode.Code} onClick={_ => setTestCodeMode(TestCodeMode.Code)} />
             </Form.Group> 
             <Container>
                 <Card className="test-row">
@@ -197,14 +212,14 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                             <Row>
                                 <Col xs="10" md="10" lg="10" style={{"paddingLeft": "5px"}}>{endpointTest.variantDisplayName}</Col>
                                 <Col xs="1" md="1" lg="1" style={{"padding": "0"}}>
-                                    <span className="clickable" onClick={_ => copyToClipboard(endpointTest.code)}>{copyIcon}</span>
+                                    <span className="clickable" onClick={_ => copyToClipboard(testCode)}>{copyIcon}</span>
                                 </Col>
                             </Row>
                         </Container>
                     </Card.Header>
                     <Card.Body>
-                            <AceEditor width="100%" mode="python" fontSize="14px" maxLines={1000} height={`${14 * endpointTest.code.split(/\r\n|\r|\n/).length}px`}
-                            theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={endpointTest.code}
+                            <AceEditor width="100%" mode="python" fontSize="14px" maxLines={1000}
+                            theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={testCode}
                                 setOptions={{showGutter: false, hScrollBarAlwaysVisible: false, highlightActiveLine: false}}/>
                     </Card.Body>
                 </Card>
