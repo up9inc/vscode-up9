@@ -4,7 +4,8 @@ import { up9AuthStore } from "../stores/up9AuthStore";
 import {sendApiMessage, sendInfoToast, setExtensionDefaultWorkspace} from "../providers/extensionConnectionProvider";
 import { ApiMessageType } from "../../../models/internal";
 import {Form, FormControl, Dropdown, Container, Row, Col, Card} from 'react-bootstrap';
-import { isHexColorDark, unindentString } from "../utils";
+import { isHexColorDark, transformTest } from "../utils";
+import { microTestsHeader } from "../../../consts";
 import { v4 as uuidv4 } from 'uuid';
 import { copyIcon, userIcon } from "./svgs";
 
@@ -102,12 +103,9 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                     if (tests?.tests?.length < 1) {
                         return;
                     }
-                    let test = tests.tests.find(t => t.tag == "minimal");
-                    if (!test) {
-                        test = tests.tests[0];
-                    }
+                    const test = transformTest(tests.tests[0]);
 
-                    test.code = unindentString(test.code); // tests from up9 come over indented by 4 spaces
+                    test.code = `${microTestsHeader}\n${test.code}`;
                     test.uuid = uuidv4(); //for react Key prop
 
                     setEndpointTest(test);
