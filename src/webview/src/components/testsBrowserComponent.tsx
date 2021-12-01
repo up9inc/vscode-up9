@@ -4,16 +4,21 @@ import { up9AuthStore } from "../stores/up9AuthStore";
 import {sendApiMessage, sendInfoToast, setExtensionDefaultWorkspace} from "../providers/extensionConnectionProvider";
 import { ApiMessageType } from "../../../models/internal";
 import {Form, FormControl, Dropdown, Container, Row, Col, Card} from 'react-bootstrap';
-import { isHexColorDark, transformTest } from "../utils";
-import { microTestsHeader } from "../../../consts";
+import { isHexColorDark } from "../utils";
 import { v4 as uuidv4 } from 'uuid';
 import { copyIcon, userIcon } from "./svgs";
+import { microTestsHeader } from "../../../utils";
 
 import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-python";
 import "ace-builds/src-noconflict/theme-chaos";
 import "ace-builds/src-noconflict/theme-chrome";
 import { LoadingOverlay } from "./loadingOverlay";
+
+enum TestCodeMode {
+    Code = "code",
+    Test = "test"
+}
 
 
 // TODO: split this into multiple components
@@ -34,6 +39,8 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
     const [isThemeDark, setIsThemeDark] = useState(null);
 
     const [isLoading, setIsLoading] = useState(true);
+
+    const [testCodeMode, setTestCodeMode] = useState(TestCodeMode.Test);
 
     const getEndpointDisplayText = (endpoint) => {
         return `${endpoint.method.toUpperCase()} ${endpoint.service}${endpoint.path}`;
@@ -56,6 +63,18 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
     useEffect(() => {
         setIsThemeDark(isHexColorDark(editorBackgroundColor))
     }, [editorBackgroundColor]);
+
+    const testCode = useMemo(() => {
+        if (!endpointTest) {
+            return null;
+        }
+
+        if (testCodeMode === TestCodeMode.Test) {
+            return `${microTestsHeader}\n${endpointTest.code}`;
+        }
+
+        return endpointTest.code;
+    }, [endpointTest, testCodeMode]);
 
     const refreshWorkspaces = async () => {
         setIsLoading(true);
@@ -104,8 +123,6 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                         return;
                     }
                     const test = transformTest(tests.tests[0]);
-
-                    test.code = `${microTestsHeader}\n${test.code}`;
                     test.uuid = uuidv4(); //for react Key prop
 
                     setEndpointTest(test);
@@ -186,7 +203,8 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             <hr/>
             <div className="tests-list-container">
             <Form.Group>
-                <Form.Label>Code</Form.Label>
+                <Form.Check inline label="Test" name="group1" type="radio" checked={testCodeMode == TestCodeMode.Test} onClick={_ => setTestCodeMode(TestCodeMode.Test)} />
+                <Form.Check inline label="Code" name="group1" type="radio" checked={testCodeMode == TestCodeMode.Code} onClick={_ => setTestCodeMode(TestCodeMode.Code)} />
             </Form.Group> 
             <Container>
                 <Card className="test-row">
@@ -195,14 +213,14 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                             <Row>
                                 <Col xs="10" md="10" lg="10" style={{"paddingLeft": "5px"}}>{endpointTest.variantDisplayName}</Col>
                                 <Col xs="1" md="1" lg="1" style={{"padding": "0"}}>
-                                    <span className="clickable" onClick={_ => copyToClipboard(endpointTest.code)}>{copyIcon}</span>
+                                    <span className="clickable" onClick={_ => copyToClipboard(testCode)}>{copyIcon}</span>
                                 </Col>
                             </Row>
                         </Container>
                     </Card.Header>
                     <Card.Body>
-                            <AceEditor width="100%" mode="python" fontSize="14px" maxLines={1000} height={`${14 * endpointTest.code.split(/\r\n|\r|\n/).length}px`}
-                            theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={endpointTest.code}
+                            <AceEditor width="100%" mode="python" fontSize="14px" maxLines={1000}
+                            theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={testCode}
                                 setOptions={{showGutter: false, hScrollBarAlwaysVisible: false, highlightActiveLine: false}}/>
                     </Card.Body>
                 </Card>
