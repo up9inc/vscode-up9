@@ -14,7 +14,8 @@ export enum MessageCommandType {
 export enum ApiMessageType {
     WorkspacesList = "workspaceList",
     EndpointsList = "endpointList",
-    EndpointTests = "endpointTests"
+    EndpointTests = "endpointTests",
+    Swagger = "swagger"
 }
 
 export interface WebViewApiMessage {
