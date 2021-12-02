@@ -7,3 +7,11 @@ export const internalRunTestCommandName = "up9.runTest";
 
 export const authGlobalStorageKey = "up9.auth.data";
 export const authEnvStorageKey = "up9.auth.env";
+
+export const microTestsHeader = `import requests
+import unittest
+from urllib.parse import urlencode
+
+
+class Tests(unittest.TestCase):
+`;
