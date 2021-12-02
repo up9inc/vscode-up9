@@ -22,3 +22,41 @@ export const transformTest = (test: any) => {
 
     return test;
 }
+
+
+// produces a simplified version of the endpoint schema for easier reading
+export const getSchemaForViewForEndpointSchema = (endpointSchema: any) => {
+    const requests = {};
+    for (const requestContentType in endpointSchema.requestBody?.content) {
+        const contentTypeRequestProperties = endpointSchema.requestBody?.content[requestContentType]?.schema?.properties;
+        if (contentTypeRequestProperties) {
+            requests[requestContentType] = contentTypeRequestProperties;
+        }
+    }
+
+    const responses = {};
+
+    for (const responseCode in endpointSchema.responses) {
+        const response = endpointSchema.responses[responseCode];
+        if (response.content) {
+            responses[responseCode] = {};
+            for (const contentType in response.content) {
+                responses[responseCode][contentType] = {
+                    schema: response.content[contentType].schema
+                }
+            }
+        }
+    }
+    
+    const schemaForView = {} as any;
+    if (Object.keys(endpointSchema.parameters).length) {
+        schemaForView.parameters = endpointSchema.parameters;
+    }
+    if (Object.keys(requests).length) {
+        schemaForView.requests = requests;
+    }
+    if (Object.keys(responses).length) {
+        schemaForView.responses = responses;
+    }
+    return JSON.stringify(schemaForView, null, 4);
+};
