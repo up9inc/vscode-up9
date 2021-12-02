@@ -40,7 +40,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
 
     const [isLoading, setIsLoading] = useState(true);
 
-    const [testCodeMode, setTestCodeMode] = useState(TestCodeMode.Test);
+    const [testCodeMode, setTestCodeMode] = useState(TestCodeMode.Code);
 
     const getEndpointDisplayText = (endpoint) => {
         return `${endpoint.method.toUpperCase()} ${endpoint.service}${endpoint.path}`;
@@ -203,8 +203,8 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             <hr/>
             <div className="tests-list-container">
             <Form.Group>
-                <Form.Check inline label="Test" name="group1" type="radio" checked={testCodeMode == TestCodeMode.Test} onClick={_ => setTestCodeMode(TestCodeMode.Test)} />
                 <Form.Check inline label="Code" name="group1" type="radio" checked={testCodeMode == TestCodeMode.Code} onClick={_ => setTestCodeMode(TestCodeMode.Code)} />
+                <Form.Check inline label="Test" name="group1" type="radio" checked={testCodeMode == TestCodeMode.Test} onClick={_ => setTestCodeMode(TestCodeMode.Test)} />
             </Form.Group> 
             <Container>
                 <Card className="test-row">
