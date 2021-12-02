@@ -1,5 +1,6 @@
 import * as childProcess from 'child_process';
 import * as k8s from '@kubernetes/client-node';
+import * as httpProxy from 'http-proxy';
 
 const k8sProxyPort = 43441;
 const httpProxyPort = 43442;
@@ -9,6 +10,7 @@ export class K8STunnel {
     private interval: any;
     private isStarted: boolean = false;
     private k8sProxyProcess: childProcess.ChildProcess;
+    private proxy: httpProxy;
 
     private serviceInternalDnsNameToProxyPathDict: { [serviceInternalDnsName: string]: string } = {};
     
@@ -31,12 +33,22 @@ export class K8STunnel {
 
         this.syncServices();
         this.interval = setInterval(this.syncServices, 30000);
+        this.startK8sCliProxy();
+    }
+
+    private startHttpProxy() {
+        this.proxy = httpProxy.createProxyServer({
+            ws: true,
+            target: `http://localhost:${httpProxyPort}`
+        }).listen(httpProxyPort);
+        
     }
 
     public stop() {
         clearInterval(this.interval);
         this.isStarted = false;
-
+        
+        this.proxy.close();
         try {
             this.k8sProxyProcess.kill();
         } catch (e) {
@@ -44,12 +56,12 @@ export class K8STunnel {
         }
     }
 
-    private async startK8sCliProxy() {
-        this.k8sProxyProcess = childProcess.spawn('kubectl', ['proxy', `--port=${43441}`]);
+    private startK8sCliProxy() {
+        this.k8sProxyProcess = childProcess.spawn('kubectl', ['proxy', `--port=${k8sProxyPort}`]);
         this.k8sProxyProcess.stderr.on('data', (data) => {
             console.error(`k8s proxy stderr: ${data}`);
             this.stop();
-        };
+        });
     }
 
     private async syncServices() {

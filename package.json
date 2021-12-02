@@ -88,6 +88,7 @@
   },
   "devDependencies": {
     "@types/glob": "^7.2.0",
+    "@types/http-proxy": "^1.17.7",
     "@types/mocha": "^9.0.0",
     "@types/node": "^10.12.21",
     "@types/tmp": "^0.2.2",
@@ -106,6 +107,7 @@
     "@kubernetes/client-node": "^0.16.1",
     "axios": "^0.24.0",
     "client-oauth2": "^4.3.3",
+    "http-proxy": "^1.18.1",
     "jsonwebtoken": "^8.5.1",
     "open": "^8.4.0"
   }
