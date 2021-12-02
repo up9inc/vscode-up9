@@ -3,14 +3,15 @@ import {observer} from "mobx-react";
 import { up9AuthStore } from "../stores/up9AuthStore";
 import {sendApiMessage, sendInfoToast, setExtensionDefaultWorkspace} from "../providers/extensionConnectionProvider";
 import { ApiMessageType } from "../../../models/internal";
-import {Form, FormControl, Dropdown, Container, Row, Col, Card} from 'react-bootstrap';
-import { isHexColorDark, transformTest } from "../utils";
+import {Form, FormControl, Dropdown, Container, Row, Col, Card, Accordion} from 'react-bootstrap';
+import { getSchemaForViewForEndpointSchema, isHexColorDark, transformTest } from "../utils";
 import { v4 as uuidv4 } from 'uuid';
 import { copyIcon, userIcon } from "./svgs";
 import { microTestsHeader } from "../../../consts";
 
 import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-python";
+import "ace-builds/src-noconflict/mode-json";
 import "ace-builds/src-noconflict/theme-chaos";
 import "ace-builds/src-noconflict/theme-chrome";
 import { LoadingOverlay } from "./loadingOverlay";
@@ -26,6 +27,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
     const [workspaces, setWorkspaces] = useState(null);
     const [workspaceFilterInput, setWorkspaceFilterInput] = useState("");
     const [selectedWorkspace, setSelectedWorkspace] = useState("");
+    const [workspaceOAS, setWorkspaceOAS] = useState(null);
 
     const [endpoints, setEndpoints] = useState(null);
     const [endpointFilterInput, setEndpointFilterInput] = useState("");
@@ -59,6 +61,20 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
         }
         return workspaces.filter(workspace => workspace.toLocaleLowerCase().indexOf(workspaceFilterInput.toLowerCase()) > -1);
     }, [workspaces, workspaceFilterInput]);
+
+    const endpointSchemaJSONString = useMemo(() => {
+        if (!selectedEndpoint || !workspaceOAS) {
+            return null;
+        }
+
+        const endpointSchema = workspaceOAS?.[selectedEndpoint.service]?.paths?.[selectedEndpoint.path]?.[selectedEndpoint.method.toLowerCase()];
+        if (!endpointSchema) {
+            console.warn("could not find schema for endpoint from OAS");
+            return null;
+        }
+        console.log('endpointSchema', endpointSchema);
+        return getSchemaForViewForEndpointSchema(endpointSchema);
+    }, [selectedEndpoint]);
 
     useEffect(() => {
         setIsThemeDark(isHexColorDark(editorBackgroundColor))
@@ -100,12 +116,21 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             setSelectedEndpoint(null);
             setEndpointFilterInput("");
             setEndpoints(null);
+            setWorkspaceOAS(null);
+
             if (selectedWorkspace) {
                 try {
                     const endpoints = await sendApiMessage(ApiMessageType.EndpointsList, {workspaceId: selectedWorkspace});
                     setEndpoints(endpoints);
                 } catch (error) {
-                    console.log('error loading endpoints', error);
+                    console.error('error loading workspace endpoints', error);
+                }
+
+                try {
+                    const workspaceOAS = await sendApiMessage(ApiMessageType.Swagger, {workspaceId: selectedWorkspace});
+                    setWorkspaceOAS(workspaceOAS);
+                } catch (error) {
+                    console.error('error loading workspace OAS', error);
                 }
             }
         })()
@@ -224,6 +249,16 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                                 setOptions={{showGutter: false, hScrollBarAlwaysVisible: false, highlightActiveLine: false}}/>
                     </Card.Body>
                 </Card>
+                {endpointSchemaJSONString && <Accordion>
+                    <Accordion.Item eventKey="0">
+                        <Accordion.Header>Endpoint Schema</Accordion.Header>
+                        <Accordion.Body style={{maxHeight: "700px", overflowY: "auto"}}>
+                            <AceEditor width="100%" mode="json" fontSize="14px" maxLines={1000} height={`${14 * endpointSchemaJSONString.split(/\r\n|\r|\n/).length}px`}
+                                theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={endpointSchemaJSONString}
+                                setOptions={{showGutter: false, hScrollBarAlwaysVisible: false, highlightActiveLine: false}}/>
+                        </Accordion.Body>
+                    </Accordion.Item>
+                </Accordion>}
             </Container>
             </div>
             </>}

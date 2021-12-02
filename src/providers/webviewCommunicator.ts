@@ -67,16 +67,20 @@ export class UP9WebviewCommunicator {
     }
 
     private notifyPanelOfAuthStateChange(authStatus: boolean): void {
-        if (authStatus) {
-            this._panel.webview.postMessage({
-                command: MessageCommandType.AuthSuccess,
-                username: this._authProvider.getUsernameFromToken()
-            });
-        } else {
-            this._panel.webview.postMessage({
-                command: MessageCommandType.AuthSignOut,
-            });
-        }
+        try {
+            if (authStatus) {
+                this._panel.webview.postMessage({
+                    command: MessageCommandType.AuthSuccess,    
+                    username: this._authProvider.getUsernameFromToken()
+                });
+            } else {
+                this._panel.webview.postMessage({
+                    command: MessageCommandType.AuthSignOut,
+                });
+            }
+        } catch (error) {
+            console.warn('failed to send auth state to panel', error);
+        }   
     }
 
     private async sendStoredDataToPanel(): Promise<void> {
@@ -106,6 +110,10 @@ export class UP9WebviewCommunicator {
                 case ApiMessageType.EndpointTests:
                     const tests = await this._apiProvider.getTestsForSpan(messageData.params.workspaceId, messageData.params.spanGuid, token);
                     this.handlePanelUP9ApiResponse(messageData, tests, null);
+                    break;
+                case ApiMessageType.Swagger:
+                    const swagger = await this._apiProvider.getSwagger(messageData.params.workspaceId, token);
+                    this.handlePanelUP9ApiResponse(messageData, swagger, null);
                     break;
             }
         } catch (error) {
