@@ -18,7 +18,8 @@ import { LoadingOverlay } from "./loadingOverlay";
 
 enum TestCodeMode {
     Code = "code",
-    Test = "test"
+    Test = "test",
+    Schema = "schema"
 }
 
 
@@ -72,15 +73,27 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             console.warn("could not find schema for endpoint from OAS");
             return null;
         }
-        console.log('endpointSchema', endpointSchema);
+
         return getSchemaForViewForEndpointSchema(endpointSchema);
     }, [selectedEndpoint]);
+
+    useEffect(() => {
+        // make sure ui doesnt reach a weird state where no schema is available and we hide the schema radio button
+        if (!endpointSchemaJSONString && testCodeMode == TestCodeMode.Schema) {
+            setTestCodeMode(TestCodeMode.Code);
+            sendInfoToast("No schema available for selected endpoint");
+        }
+    }, [endpointSchemaJSONString, testCodeMode]);
 
     useEffect(() => {
         setIsThemeDark(isHexColorDark(editorBackgroundColor))
     }, [editorBackgroundColor]);
 
     const testCode = useMemo(() => {
+        if (testCodeMode == TestCodeMode.Schema) {
+            return endpointSchemaJSONString;
+        }
+
         if (!endpointTest) {
             return null;
         }
@@ -90,7 +103,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
         }
 
         return endpointTest.code;
-    }, [endpointTest, testCodeMode]);
+    }, [endpointTest, testCodeMode, endpointSchemaJSONString]);
 
     const refreshWorkspaces = async () => {
         setIsLoading(true);
@@ -189,7 +202,6 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             <div className="user-info">
                 <div>
                     <p>{up9AuthStore.username}</p>
-                    {/* <img src={userIcon} /> */}
                     {userIcon}
                 </div>
             </div>
@@ -227,39 +239,30 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             {endpointTest && <>
             <hr/>
             <div className="tests-list-container">
-            <Form.Group>
-                <Form.Check inline label="Code" name="group1" type="radio" checked={testCodeMode == TestCodeMode.Code} onClick={_ => setTestCodeMode(TestCodeMode.Code)} />
-                <Form.Check inline label="Test" name="group1" type="radio" checked={testCodeMode == TestCodeMode.Test} onClick={_ => setTestCodeMode(TestCodeMode.Test)} />
-            </Form.Group> 
-            <Container>
-                <Card className="test-row">
-                    <Card.Header className="test-row-card-header">
-                        <Container>
-                            <Row>
-                                <Col xs="10" md="10" lg="10" style={{"paddingLeft": "5px"}}>{endpointTest.variantDisplayName}</Col>
-                                <Col xs="1" md="1" lg="1" style={{"padding": "0"}}>
-                                    <span className="clickable" onClick={_ => copyToClipboard(testCode)}>{copyIcon}</span>
-                                </Col>
-                            </Row>
-                        </Container>
-                    </Card.Header>
-                    <Card.Body>
-                            <AceEditor width="100%" mode="python" fontSize="14px" maxLines={1000}
-                            theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={testCode}
-                                setOptions={{showGutter: false, hScrollBarAlwaysVisible: false, highlightActiveLine: false}}/>
-                    </Card.Body>
-                </Card>
-                {endpointSchemaJSONString && <Accordion>
-                    <Accordion.Item eventKey="0">
-                        <Accordion.Header>Endpoint Schema</Accordion.Header>
-                        <Accordion.Body style={{maxHeight: "700px", overflowY: "auto"}}>
-                            <AceEditor width="100%" mode="json" fontSize="14px" maxLines={1000} height={`${14 * endpointSchemaJSONString.split(/\r\n|\r|\n/).length}px`}
-                                theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={endpointSchemaJSONString}
-                                setOptions={{showGutter: false, hScrollBarAlwaysVisible: false, highlightActiveLine: false}}/>
-                        </Accordion.Body>
-                    </Accordion.Item>
-                </Accordion>}
-            </Container>
+                <Form.Group>
+                    <Form.Check inline label="Code" name="group1" type="radio" checked={testCodeMode == TestCodeMode.Code} onClick={_ => setTestCodeMode(TestCodeMode.Code)} />
+                    <Form.Check inline label="Test" name="group1" type="radio" checked={testCodeMode == TestCodeMode.Test} onClick={_ => setTestCodeMode(TestCodeMode.Test)} />
+                    {endpointSchemaJSONString && <Form.Check inline label="Schema" name="group1" type="radio" checked={testCodeMode == TestCodeMode.Schema} onClick={_ => setTestCodeMode(TestCodeMode.Schema)} />}
+                </Form.Group> 
+                <Container>
+                    <Card className="test-row">
+                        <Card.Header className="test-row-card-header">
+                            <Container>
+                                <Row>
+                                    <Col xs="10" md="10" lg="10" style={{"paddingLeft": "5px"}}></Col>
+                                    <Col xs="1" md="1" lg="1" style={{"padding": "0"}}>
+                                        <span className="clickable" onClick={_ => copyToClipboard(testCode)}>{copyIcon}</span>
+                                    </Col>
+                                </Row>
+                            </Container>
+                        </Card.Header>
+                        <Card.Body>
+                                <AceEditor width="100%" mode="python" fontSize="14px" maxLines={1000}
+                                theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={testCode}
+                                    setOptions={{showGutter: false, hScrollBarAlwaysVisible: false, highlightActiveLine: false}}/>
+                        </Card.Body>
+                    </Card>
+                </Container>
             </div>
             </>}
             {(testsLoaded && !endpointTest) && <p>No code found for this endpoint</p>}
