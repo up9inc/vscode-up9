@@ -1,3 +1,4 @@
+import * as http from 'http';
 import * as childProcess from 'child_process';
 import * as k8s from '@kubernetes/client-node';
 import * as httpProxy from 'http-proxy';
@@ -11,9 +12,9 @@ export class K8STunnel {
     private isStarted: boolean = false;
     private k8sProxyProcess: childProcess.ChildProcess;
     private proxy: httpProxy;
+    private httpServer: http.Server;
 
     private serviceInternalDnsNameToProxyPathDict: { [serviceInternalDnsName: string]: string } = {};
-    
 
 
     public constructor() {
@@ -37,11 +38,25 @@ export class K8STunnel {
     }
 
     private startHttpProxy() {
-        this.proxy = httpProxy.createProxyServer({
-            ws: true,
-            target: `http://localhost:${httpProxyPort}`
-        }).listen(httpProxyPort);
-        
+        this.proxy = httpProxy.createProxyServer({});
+
+        this.httpServer = http.createServer((req, res) => {
+            const url = new URL(req.url);
+            const protocol = url.protocol;
+            const path = url.pathname;
+            const host = url.hostname;
+            const port = url.port;
+
+            const k8sProxyRedirectHost = this.serviceInternalDnsNameToProxyPathDict[`${host}:${port}`];
+
+            if (k8sProxyRedirectHost) {
+                req.url = `${protocol}://${host}:${port}/${path}`;
+                console.log('req.url', req.url);
+                this.proxy.web(req, res, { target: `${protocol}://${k8sProxyRedirectHost}`});
+            } else {
+                this.proxy.web(req, res, { target: `${protocol}://${host}:${port}`});
+            }
+        });
     }
 
     public stop() {
@@ -72,8 +87,8 @@ export class K8STunnel {
             for (const port of service.spec.ports) {
                 const proxyPath = `/api/v1/namespaces/${service.metadata.namespace}/services/${service.metadata.name}:${port.port}/proxy`
 
-                newServiceDnsDict[`${service.metadata.namespace}.${service.metadata.name}.svc.cluster.local`] = proxyPath;
-                newServiceDnsDict[`${service.metadata.namespace}.${service.metadata.name}`] = proxyPath;
+                newServiceDnsDict[`${service.metadata.namespace}.${service.metadata.name}.svc.cluster.local:${port.port}`] = proxyPath;
+                newServiceDnsDict[`${service.metadata.namespace}.${service.metadata.name}:${port.port}`] = proxyPath;
             }
 
             this.serviceInternalDnsNameToProxyPathDict = newServiceDnsDict;
