@@ -41,12 +41,6 @@
                 "--extensionDevelopmentPath=${workspaceFolder}",
                 "--extensionTestsPath=${workspaceFolder}/out/tests/integration/index"
             ],
-            "env": {
-                "UP9_ENV": "stg.testr.io",
-                "UP9_CLIENT_ID": "Vt1tFL3C_JPK31U252u5-bqv_Y7Ja3SW", //DO NOT PUSH THIS!~@#!@#!@
-                "UP9_CLIENT_SECRET": "7w9GxDmJju7M9m4kRBa8AXH9Vl-PN7z_",
-                "DEFAULT_WORKSPACE": "rb-reg-18-11"
-            },
             "outFiles": ["${workspaceFolder}/out/tests/integration/*.js"],
             "preLaunchTask": "npm: pretest"
         }
