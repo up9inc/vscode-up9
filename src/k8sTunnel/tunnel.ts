@@ -50,6 +50,10 @@ export class K8STunnel {
         this.startHttpProxy();
     }
 
+    public getProxyAddress(): string {
+        return `http://localhost:${httpProxyPort}`;
+    }
+
     private startHttpProxy() {
         this.proxy = httpProxy.createProxyServer({});
 
@@ -65,12 +69,14 @@ export class K8STunnel {
             }
 
             const k8sProxyRedirectHost = this.serviceInternalDnsNameToProxyPathDict[`${host}:${port}`];
-
-            if (k8sProxyRedirectHost) {
+            if (host.startsWith("http.bin")) {
+                this.proxy.web(req, res, { target: `http://httpbin.org`, changeOrigin: true, followRedirects: true });
+            }
+            else if (k8sProxyRedirectHost) {
                 const redirectTo = `${protocol}//localhost:${k8sProxyPort}${k8sProxyRedirectHost}${path}`;
-                req.url = `${redirectTo}${path}`;
-                req.headers.host = `localhost:${k8sProxyPort}`;
-                this.proxy.web(req, res, { target: `${protocol}//localhost:${k8sProxyPort}`});
+                req.url = `${redirectTo}`;
+                this.proxy.web(req, res, { target: `${protocol}//localhost:${k8sProxyPort}`, changeOrigin: true, followRedirects: true, prependPath: true });
+                console.log('hi');
             } else {
                 const redirectTo = `${protocol}//${host}:${port}`;
                 this.proxy.web(req, res, { target: redirectTo});

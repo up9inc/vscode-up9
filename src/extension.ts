@@ -33,9 +33,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<vscode
     const startAuthCommand = vscode.commands.registerCommand(startAuthCommandName, () => up9Auth.startNewAuthentication());
     const signOutCommand = vscode.commands.registerCommand(signOutCommandName, () => up9Auth.signOut());
     const startTunnelCommand = vscode.commands.registerCommand(startTunnelCommandName, () => {
-        K8STunnel.getInstance().start();
-
-        vscode.window.showInformationMessage('Tunnel started');
+        const tunnel = K8STunnel.getInstance();
+        tunnel.start();
+        
+        vscode.window.showInformationMessage(`Tunnel is running at ${tunnel.getProxyAddress()}`);
     });
     const stopTunnelCommand = vscode.commands.registerCommand(stopTunnelCommandName, () => K8STunnel.getInstance().stop());
     
