@@ -19,7 +19,9 @@
     "onCommand:up9.openTestsBrowser",
     "onCommand:up9.runTest",
     "onCommand:up9.testAuth",
-    "onCommand:up9.signOut"
+    "onCommand:up9.signOut",
+    "onCommand:up9.startTunnel",
+    "onCommand:up9.stopTunnel"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -39,6 +41,14 @@
       {
         "command": "up9.signOut",
         "title": "UP9: Sign Out"
+      },
+      {
+        "command": "up9.startTunnel",
+        "title": "UP9: Start Tunnel"
+      },
+      {
+        "command": "up9.stopTunnel",
+        "title": "UP9: Stop Tunnel"
       }
     ],
     "menus": {
@@ -81,8 +91,8 @@
   "scripts": {
     "setup-browser": "cd src/webview && npm install && cd ../../",
     "vscode:prepublish": "npm run compile",
-    "compile": "cd src/webview && npm run build && cd ../../ && tsc -p ./ && cp ./src/webview/dist/index.html ./out/",
-    "compile-no-gui": "tsc -p ./",
+    "compile-full": "cd src/webview && npm run build && cd ../../ && tsc -p ./ && cp ./src/webview/dist/index.html ./out/",
+    "compile": "tsc -p ./",
     "pretest": "mkdir -p ./out/tests/integration/resources/ && cp -r ./src/tests/integration/resources/* ./out/tests/integration/resources/",
     "test": "node ./out/tests/integration/runIntegrationTests.js"
   },
