@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { CloudRunner } from './commands/runInCloud';
+import { runCreateTunneledLaunchConfig } from './commands/tunneledLaunchConfig';
 import { envConfigKey } from './consts';
 import { K8STunnel } from './k8sTunnel/tunnel';
 import {
@@ -14,8 +15,9 @@ const testBrowserCommandName = 'up9.openTestsBrowser';
 const runTestInCloudCommandName = 'up9.runTest';
 export const startAuthCommandName = 'up9.webAuth';
 const signOutCommandName = 'up9.signOut';
-const startTunnelCommandName = 'up9.startTunnel';
+export const startTunnelCommandName = 'up9.startTunnel';
 const stopTunnelCommandName = 'up9.stopTunnel';
+const createTunneledConfigCommandName = 'up9.createTunneledLaunchConfig';
 
 
 // onTerminalEmit is used by tests to intercept terminal contents, theres no way to directly get terminal contents otherwise sadly
@@ -35,10 +37,11 @@ export async function activate(context: vscode.ExtensionContext): Promise<vscode
     const startTunnelCommand = vscode.commands.registerCommand(startTunnelCommandName, () => {
         const tunnel = K8STunnel.getInstance();
         tunnel.start();
-        
+
         vscode.window.showInformationMessage(`Tunnel is running at ${tunnel.getProxyAddress()}`);
     });
     const stopTunnelCommand = vscode.commands.registerCommand(stopTunnelCommandName, () => K8STunnel.getInstance().stop());
+    const createTunneledConfigCommand = vscode.commands.registerCommand(createTunneledConfigCommandName, () => runCreateTunneledLaunchConfig(K8STunnel.getInstance().getProxyAddress()));
     
 
     context.subscriptions.push(openTestBrowserCommand);
@@ -47,6 +50,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<vscode
     context.subscriptions.push(signOutCommand);
     context.subscriptions.push(startTunnelCommand);
     context.subscriptions.push(stopTunnelCommand);
+    context.subscriptions.push(createTunneledConfigCommand);
 
     // return the context so its usable by tests
     return context;

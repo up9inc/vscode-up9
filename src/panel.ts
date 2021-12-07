@@ -3,7 +3,6 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { UP9WebviewCommunicator } from './providers/webviewCommunicator';
 import { UP9Auth } from './providers/up9Auth';
-import { MessageCommandType } from './models/internal';
 
 const panelId = "up9BrowserPanel";
 const panelTitle = "UP9 Code Browser";

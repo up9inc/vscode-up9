@@ -21,7 +21,8 @@
     "onCommand:up9.testAuth",
     "onCommand:up9.signOut",
     "onCommand:up9.startTunnel",
-    "onCommand:up9.stopTunnel"
+    "onCommand:up9.stopTunnel",
+    "onCommand:up9.createTunneledLaunchConfig"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -49,6 +50,10 @@
       {
         "command": "up9.stopTunnel",
         "title": "UP9: Stop Tunnel"
+      },
+      {
+        "command": "up9.createTunneledLaunchConfig",
+        "title": "UP9: Create Tunneled Launch Config"
       }
     ],
     "menus": {
