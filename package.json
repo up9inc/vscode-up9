@@ -96,8 +96,8 @@
   "scripts": {
     "setup-browser": "cd src/webview && npm install && cd ../../",
     "vscode:prepublish": "npm run compile",
-    "compile-full": "cd src/webview && npm run build && cd ../../ && tsc -p ./ && cp ./src/webview/dist/index.html ./out/",
-    "compile": "tsc -p ./",
+    "compile": "cd src/webview && npm run build && cd ../../ && tsc -p ./ && cp ./src/webview/dist/index.html ./out/",
+    "compile-no-browser": "tsc -p ./",
     "pretest": "mkdir -p ./out/tests/integration/resources/ && cp -r ./src/tests/integration/resources/* ./out/tests/integration/resources/",
     "test": "node ./out/tests/integration/runIntegrationTests.js"
   },
