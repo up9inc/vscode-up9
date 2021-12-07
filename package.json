@@ -19,7 +19,10 @@
     "onCommand:up9.openTestsBrowser",
     "onCommand:up9.runTest",
     "onCommand:up9.testAuth",
-    "onCommand:up9.signOut"
+    "onCommand:up9.signOut",
+    "onCommand:up9.startTunnel",
+    "onCommand:up9.stopTunnel",
+    "onCommand:up9.createTunneledLaunchConfig"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -39,6 +42,18 @@
       {
         "command": "up9.signOut",
         "title": "UP9: Sign Out"
+      },
+      {
+        "command": "up9.startTunnel",
+        "title": "UP9: Start Tunnel"
+      },
+      {
+        "command": "up9.stopTunnel",
+        "title": "UP9: Stop Tunnel"
+      },
+      {
+        "command": "up9.createTunneledLaunchConfig",
+        "title": "UP9: Create Tunneled Launch Config"
       }
     ],
     "menus": {
@@ -82,12 +97,13 @@
     "setup-browser": "cd src/webview && npm install && cd ../../",
     "vscode:prepublish": "npm run compile",
     "compile": "cd src/webview && npm run build && cd ../../ && tsc -p ./ && cp ./src/webview/dist/index.html ./out/",
-    "compile-no-gui": "tsc -p ./",
+    "compile-no-browser": "tsc -p ./",
     "pretest": "mkdir -p ./out/tests/integration/resources/ && cp -r ./src/tests/integration/resources/* ./out/tests/integration/resources/",
     "test": "node ./out/tests/integration/runIntegrationTests.js"
   },
   "devDependencies": {
     "@types/glob": "^7.2.0",
+    "@types/http-proxy": "^1.17.7",
     "@types/mocha": "^9.0.0",
     "@types/node": "^10.12.21",
     "@types/tmp": "^0.2.2",
@@ -103,8 +119,10 @@
     "webpack-cli": "^4.9.1"
   },
   "dependencies": {
+    "@kubernetes/client-node": "^0.16.1",
     "axios": "^0.24.0",
     "client-oauth2": "^4.3.3",
+    "http-proxy": "^1.18.1",
     "jsonwebtoken": "^8.5.1",
     "open": "^8.4.0"
   }
