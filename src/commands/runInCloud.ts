@@ -22,7 +22,7 @@ export class CloudRunner {
     }
 
     public startTestRun = (code: string): Promise<void> => {
-        return new Promise<any>(async (resolve, reject) => {
+        const promise = new Promise<any>(async (resolve, reject) => {
             let token: string;
 
             if (!(await this._up9Auth.isAuthenticated())) {
@@ -46,7 +46,7 @@ export class CloudRunner {
             }
 
             //TODO: reuse the same terminal (will require having only 1 simultaneous test run)
-            const terminalOutputter = this.createAndShowTerminal("Running test through UP9...\n\r");
+            const terminalOutputter = this.createAndShowTerminal("Running test through UP9...\n\r", promise);
             const up9Api = new UP9ApiProvider(this._up9Auth.getEnv());
             try {
                 const res = await up9Api.testRunSingle(defaultWorkspace, code, token);
@@ -76,17 +76,31 @@ export class CloudRunner {
             }
             
         });
+
+        return promise;
     }
 
-    private createAndShowTerminal = (initialMessage: string): vscode.EventEmitter<string> => {
+    private createAndShowTerminal = (initialMessage: string, commandPromise: Promise<any>): vscode.EventEmitter<string> => {
         const statusTerminalEmitter = new vscode.EventEmitter<string>();
+        let statusTerminal: vscode.Terminal;
+
+        let isPromiseResolved = false;
+        commandPromise.then(() => {
+            statusTerminalEmitter.fire(`\n\rExecution completed, Press 'enter' to quit this terminal\n\r`);
+            isPromiseResolved = true;
+        });
+
         const terminalHandlers = {
             onDidWrite: statusTerminalEmitter.event,
             open: () => {this.processTerminalOutputAndPrint(initialMessage, statusTerminalEmitter);},
             close: () => { /* noop*/ },
-            handleInput: (_: string) => {} //seal terminal to user input
+            handleInput: (input: string) => {
+                if (isPromiseResolved && input.charCodeAt(0) == 13) {
+                    statusTerminal.dispose();
+                }
+            }
         };
-        const statusTerminal = vscode.window.createTerminal({ name: 'UP9 Test Run', pty: terminalHandlers });
+        statusTerminal = vscode.window.createTerminal({ name: 'UP9 Test Run', pty: terminalHandlers });
         statusTerminal.show();
 
         return statusTerminalEmitter;
