@@ -156,6 +156,12 @@ hr {
 	flex-grow: 2;
 	flex-shrink: 2;
 	flex-basis: 66%;
+	max-width: 50%;
+}
+
+.select-dropdown > button {
+	overflow-x: hidden;
+	text-overflow: ellipsis;
 }
 
 .tests-list-container {
