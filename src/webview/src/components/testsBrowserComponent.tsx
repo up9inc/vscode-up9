@@ -198,7 +198,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
         return <LoadingOverlay />;
     }
 
-    return <div>
+    return <>
             <div className="user-info">
                 <div>
                     <p>{up9AuthStore.username}</p>
@@ -239,12 +239,12 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             {endpointTest && <>
             <hr/>
             <div className="tests-list-container">
-                <Form.Group>
+                <Form.Group className="check-box-container">
                     <Form.Check inline label="Code" name="group1" type="radio" checked={testCodeMode == TestCodeMode.Code} onClick={_ => setTestCodeMode(TestCodeMode.Code)} />
                     <Form.Check inline label="Test" name="group1" type="radio" checked={testCodeMode == TestCodeMode.Test} onClick={_ => setTestCodeMode(TestCodeMode.Test)} />
                     {endpointSchemaJSONString && <Form.Check inline label="Schema" name="group1" type="radio" checked={testCodeMode == TestCodeMode.Schema} onClick={_ => setTestCodeMode(TestCodeMode.Schema)} />}
                 </Form.Group> 
-                <Container>
+                <Container className="test-code-container">
                     <Card className="test-row">
                         <Card.Header className="test-row-card-header">
                             <Container>
@@ -256,7 +256,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                                 </Row>
                             </Container>
                         </Card.Header>
-                        <Card.Body>
+                        <Card.Body style={{height: "100%", overflowY: "auto"}}>
                                 <AceEditor width="100%" mode="python" fontSize="14px" maxLines={1000}
                                 theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={testCode}
                                     setOptions={{showGutter: false, hScrollBarAlwaysVisible: false, highlightActiveLine: false}}/>
@@ -266,7 +266,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             </div>
             </>}
             {(testsLoaded && !endpointTest) && <p>No code found for this endpoint</p>}
-        </div>;
+        </>;
 });
 
 export default TestsBrowserComponent;

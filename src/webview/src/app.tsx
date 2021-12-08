@@ -5,9 +5,9 @@ import AuthComponent from "./components/authComponent";
 import TestsBrowserComponent from "./components/testsBrowserComponent";
 
 const App: React.FC<{}> = observer(() => {
-    return <div>
+    return <>
         {up9AuthStore.isAuthConfigured ? <TestsBrowserComponent /> : <AuthComponent/>}
-    </div>;
+    </>;
 });
 
 

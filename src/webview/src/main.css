@@ -1,3 +1,33 @@
+#root {
+	height: 100%;
+	overflow: hidden;
+}
+
+.user-info {
+	height: 2%;
+}
+
+.select-test-form {
+	height: 5%;
+	min-height: 65px;
+}
+
+.tests-list-container {
+	height: 85%;
+}
+
+.check-box-container {
+	height: 2%;
+	min-height: 20px;
+	background-color: var(--vscode-editor-background);
+	z-index: 100000;
+}
+
+.test-code-container {
+	height: 96%;
+	overflow-y: auto;
+}
+
 .select-test-form {
 	margin: 15px 20px;
 	display: flex;
