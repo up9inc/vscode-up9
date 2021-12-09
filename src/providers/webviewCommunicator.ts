@@ -98,24 +98,26 @@ export class UP9WebviewCommunicator {
         }
         let token = await this._authProvider.getToken();
         try {
+            let response;
             switch (messageData.messageType) {
                 case ApiMessageType.WorkspacesList:
-                    const workspaces = await this._apiProvider.getWorkspaces(token);
-                    this.handlePanelUP9ApiResponse(messageData, workspaces, null);
+                    response = await this._apiProvider.getWorkspaces(token);
                     break;
                 case ApiMessageType.EndpointsList:
-                    const endpoints = await this._apiProvider.getWorkspaceEndpoints(messageData.params.workspaceId, token);
-                    this.handlePanelUP9ApiResponse(messageData, endpoints, null);
+                    response = await this._apiProvider.getWorkspaceEndpoints(messageData.params.workspaceId, token);
                     break;
                 case ApiMessageType.EndpointTests:
-                    const tests = await this._apiProvider.getTestsForSpan(messageData.params.workspaceId, messageData.params.spanGuid, token);
-                    this.handlePanelUP9ApiResponse(messageData, tests, null);
+                    response = await this._apiProvider.getTestsForSpan(messageData.params.workspaceId, messageData.params.spanGuid, token);
                     break;
                 case ApiMessageType.Swagger:
-                    const swagger = await this._apiProvider.getSwagger(messageData.params.workspaceId, token);
-                    this.handlePanelUP9ApiResponse(messageData, swagger, null);
+                    response = await this._apiProvider.getSwagger(messageData.params.workspaceId, token);
+                    break;
+                case ApiMessageType.Spans:
+                    response = await this._apiProvider.getSpans(messageData.params.workspaceId, messageData.params.spanId, token);
                     break;
             }
+
+            this.handlePanelUP9ApiResponse(messageData, response, null);
         } catch (error) {
             console.error("error handling api request from panel", messageData, error);
             this.handlePanelUP9ApiResponse(messageData, null, error);

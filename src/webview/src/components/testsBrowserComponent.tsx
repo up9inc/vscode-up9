@@ -4,7 +4,7 @@ import { up9AuthStore } from "../stores/up9AuthStore";
 import {sendApiMessage, sendInfoToast, setExtensionDefaultWorkspace} from "../providers/extensionConnectionProvider";
 import { ApiMessageType } from "../../../models/internal";
 import {Form, FormControl, Dropdown, Container, Row, Col, Card, Accordion} from 'react-bootstrap';
-import { getSchemaForViewForEndpointSchema, isHexColorDark, transformTest } from "../utils";
+import { getSchemaForViewForEndpointSchema, isHexColorDark, transformTest, getAssertionsCodeForSpan } from "../utils";
 import { v4 as uuidv4 } from 'uuid';
 import { copyIcon, userIcon } from "./svgs";
 import { microTestsHeader } from "../../../consts";
@@ -22,7 +22,6 @@ enum TestCodeMode {
     Schema = "schema"
 }
 
-
 // TODO: split this into multiple components
 const TestsBrowserComponent: React.FC<{}> = observer(() => {
     const [workspaces, setWorkspaces] = useState(null);
@@ -33,6 +32,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
     const [endpoints, setEndpoints] = useState(null);
     const [endpointFilterInput, setEndpointFilterInput] = useState("");
     const [selectedEndpoint, setSelectedEndpoint] = useState(null);
+    const [workspaceSpans, setWorkspaceSpans] = useState(null);
 
     const [testsLoaded, setTestsLoaded] = useState(false);
     const [endpointTest, setEndpointTest] = useState(null);
@@ -89,6 +89,25 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
         setIsThemeDark(isHexColorDark(editorBackgroundColor))
     }, [editorBackgroundColor]);
 
+
+    const endpointSpan = useMemo(() => {
+        console.log('selectedEndpoint', selectedEndpoint);
+        console.log('workspaceSpans', workspaceSpans);
+        if (!workspaceSpans || !selectedEndpoint) {
+            console.log('returning cause null');
+            return null;
+        }
+
+        return workspaceSpans.find(span => {
+
+            console.log('span.uuid', span.uuid);
+            console.log('selectedEndpoint.uuid', selectedEndpoint.uuid);
+            return span.uuid === selectedEndpoint.uuid;
+        });
+    }, [workspaceSpans, selectedEndpoint]);
+
+    console.log('endpointSpan', endpointSpan);
+
     const testCode = useMemo(() => {
         if (testCodeMode == TestCodeMode.Schema) {
             return endpointSchemaJSONString;
@@ -98,12 +117,24 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             return null;
         }
 
+        const testCode = endpointTest.code.replace('return resp', '');
+
+        let generatedAssertions = '';
+        if (endpointSpan) {
+            try {
+                generatedAssertions = getAssertionsCodeForSpan(endpointSpan, '        ');
+            } catch (error) {
+                console.error("error generating assertions", error);
+            }
+        }
+        
+
         if (testCodeMode === TestCodeMode.Test) {
-            return `${microTestsHeader}\n${endpointTest.code}`;
+            return `${microTestsHeader}\n${testCode}\n${generatedAssertions}`;
         }
 
-        return endpointTest.code;
-    }, [endpointTest, testCodeMode, endpointSchemaJSONString]);
+        return `${testCode}\n${generatedAssertions}`;
+    }, [endpointTest, testCodeMode, endpointSchemaJSONString, endpointSpan]);
 
     const refreshWorkspaces = async () => {
         setIsLoading(true);
@@ -145,6 +176,13 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                 } catch (error) {
                     console.error('error loading workspace OAS', error);
                 }
+
+                try {
+                    const spans = await sendApiMessage(ApiMessageType.Spans, {workspaceId: selectedWorkspace}); 
+                    setWorkspaceSpans(spans);
+                } catch (error) {
+                    console.error('error loading workspace spans', error);
+                }
             }
         })()
     }, [selectedWorkspace]);
@@ -168,6 +206,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                     console.log('error loading tests', error);
                     setTestsLoaded(false);
                 }
+
             }
         })()
     }, [selectedEndpoint?.uuid]);

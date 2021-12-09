@@ -41,4 +41,10 @@ export class UP9ApiProvider {
         raiseForBadResponse(response);
         return response.data;
     }
+
+    public getSpans = async(workspaceId: string, spanId: string, token: string): Promise<any> => {
+        const response = await axios.get<any>(`${this._trccUrl}/models/${workspaceId}/lastResults/all/dataDependency`, {headers: {'Authorization': `Bearer ${token}`}});
+        raiseForBadResponse(response);
+        return response.data;
+    }
 }
