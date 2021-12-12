@@ -73,7 +73,7 @@ export const getAssertionsCodeForSpan = (span: any, indent: string = ''): string
                 switch (splitSpec[1]) {
                     case 'json':
                         const jsonPath = splitSpec[2];
-                        if (!assertion.expected) { // assert json path exists
+                        if (!assertion.expected) { // assert css path exists regardless of value
                             code += indent +  `# assert parse("${jsonPath}").find(resp.json())\n`;
                         } else {
                             code += indent +  `# assert parse("${jsonPath}").find(resp.json())[0].value == ${JSON.stringify(assertion.expected)}\n`;
@@ -81,7 +81,7 @@ export const getAssertionsCodeForSpan = (span: any, indent: string = ''): string
                         break;
                     case 'html':
                         const cssSelector = splitSpec[2];
-                        if (!assertion.expected) { // assert json path exists
+                        if (!assertion.expected) { // assert css path exists regardless of value
                             code += indent +  `# assert html.fromstring(resp.text).cssselect("${cssSelector}")\n`;
                         } else {
                             code += indent +  `# assert html.fromstring(resp.text).cssselect("${cssSelector}")[0].text == "${assertion.expected}"\n`;
