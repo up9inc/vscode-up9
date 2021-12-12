@@ -1,29 +1,14 @@
 import React, { useEffect, useState, useMemo } from "react";
 import {observer} from "mobx-react";
 import { up9AuthStore } from "../stores/up9AuthStore";
-import {sendApiMessage, sendInfoToast, setExtensionDefaultWorkspace} from "../providers/extensionConnectionProvider";
+import {sendApiMessage, setExtensionDefaultWorkspace} from "../providers/extensionConnectionProvider";
 import { ApiMessageType } from "../../../models/internal";
-import {Form, FormControl, Dropdown, Container, Row, Col, Card, Accordion} from 'react-bootstrap';
-import { getSchemaForViewForEndpointSchema, isHexColorDark, transformTest } from "../utils";
-import { v4 as uuidv4 } from 'uuid';
-import { copyIcon, userIcon } from "./svgs";
-import { microTestsHeader } from "../../../consts";
+import {Form, FormControl, Dropdown} from 'react-bootstrap';
+import { userIcon } from "./svgs";
 
-import AceEditor from "react-ace";
-import "ace-builds/src-noconflict/mode-python";
-import "ace-builds/src-noconflict/mode-json";
-import "ace-builds/src-noconflict/theme-chaos";
-import "ace-builds/src-noconflict/theme-chrome";
 import { LoadingOverlay } from "./loadingOverlay";
+import TestCodeViewer from "./testCodeViewer";
 
-enum TestCodeMode {
-    Code = "code",
-    Test = "test",
-    Schema = "schema"
-}
-
-
-// TODO: split this into multiple components
 const TestsBrowserComponent: React.FC<{}> = observer(() => {
     const [workspaces, setWorkspaces] = useState(null);
     const [workspaceFilterInput, setWorkspaceFilterInput] = useState("");
@@ -33,17 +18,9 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
     const [endpoints, setEndpoints] = useState(null);
     const [endpointFilterInput, setEndpointFilterInput] = useState("");
     const [selectedEndpoint, setSelectedEndpoint] = useState(null);
-
-    const [testsLoaded, setTestsLoaded] = useState(false);
-    const [endpointTest, setEndpointTest] = useState(null);
-
-    const editorBackgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--vscode-editor-background');
-
-    const [isThemeDark, setIsThemeDark] = useState(null);
+    const [workspaceSpans, setWorkspaceSpans] = useState(null);
 
     const [isLoading, setIsLoading] = useState(true);
-
-    const [testCodeMode, setTestCodeMode] = useState(TestCodeMode.Code);
 
     const getEndpointDisplayText = (endpoint) => {
         return `${endpoint.method.toUpperCase()} ${endpoint.service}${endpoint.path}`;
@@ -62,48 +39,6 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
         }
         return workspaces.filter(workspace => workspace.toLocaleLowerCase().indexOf(workspaceFilterInput.toLowerCase()) > -1);
     }, [workspaces, workspaceFilterInput]);
-
-    const endpointSchemaJSONString = useMemo(() => {
-        if (!selectedEndpoint || !workspaceOAS) {
-            return null;
-        }
-
-        const endpointSchema = workspaceOAS?.[selectedEndpoint.service]?.paths?.[selectedEndpoint.path]?.[selectedEndpoint.method.toLowerCase()];
-        if (!endpointSchema) {
-            console.warn("could not find schema for endpoint from OAS");
-            return null;
-        }
-
-        return getSchemaForViewForEndpointSchema(endpointSchema);
-    }, [selectedEndpoint]);
-
-    useEffect(() => {
-        // make sure ui doesnt reach a weird state where no schema is available and we hide the schema radio button
-        if (!endpointSchemaJSONString && testCodeMode == TestCodeMode.Schema) {
-            setTestCodeMode(TestCodeMode.Code);
-            sendInfoToast("No schema available for selected endpoint");
-        }
-    }, [endpointSchemaJSONString, testCodeMode]);
-
-    useEffect(() => {
-        setIsThemeDark(isHexColorDark(editorBackgroundColor))
-    }, [editorBackgroundColor]);
-
-    const testCode = useMemo(() => {
-        if (testCodeMode == TestCodeMode.Schema) {
-            return endpointSchemaJSONString;
-        }
-
-        if (!endpointTest) {
-            return null;
-        }
-
-        if (testCodeMode === TestCodeMode.Test) {
-            return `${microTestsHeader}\n${endpointTest.code}`;
-        }
-
-        return endpointTest.code;
-    }, [endpointTest, testCodeMode, endpointSchemaJSONString]);
 
     const refreshWorkspaces = async () => {
         setIsLoading(true);
@@ -145,32 +80,16 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                 } catch (error) {
                     console.error('error loading workspace OAS', error);
                 }
-            }
-        })()
-    }, [selectedWorkspace]);
 
-    useEffect(() => {
-        (async () => {
-            setEndpointTest(null);
-            setTestsLoaded(false);
-            if (selectedEndpoint) {
                 try {
-                    const tests = await sendApiMessage(ApiMessageType.EndpointTests, {workspaceId: selectedWorkspace, spanGuid: selectedEndpoint.uuid});
-                    setTestsLoaded(true);
-                    if (tests?.tests?.length < 1) {
-                        return;
-                    }
-                    const test = transformTest(tests.tests[0]);
-                    test.uuid = uuidv4(); //for react Key prop
-
-                    setEndpointTest(test);
+                    const spans = await sendApiMessage(ApiMessageType.Spans, {workspaceId: selectedWorkspace}); 
+                    setWorkspaceSpans(spans);
                 } catch (error) {
-                    console.log('error loading tests', error);
-                    setTestsLoaded(false);
+                    console.error('error loading workspace spans', error);
                 }
             }
         })()
-    }, [selectedEndpoint?.uuid]);
+    }, [selectedWorkspace]);
 
     useEffect(() => {
         setSelectedWorkspace("");
@@ -178,11 +97,6 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             refreshWorkspaces();
         }
     }, [up9AuthStore.isAuthConfigured]);
-
-    const copyToClipboard = (text: string) => {
-        sendInfoToast("Test code copied to clipboard");
-        navigator.clipboard.writeText(text)
-    }
 
     const setDefaultWorkspace = (workspace: string) => {
         setExtensionDefaultWorkspace(workspace);
@@ -236,36 +150,8 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                     </Dropdown>
                 </Form.Group>
             </div>
-            {endpointTest && <>
             <hr/>
-            <div className="tests-list-container">
-                <Form.Group className="check-box-container">
-                    <Form.Check inline label="Code" name="group1" type="radio" checked={testCodeMode == TestCodeMode.Code} onClick={_ => setTestCodeMode(TestCodeMode.Code)} />
-                    <Form.Check inline label="Test" name="group1" type="radio" checked={testCodeMode == TestCodeMode.Test} onClick={_ => setTestCodeMode(TestCodeMode.Test)} />
-                    {endpointSchemaJSONString && <Form.Check inline label="Schema" name="group1" type="radio" checked={testCodeMode == TestCodeMode.Schema} onClick={_ => setTestCodeMode(TestCodeMode.Schema)} />}
-                </Form.Group> 
-                <Container className="test-code-container">
-                    <Card className="test-row">
-                        <Card.Header className="test-row-card-header">
-                            <Container>
-                                <Row>
-                                    <Col xs="10" md="10" lg="10" style={{"paddingLeft": "5px"}}></Col>
-                                    <Col xs="1" md="1" lg="1" style={{"padding": "0"}}>
-                                        <span className="clickable" onClick={_ => copyToClipboard(testCode)}>{copyIcon}</span>
-                                    </Col>
-                                </Row>
-                            </Container>
-                        </Card.Header>
-                        <Card.Body style={{height: "100%", overflowY: "auto"}}>
-                                <AceEditor width="100%" mode="python" fontSize="14px" maxLines={1000}
-                                theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={testCode}
-                                    setOptions={{showGutter: false, hScrollBarAlwaysVisible: false, highlightActiveLine: false}}/>
-                        </Card.Body>
-                    </Card>
-                </Container>
-            </div>
-            </>}
-            {(testsLoaded && !endpointTest) && <p>No code found for this endpoint</p>}
+            <TestCodeViewer workspace={selectedWorkspace} endpoint={selectedEndpoint} spans={workspaceSpans} workspaceOAS={workspaceOAS} />
         </>;
 });
 

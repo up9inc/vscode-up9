@@ -76,7 +76,6 @@ export class K8STunnel {
                 const redirectTo = `${protocol}//localhost:${k8sProxyPort}${k8sProxyRedirectHost}${path}`;
                 req.url = `${redirectTo}`;
                 this.proxy.web(req, res, { target: `${protocol}//localhost:${k8sProxyPort}`, changeOrigin: true, followRedirects: true, prependPath: true });
-                console.log('hi');
             } else {
                 const redirectTo = `${protocol}//${host}:${port}`;
                 this.proxy.web(req, res, { target: redirectTo});

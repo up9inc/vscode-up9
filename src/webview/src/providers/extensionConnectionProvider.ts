@@ -57,6 +57,81 @@ export const sendApiMessage = (messageType: ApiMessageType, params: object): Pro
 export const getDebugReply = (apiMessageType: ApiMessageType): Promise < any > => {
     let response;
     switch (apiMessageType) {
+        case ApiMessageType.Spans:
+            response = [
+              {
+                "assertions": [
+                  {
+                    "expected": [
+                      200
+                    ],
+                    "spec": "status\t"
+                  },
+                  {
+                    "entries": 1,
+                    "expected": "Glasgow",
+                    "spec": "body\t\njson\t$.city"
+                  }
+                ],
+                "ctype": "application/json",
+                "depth": 0,
+                "id": 29,
+                "inputParameters": [
+                  {
+                    "knownValues": [
+                      "application/hal+json"
+                    ],
+                    "name": "accept",
+                    "spec": "accept",
+                    "type": "header",
+                    "uuid": "5209b911-bba2-4831-8d5e-57b351d2b3d9"
+                  },
+                  {
+                    "knownValues": [
+                      "57a98d98e4b00679b4a830b0"
+                    ],
+                    "name": "id",
+                    "spec": "2",
+                    "type": "url",
+                    "uuid": "e2b55aca-53aa-4f27-bc15-da210c652f31"
+                  },
+                  {
+                    "knownValues": [
+                      "http:/addresses/57a98d98e4b00679b4a830b0"
+                    ],
+                    "name": "x-span-name",
+                    "spec": "x-span-name",
+                    "type": "header",
+                    "uuid": "8f3a715a-dd82-4250-a3a8-b379b792b6ca"
+                  }
+                ],
+                "isAuth": false,
+                "kpis": {
+                  "avg_rt": 0.007308941716507287,
+                  "entries": 3459,
+                  "err_rate": 0,
+                  "failures": 0,
+                  "first_seen": 1637241880.737,
+                  "hits_rate": 1.9366975921553131,
+                  "last_active": 1637294523.884,
+                  "last_seen": 1637294523.884,
+                  "sessions": 6,
+                  "sum_duration": 1786.0299997329712,
+                  "sum_rt": 13.053989171981812
+                },
+                "linksTo": [],
+                "method": "get",
+                "path": "/addresses/{id}",
+                "service": "http://user.sock-shop",
+                "serviceColorIndex": 0,
+                "spanLength": 1,
+                "spanParticipationCount": 0,
+                "spanParticipationIds": [],
+                "type": "edge",
+                "uuid": "8e8b2b07-e7e0-49bd-b767-d515875a8940"
+              }
+            ];
+            break;
         case ApiMessageType.EndpointTests:
             response = {
                 "headerCode": "from up9lib import *\nfrom authentication import authenticate\n\n# logging.basicConfig(level=logging.DEBUG)\n\n",

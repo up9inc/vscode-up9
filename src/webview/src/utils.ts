@@ -60,3 +60,40 @@ export const getSchemaForViewForEndpointSchema = (endpointSchema: any) => {
     }
     return JSON.stringify(schemaForView, null, 4);
 };
+
+export const getAssertionsCodeForSpan = (span: any, indent: string = ''): string => {
+    let code = "";
+    for (const assertion of (span.assertions ?? [])) {
+        const splitSpec = assertion.spec.replaceAll('\n', '').split('\t');
+        switch (splitSpec[0]) {
+            case 'status':
+                code += indent + `# assert resp.status_code in [${assertion.expected.join(", ")}]\n`
+                break;
+            case 'body':
+                switch (splitSpec[1]) {
+                    case 'json':
+                        const jsonPath = splitSpec[2];
+                        if (!assertion.expected) { // assert css path exists regardless of value
+                            code += indent +  `# assert parse("${jsonPath}").find(resp.json())\n`;
+                        } else {
+                            code += indent +  `# assert parse("${jsonPath}").find(resp.json())[0].value == ${JSON.stringify(assertion.expected)}\n`;
+                        }
+                        break;
+                    case 'html':
+                        const cssSelector = splitSpec[2];
+                        if (!assertion.expected) { // assert css path exists regardless of value
+                            code += indent +  `# assert html.fromstring(resp.text).cssselect("${cssSelector}")\n`;
+                        } else {
+                            code += indent +  `# assert html.fromstring(resp.text).cssselect("${cssSelector}")[0].text == "${assertion.expected}"\n`;
+                        }
+                }
+            break;
+        }
+    }
+
+    return code;
+}
+
+export const getEndpointSchema = (endpoint, workspaceOAS) => {
+    return workspaceOAS?.[endpoint.service]?.paths?.[endpoint.path]?.[endpoint.method.toLowerCase()];
+};
