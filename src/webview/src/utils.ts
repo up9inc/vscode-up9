@@ -73,9 +73,19 @@ export const getAssertionsCodeForSpan = (span: any, indent: string = ''): string
                 switch (splitSpec[1]) {
                     case 'json':
                         const jsonPath = splitSpec[2];
-                        code += indent +  `# assert jsonpath_ng.parse("${jsonPath}").find(resp.json())[0].value == ${assertion.expected == null ? "None" : JSON.stringify(assertion.expected)}\n`;
+                        if (!assertion.expected) { // assert json path exists
+                            code += indent +  `# assert parse("${jsonPath}").find(resp.json())\n`;
+                        } else {
+                            code += indent +  `# assert parse("${jsonPath}").find(resp.json())[0].value == ${JSON.stringify(assertion.expected)}\n`;
+                        }
                         break;
-                    
+                    case 'html':
+                        const cssSelector = splitSpec[2];
+                        if (!assertion.expected) { // assert json path exists
+                            code += indent +  `# assert html.fromstring(resp.text).cssselect("${cssSelector}")\n`;
+                        } else {
+                            code += indent +  `# assert html.fromstring(resp.text).cssselect("${cssSelector}")[0].text == "${assertion.expected}"\n`;
+                        }
                 }
             break;
         }

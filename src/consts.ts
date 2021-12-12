@@ -11,6 +11,8 @@ export const authEnvStorageKey = "up9.auth.env";
 export const microTestsHeader = `import requests
 import unittest
 from urllib.parse import urlencode
+# from jsonpath_ng import parse
+# from lxml import html
 
 
 class Tests(unittest.TestCase):
