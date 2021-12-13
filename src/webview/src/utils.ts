@@ -23,43 +23,33 @@ export const transformTest = (test: any) => {
     return test;
 }
 
+export const getRequestBodySchemaForView = (endpointSchema: any) => {
+    return endpointSchema.requestBody?.content?.['application/json']?.schema?.properties;
+}
 
-// produces a simplified version of the endpoint schema for easier reading
-export const getSchemaForViewForEndpointSchema = (endpointSchema: any) => {
-    const requests = {};
-    for (const requestContentType in endpointSchema.requestBody?.content) {
-        const contentTypeRequestProperties = endpointSchema.requestBody?.content[requestContentType]?.schema?.properties;
-        if (contentTypeRequestProperties) {
-            requests[requestContentType] = contentTypeRequestProperties;
-        }
+export const getResponseBodySchemaForView = (endpointSchema: any) => {
+    if (!endpointSchema.responses) {
+        return null;
     }
 
-    const responses = {};
+    const responseCode = Object.keys(endpointSchema.responses ?? {})?.[0];
 
-    for (const responseCode in endpointSchema.responses) {
-        const response = endpointSchema.responses[responseCode];
-        if (response.content) {
-            responses[responseCode] = {};
-            for (const contentType in response.content) {
-                responses[responseCode][contentType] = {
-                    schema: response.content[contentType].schema
-                }
-            }
-        }
+    if (!responseCode) {
+        return null;
+    }
+
+    const contentType = Object.keys(endpointSchema.responses[responseCode].content ?? {})?.[0];
+
+    if (!contentType) {
+        return null;
     }
     
-    const schemaForView = {} as any;
-    if (Object.keys(endpointSchema.parameters).length) {
-        schemaForView.parameters = endpointSchema.parameters;
-    }
-    if (Object.keys(requests).length) {
-        schemaForView.requests = requests;
-    }
-    if (Object.keys(responses).length) {
-        schemaForView.responses = responses;
-    }
-    return JSON.stringify(schemaForView, null, 4);
-};
+    const responseSchema =  endpointSchema.responses[responseCode].content[contentType]?.schema;
+
+    const bodyName = Object.keys(responseSchema ?? {})?.[0];
+
+    return responseSchema?.[bodyName]?.properties;
+}
 
 export const getAssertionsCodeForSpan = (span: any, indent: string = ''): string => {
     let code = "";

@@ -10,9 +10,10 @@ import "ace-builds/src-noconflict/theme-chrome";
 
 import { copyIcon } from "./svgs";
 import {sendApiMessage, sendInfoToast } from "../providers/extensionConnectionProvider";
-import { getSchemaForViewForEndpointSchema, isHexColorDark, transformTest, getAssertionsCodeForSpan, getEndpointSchema } from "../utils";
+import { isHexColorDark, transformTest, getAssertionsCodeForSpan, getEndpointSchema } from "../utils";
 import { ApiMessageType } from "../../../models/internal";
 import { microTestsHeader } from "../../../consts";
+import EndpointSchema from "./endpointSchema";
 
 enum TestCodeMode {
     Code = "code",
@@ -78,24 +79,18 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = ({ workspace, endpoint, sp
         return spans.find(span => span.uuid === endpoint.uuid);
     }, [workspace, endpoint]);
 
-    const endpointSchemaJSONString = useMemo(() => {
+    const endpointSchema = useMemo(() => {
         if (!endpoint || !workspaceOAS) {
             return null;
         }
 
-        const endpointSchema = getEndpointSchema(endpoint, workspaceOAS);
-        if (!endpointSchema) {
-            console.warn("could not find schema for endpoint from OAS");
-            return null;
-        }
-
-        return getSchemaForViewForEndpointSchema(endpointSchema);
+        return getEndpointSchema(endpoint, workspaceOAS);
     }, [endpoint, workspaceOAS]);
 
 
     const testCode = useMemo(() => {
         if (testCodeMode == TestCodeMode.Schema) {
-            return endpointSchemaJSONString;
+            return null;
         }
 
         if (!endpointTest) {
@@ -118,15 +113,15 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = ({ workspace, endpoint, sp
         }
 
         return `${testCode}\n${generatedAssertions}`;
-    }, [endpointTest, testCodeMode, endpointSchemaJSONString, endpointSpan]);
+    }, [endpointTest, testCodeMode, endpointSchema, endpointSpan]);
 
     useEffect(() => {
         // make sure ui doesnt reach a weird state where no schema is available and we hide the schema radio button
-        if (!endpointSchemaJSONString && testCodeMode == TestCodeMode.Schema) {
+        if (!endpointSchema && testCodeMode == TestCodeMode.Schema) {
             setTestCodeMode(TestCodeMode.Code);
             sendInfoToast("No schema available for selected endpoint");
         }
-    }, [endpointSchemaJSONString, testCodeMode]);
+    }, [endpointSchema, testCodeMode]);
 
 
     if (testsLoaded && !endpointTest) {
@@ -139,25 +134,29 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = ({ workspace, endpoint, sp
                 <Form.Group className="check-box-container">
                     <Form.Check inline label="Code" name="group1" type="radio" checked={testCodeMode == TestCodeMode.Code} onClick={_ => setTestCodeMode(TestCodeMode.Code)} />
                     <Form.Check inline label="Test" name="group1" type="radio" checked={testCodeMode == TestCodeMode.Test} onClick={_ => setTestCodeMode(TestCodeMode.Test)} />
-                    {endpointSchemaJSONString && <Form.Check inline label="Schema" name="group1" type="radio" checked={testCodeMode == TestCodeMode.Schema} onClick={_ => setTestCodeMode(TestCodeMode.Schema)} />}
+                    {endpointSchema && <Form.Check inline label="Schema" name="group1" type="radio" checked={testCodeMode == TestCodeMode.Schema} onClick={_ => setTestCodeMode(TestCodeMode.Schema)} />}
                 </Form.Group> 
                 <Container className="test-code-container">
                 <Card className="test-row">
-                    <Card.Header className="test-row-card-header">
-                        <Container>
-                            <Row>
-                                <Col xs="10" md="10" lg="10" style={{"paddingLeft": "5px"}}></Col>
-                                <Col xs="1" md="1" lg="1" style={{"padding": "0"}}>
-                                    <span className="clickable" onClick={_ => copyToClipboard(testCode)}>{copyIcon}</span>
-                                </Col>
-                            </Row>
-                        </Container>
-                    </Card.Header>
-                    <Card.Body style={{height: "100%", overflowY: "auto"}}>
-                            <AceEditor width="100%" mode="python" fontSize="14px" maxLines={1000}
-                            theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={testCode}
-                                setOptions={{showGutter: false, hScrollBarAlwaysVisible: false, highlightActiveLine: false}}/>
-                    </Card.Body>
+                    {testCodeMode === TestCodeMode.Schema ? <EndpointSchema schema={getEndpointSchema(endpoint, workspaceOAS)} isThemeDark={true} /> : 
+                    <>
+                        <Card.Header className="test-row-card-header">
+                            <Container>
+                                <Row>
+                                    <Col xs="10" md="10" lg="10" style={{"paddingLeft": "5px"}}></Col>
+                                    <Col xs="1" md="1" lg="1" style={{"padding": "0"}}>
+                                        <span className="clickable" onClick={_ => copyToClipboard(testCode)}>{copyIcon}</span>
+                                    </Col>
+                                </Row>
+                            </Container>
+                        </Card.Header>
+                        <Card.Body style={{height: "100%", overflowY: "auto"}}>
+                                <AceEditor width="100%" mode="python" fontSize="14px" maxLines={1000}
+                                theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={testCode}
+                                    setOptions={{showGutter: false, hScrollBarAlwaysVisible: false, highlightActiveLine: false}}/>
+                        </Card.Body>
+                    </>
+                    }
                     </Card>
                 </Container>
     </div>
