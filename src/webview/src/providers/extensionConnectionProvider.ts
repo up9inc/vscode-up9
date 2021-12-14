@@ -715,6 +715,14 @@ export const setExtensionDefaultWorkspace = (workspaceId: string) => {
 });
 }
 
+export const sendPushCodeToEditor = (code: string, header: string) => {
+  vsCodeApi.postMessage({
+    command: MessageCommandType.PushText,
+    code,
+    header
+  });
+};
+
 //handle messages incoming from the extension
 window.addEventListener('message', event => {
     console.log('received message', event.data);

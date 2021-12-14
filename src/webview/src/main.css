@@ -30,7 +30,20 @@ table {
 	z-index: 100000;
 }
 
+.floating-buttons {
+	position: absolute;
+	left: 0;
+	top: 26px;
+}
+
+.card-body {
+	padding-left: 65px;
+}
+
 .test-code-container {
+	width: 100%;
+	padding: 0;
+	margin: 0;
 	height: 96%;
 	overflow-y: auto;
 }
@@ -74,7 +87,7 @@ table {
 .anchor-button {
 	color: var(--vscode-textLink-foreground);
 	text-decoration: none;
-	font-size: 0.8em;
+	font-size: 0.9em;
 }
 
 .anchor-button:active, .anchor-button:hover, .anchor-button:focus {
@@ -217,6 +230,7 @@ hr {
 .test-row {
 	border: none;
 	background: inherit;
+	padding: 0;
 	/* margin-top: 20px; */
 	/* height: 38px;
 	line-height: 38px;
@@ -228,6 +242,7 @@ hr {
 .test-row-card-header {
 	background: inherit;
 	border: none;
+	padding-left: 0;
 }
 
 .ace_editor {

@@ -8,15 +8,14 @@ import "ace-builds/src-noconflict/mode-json";
 import "ace-builds/src-noconflict/theme-chaos";
 import "ace-builds/src-noconflict/theme-chrome";
 
-import { copyIcon } from "./svgs";
-import {sendApiMessage, sendInfoToast } from "../providers/extensionConnectionProvider";
+import { copyIcon, inputIcon } from "./svgs";
+import {sendApiMessage, sendInfoToast, sendPushCodeToEditor } from "../providers/extensionConnectionProvider";
 import { isHexColorDark, transformTest, getAssertionsCodeForSpan, getEndpointSchema } from "../utils";
 import { ApiMessageType } from "../../../models/internal";
 import { microTestsHeader } from "../../../consts";
 import EndpointSchema from "./endpointSchema";
 
 enum TestCodeMode {
-    Code = "code",
     Test = "test",
     Schema = "schema"
 }
@@ -33,7 +32,7 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = ({ workspace, endpoint, sp
     const [isThemeDark, setIsThemeDark] = useState(null);
     const [testsLoaded, setTestsLoaded] = useState(false);
     const [endpointTest, setEndpointTest] = useState(null);
-    const [testCodeMode, setTestCodeMode] = useState(TestCodeMode.Code);
+    const [testCodeMode, setTestCodeMode] = useState(TestCodeMode.Test);
 
     const editorBackgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--vscode-editor-background');
 
@@ -87,16 +86,10 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = ({ workspace, endpoint, sp
         return getEndpointSchema(endpoint, workspaceOAS);
     }, [endpoint, workspaceOAS]);
 
-
     const testCode = useMemo(() => {
-        if (testCodeMode == TestCodeMode.Schema) {
-            return null;
-        }
-
         if (!endpointTest) {
             return null;
         }
-
         const testCode = endpointTest.code.replace('return resp', '');
 
         let generatedAssertions = '';
@@ -108,18 +101,13 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = ({ workspace, endpoint, sp
             }
         }
         
-        if (testCodeMode === TestCodeMode.Test) {
-            return `${microTestsHeader}\n${testCode}\n${generatedAssertions}`;
-        }
-
         return `${testCode}\n${generatedAssertions}`;
-    }, [endpointTest, testCodeMode, endpointSchema, endpointSpan]);
+    }, [endpointTest, endpointSchema, endpointSpan]);
 
     useEffect(() => {
         // make sure ui doesnt reach a weird state where no schema is available and we hide the schema radio button
         if (!endpointSchema && testCodeMode == TestCodeMode.Schema) {
-            setTestCodeMode(TestCodeMode.Code);
-            sendInfoToast("No schema available for selected endpoint");
+            setTestCodeMode(TestCodeMode.Test);
         }
     }, [endpointSchema, testCodeMode]);
 
@@ -132,8 +120,7 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = ({ workspace, endpoint, sp
     
     return <div className="tests-list-container">
                 <Form.Group className="check-box-container">
-                    <Form.Check inline label="Code" name="group1" type="radio" checked={testCodeMode == TestCodeMode.Code} onClick={_ => setTestCodeMode(TestCodeMode.Code)} />
-                    <Form.Check inline label="Test" name="group1" type="radio" checked={testCodeMode == TestCodeMode.Test} onClick={_ => setTestCodeMode(TestCodeMode.Test)} />
+                    <Form.Check inline label="Code" name="group1" type="radio" checked={testCodeMode == TestCodeMode.Test} onClick={_ => setTestCodeMode(TestCodeMode.Test)} />
                     {endpointSchema && <Form.Check inline label="Schema" name="group1" type="radio" checked={testCodeMode == TestCodeMode.Schema} onClick={_ => setTestCodeMode(TestCodeMode.Schema)} />}
                 </Form.Group> 
                 <Container className="test-code-container">
@@ -143,16 +130,17 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = ({ workspace, endpoint, sp
                         <Card.Header className="test-row-card-header">
                             <Container>
                                 <Row>
-                                    <Col xs="10" md="10" lg="10" style={{"paddingLeft": "5px"}}></Col>
-                                    <Col xs="1" md="1" lg="1" style={{"padding": "0"}}>
-                                        <span className="clickable" onClick={_ => copyToClipboard(testCode)}>{copyIcon}</span>
+                                    <Col xs="2" md="2" lg="2" className="floating-buttons" style={{"padding": "0"}}>
+                                        <span className="clickable" style={{marginRight: "5px"}} onClick={_ => copyToClipboard(testCode)}>{copyIcon}</span>
+                                        <span className="clickable" onClick={_ => sendPushCodeToEditor(testCode, microTestsHeader)}>{inputIcon}</span>
                                     </Col>
+                                    <Col xs="10" md="10" lg="10" style={{"paddingLeft": "5px"}}></Col>
                                 </Row>
                             </Container>
                         </Card.Header>
                         <Card.Body style={{height: "100%", overflowY: "auto"}}>
                                 <AceEditor width="100%" mode="python" fontSize="14px" maxLines={1000}
-                                theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={testCode}
+                                theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={`${microTestsHeader}\n${testCode}`}
                                     setOptions={{showGutter: false, hScrollBarAlwaysVisible: false, highlightActiveLine: false}}/>
                         </Card.Body>
                     </>

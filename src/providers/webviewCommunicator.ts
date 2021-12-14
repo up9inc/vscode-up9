@@ -52,8 +52,10 @@ export class UP9WebviewCommunicator {
                     case MessageCommandType.SetDefaultWorkspace:
                         (async () => {
                             await setConfigValue(defaultWorkspaceConfigKey, message.workspaceId);
-                            vscode.window.showInformationMessage(`Successfully set ${message.workspaceId} as the default workspace.`);
                         })();
+                    case MessageCommandType.PushText:
+                        this.pushCodeToActiveEditor(message.code, message.header);
+                        break;
                 }
             },
             null,
@@ -136,5 +138,24 @@ export class UP9WebviewCommunicator {
             command: MessageCommandType.ApiResponse,
             data: replyMessage
         });
+    }
+
+    private pushCodeToActiveEditor = (code: string, header: string) => { 
+        let editor = vscode.window.activeTextEditor;
+        if (!editor) {
+            editor = vscode.window.visibleTextEditors?.[0];
+        }
+
+        if (!editor) {
+            vscode.window.showErrorMessage('No active editor found');
+            return;
+        }
+
+        const currentEditorContents = editor.document.getText();
+        if (currentEditorContents) {
+            editor.insertSnippet(new vscode.SnippetString(`\n\n${code.replace('    ', '')}`));
+        } else {
+            editor.insertSnippet(new vscode.SnippetString(`${header}\n${code}`));
+        }
     }
 }
