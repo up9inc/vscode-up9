@@ -62,7 +62,6 @@ export const getSchemaForViewForEndpointSchema = (endpointSchema: any) => {
 };
 
 export const getAssertionsCodeForSpan = (span: any, indent: string = ''): string => {
-    console.log('span', span);
     let code = "";
     for (const assertion of (span.assertions ?? [])) {
         const splitSpec = assertion.spec.replaceAll('\n', '').split('\t');
@@ -92,7 +91,8 @@ export const getAssertionsCodeForSpan = (span: any, indent: string = ''): string
         }
     }
 
-    //const avgRt = 
+    const avgRt = span.kpis.avg_rt;
+    code += indent + `# assert resp.elapsed.total_seconds() < ${avgRt * 2} # this is based on in-cluster average response time\n`;
 
     return code;
 }
