@@ -62,6 +62,7 @@ export const getSchemaForViewForEndpointSchema = (endpointSchema: any) => {
 };
 
 export const getAssertionsCodeForSpan = (span: any, indent: string = ''): string => {
+    console.log('span', span);
     let code = "";
     for (const assertion of (span.assertions ?? [])) {
         const splitSpec = assertion.spec.replaceAll('\n', '').split('\t');
@@ -90,6 +91,8 @@ export const getAssertionsCodeForSpan = (span: any, indent: string = ''): string
             break;
         }
     }
+
+    //const avgRt = 
 
     return code;
 }
