@@ -23,16 +23,11 @@ table {
 	min-height: 20px;
 	background-color: var(--vscode-editor-background);
 	z-index: 100000;
-}
-
-.floating-buttons {
-	position: absolute;
-	left: 0;
-	top: 26px;
+	margin-bottom: 16px;
 }
 
 .card-body {
-	padding-left: 65px;
+ 	padding-left: 0;
 }
 
 .test-code-container {

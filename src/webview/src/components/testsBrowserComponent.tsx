@@ -123,7 +123,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             <hr style={{margin: "0"}}/>
             <div className="select-test-form">
                 <Form.Group className="workspaces-form-group">
-                <Form.Label style={{fontSize: "1.1em", minWidth: "250px"}}>{up9AuthStore.defaultWorkspace ? up9AuthStore.defaultWorkspace : <Dropdown className="select-dropdown" onToggle={(isOpen, _) => setIsWorkspaceDropDownOpen(isOpen)}>
+                <Form.Label style={{fontSize: "1.1em"}}>{up9AuthStore.defaultWorkspace ? up9AuthStore.defaultWorkspace : <Dropdown className="select-dropdown" onToggle={(isOpen, _) => setIsWorkspaceDropDownOpen(isOpen)}>
                             <Dropdown.Toggle>Select a workspace</Dropdown.Toggle>
                             <Dropdown.Menu>
                                 {isWorkspaceDropDownOpen && <FormControl className="dropdown-filter" autoFocus placeholder="Type to filter..." value={workspaceFilterInput} onChange={e => setWorkspaceFilterInput(e.target.value)} />}
@@ -131,10 +131,10 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                                 {filteredWorkspaces?.map((workspace) => {return <Dropdown.Item key={workspace} onClick={_ => {setWorkspaceFilterInput(""); setDefaultWorkspace(workspace)}}>{workspace}</Dropdown.Item>})}
                             </Dropdown.Menu>
                         </Dropdown>}
-                    </Form.Label>
                     <br/>
-                    {up9AuthStore.defaultWorkspace && <><a className="anchor-button clickable" style={{marginLeft: "4px"}} onClick={_ => setDefaultWorkspace(null)}>Change</a></>}
+                    {up9AuthStore.defaultWorkspace && <><a className="anchor-button clickable" style={{marginLeft: "4px", float: "right", fontSize: "0.75em"}} onClick={_ => setDefaultWorkspace(null)}>Change</a></>}
                     <br/>
+                </Form.Label>
                 </Form.Group>
 
                 <Form.Group className="endpoints-form-group">
