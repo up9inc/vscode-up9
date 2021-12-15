@@ -8,7 +8,8 @@ export enum MessageCommandType {
     AuthSuccess = "authSuccess",
     AuthSignOut = "authSignOut",
     SetDefaultWorkspace = "setDefaultWorkspace",
-    StoredData = "storedData"
+    StoredData = "storedData",
+    PushText = "pushText",
 }
 
 export enum ApiMessageType {

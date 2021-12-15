@@ -3,13 +3,15 @@
 	overflow: hidden;
 }
 
-.user-info {
-	height: 2%;
+table {
+	width: 100%;
+	border-collapse: separate;
+	border-spacing: 1em;
+	position: relative;
 }
 
-.select-test-form {
-	height: 5%;
-	min-height: 65px;
+.user-info {
+	height: 2%;
 }
 
 .tests-list-container {
@@ -23,13 +25,29 @@
 	z-index: 100000;
 }
 
+.floating-buttons {
+	position: absolute;
+	left: 0;
+	top: 26px;
+}
+
+.card-body {
+	padding-left: 65px;
+}
+
 .test-code-container {
+	width: 100%;
+	padding: 0;
+	margin: 0;
 	height: 96%;
 	overflow-y: auto;
 }
 
 .select-test-form {
-	margin: 15px 20px;
+	height: 5%;
+	min-height: 65px;
+
+	margin: 15px 20px 24px;
 	display: flex;
 	justify-content: space-around;
 	gap: 10px;
@@ -40,9 +58,11 @@
 }
 
 .user-info {
+	height: 64px;
 	display: flex;
-	flex-direction: row-reverse;
-	padding-right: 20px;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0 20px;
 }
 
 .clickable {
@@ -50,14 +70,40 @@
 	user-select: none;
 }
 
-.user-info svg {
+.user-info .svg-icon {
 	display: inline-block;
 	margin-left: 8px;
+	margin-top: 4px;
+	margin-bottom: 4px;
 }
 
 .user-info p {
 	margin: 0;
+	border-radius: 3px;
+	background: var(--vscode-input-background);
 	display: inline-block;
+	padding: 0 5px;
+}
+
+.anchor-tab {
+	text-decoration: none;
+	color: var(--vscode-editor-foreground);
+	opacity: 0.8;
+	text-transform: capitalize;
+	margin-right: 24px;
+	user-select: none;
+	padding: 8px 0;
+	cursor: pointer;
+}
+
+.anchor-tab.active {
+	border-bottom: 1px solid var(--vscode-editor-foreground) !important;
+}
+
+.anchor-tab:active, .anchor-tab:hover {
+	color: var(--vscode-editor-foreground);
+	opacity: 1;
+	border-bottom: 1px solid var(--vscode-input-background);
 }
 
 .select-test-form select {
@@ -67,7 +113,7 @@
 .anchor-button {
 	color: var(--vscode-textLink-foreground);
 	text-decoration: none;
-	font-size: 0.8em;
+	font-size: 0.9em;
 }
 
 .anchor-button:active, .anchor-button:hover, .anchor-button:focus {
@@ -83,9 +129,32 @@ hr {
 	color: var(--vscode-input-foreground);
 }
 
+.accordion {
+	margin-top: 8px;
+}
+
+.accordion-button {
+	background: transparent !important;
+}
+
+.accordion-item::before {    
+      background: var(--vscode-input-background) !important;
+      width: 100%;
+	  height: 100%;
+      opacity: 0.25;
+	  z-index: 0;
+	  content: "";
+	  position: absolute;
+}
+
+.accordion-item {
+	position: relative;
+}
+
 .accordion, .accordion-item, .accordion-header, .accordion-button {
-	background: var(--vscode-editor-background) !important;
-	color: var(--vscode-editor-foreground) !important;
+	background: transparent !important;
+	color: var(--vscode-input-foreground) !important;
+	box-shadow: none !important;
 }
 
 .accordion-header {
@@ -136,6 +205,7 @@ hr {
 .select-dropdown .dropdown-item {
 	background: var(--vscode-input-background);
 	color: var(--vscode-input-foreground);
+	border-radius: 3px;
 	border: none !important;
 	box-shadow: none !important;
 	outline: none !important;
@@ -176,6 +246,10 @@ hr {
     display: none;
 }
 
+.ace_editor .ace_marker-layer .ace_bracket { 
+	display: none 
+}
+
 .code-preview-container {
 	margin-top: 30px
 }
@@ -183,6 +257,7 @@ hr {
 .test-row {
 	border: none;
 	background: inherit;
+	padding: 0;
 	/* margin-top: 20px; */
 	/* height: 38px;
 	line-height: 38px;
@@ -194,10 +269,11 @@ hr {
 .test-row-card-header {
 	background: inherit;
 	border: none;
+	padding-left: 0;
 }
 
 .ace_editor {
-	background: var(--vscode-editor-background);
+	background: transparent
 }
 
 .auth-container {

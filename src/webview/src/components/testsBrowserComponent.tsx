@@ -4,7 +4,7 @@ import { up9AuthStore } from "../stores/up9AuthStore";
 import {sendApiMessage, setExtensionDefaultWorkspace} from "../providers/extensionConnectionProvider";
 import { ApiMessageType } from "../../../models/internal";
 import {Form, FormControl, Dropdown} from 'react-bootstrap';
-import { userIcon } from "./svgs";
+import { userIcon, logoIcon } from "./svgs";
 
 import { LoadingOverlay } from "./loadingOverlay";
 import TestCodeViewer from "./testCodeViewer";
@@ -12,7 +12,6 @@ import TestCodeViewer from "./testCodeViewer";
 const TestsBrowserComponent: React.FC<{}> = observer(() => {
     const [workspaces, setWorkspaces] = useState(null);
     const [workspaceFilterInput, setWorkspaceFilterInput] = useState("");
-    const [selectedWorkspace, setSelectedWorkspace] = useState("");
     const [workspaceOAS, setWorkspaceOAS] = useState(null);
 
     const [endpoints, setEndpoints] = useState(null);
@@ -40,6 +39,12 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
         return workspaces.filter(workspace => workspace.toLocaleLowerCase().indexOf(workspaceFilterInput.toLowerCase()) > -1);
     }, [workspaces, workspaceFilterInput]);
 
+    useEffect(() => {
+        if (workspaces && !up9AuthStore.defaultWorkspace) {
+            setExtensionDefaultWorkspace(workspaces?.[0]);
+        }
+    }, [workspaces])
+
     const refreshWorkspaces = async () => {
         setIsLoading(true);
         setWorkspaceFilterInput("");
@@ -54,45 +59,38 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
     }
 
     useEffect(() => {
-        if (workspaces && up9AuthStore.defaultWorkspace && workspaces.indexOf(up9AuthStore.defaultWorkspace) > -1) {
-            setSelectedWorkspace(up9AuthStore.defaultWorkspace);
-        }
-    }, [workspaces, up9AuthStore.defaultWorkspace]);
-
-    useEffect(() => {
         (async () => {
             setSelectedEndpoint(null);
             setEndpointFilterInput("");
             setEndpoints(null);
             setWorkspaceOAS(null);
 
-            if (selectedWorkspace) {
+            if (up9AuthStore.defaultWorkspace) {
                 try {
-                    const endpoints = await sendApiMessage(ApiMessageType.EndpointsList, {workspaceId: selectedWorkspace});
+                    const endpoints = await sendApiMessage(ApiMessageType.EndpointsList, {workspaceId: up9AuthStore.defaultWorkspace});
                     setEndpoints(endpoints);
                 } catch (error) {
                     console.error('error loading workspace endpoints', error);
                 }
 
                 try {
-                    const workspaceOAS = await sendApiMessage(ApiMessageType.Swagger, {workspaceId: selectedWorkspace});
+                    const workspaceOAS = await sendApiMessage(ApiMessageType.Swagger, {workspaceId: up9AuthStore.defaultWorkspace});
                     setWorkspaceOAS(workspaceOAS);
                 } catch (error) {
                     console.error('error loading workspace OAS', error);
                 }
 
                 try {
-                    const spans = await sendApiMessage(ApiMessageType.Spans, {workspaceId: selectedWorkspace}); 
+                    const spans = await sendApiMessage(ApiMessageType.Spans, {workspaceId: up9AuthStore.defaultWorkspace}); 
                     setWorkspaceSpans(spans);
                 } catch (error) {
                     console.error('error loading workspace spans', error);
                 }
             }
         })()
-    }, [selectedWorkspace]);
+    }, [up9AuthStore.defaultWorkspace]);
 
     useEffect(() => {
-        setSelectedWorkspace("");
         if (up9AuthStore.isAuthConfigured) {
             refreshWorkspaces();
         }
@@ -114,32 +112,36 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
 
     return <>
             <div className="user-info">
+                <div style={{padding: "5px 0"}}>
+                    {logoIcon}
+                </div>
                 <div>
                     <p>{up9AuthStore.username}</p>
                     {userIcon}
                 </div>
             </div>
+            <hr style={{margin: "0"}}/>
             <div className="select-test-form">
                 <Form.Group className="workspaces-form-group">
-                    <Form.Label>Workspace {(selectedWorkspace && selectedWorkspace != up9AuthStore.defaultWorkspace) && <a className="anchor-button clickable" onClick={_ => setDefaultWorkspace(selectedWorkspace)}>Make Default</a>}</Form.Label>
+                <Form.Label style={{fontSize: "1.1em", minWidth: "250px"}}>{up9AuthStore.defaultWorkspace ? up9AuthStore.defaultWorkspace : <Dropdown className="select-dropdown" onToggle={(isOpen, _) => setIsWorkspaceDropDownOpen(isOpen)}>
+                            <Dropdown.Toggle>Select a workspace</Dropdown.Toggle>
+                            <Dropdown.Menu>
+                                {isWorkspaceDropDownOpen && <FormControl className="dropdown-filter" autoFocus placeholder="Type to filter..." value={workspaceFilterInput} onChange={e => setWorkspaceFilterInput(e.target.value)} />}
+                                <Dropdown.Divider/>
+                                {filteredWorkspaces?.map((workspace) => {return <Dropdown.Item key={workspace} onClick={_ => {setWorkspaceFilterInput(""); setDefaultWorkspace(workspace)}}>{workspace}</Dropdown.Item>})}
+                            </Dropdown.Menu>
+                        </Dropdown>}
+                    </Form.Label>
                     <br/>
-                    <Dropdown className="select-dropdown" onToggle={(isOpen, _) => setIsWorkspaceDropDownOpen(isOpen)}>
-                        <Dropdown.Toggle>
-                            {selectedWorkspace ? selectedWorkspace : "Select a workspace"}
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu>
-                            {isWorkspaceDropDownOpen && <FormControl className="dropdown-filter" autoFocus placeholder="Type to filter..." value={workspaceFilterInput} onChange={e => setWorkspaceFilterInput(e.target.value)} />}
-                            <Dropdown.Divider/>
-                            {filteredWorkspaces?.map((workspace) => {return <Dropdown.Item key={workspace} onClick={_ => {setWorkspaceFilterInput(""); setSelectedWorkspace(workspace)}}>{workspace}</Dropdown.Item>})}
-                        </Dropdown.Menu>
-                    </Dropdown>
+                    {up9AuthStore.defaultWorkspace && <><a className="anchor-button clickable" style={{marginLeft: "4px"}} onClick={_ => setDefaultWorkspace(null)}>Change</a></>}
+                    <br/>
                 </Form.Group>
 
                 <Form.Group className="endpoints-form-group">
-                    <Form.Label>Endpoint</Form.Label>
+                    {up9AuthStore.defaultWorkspace && <><Form.Label style={{fontSize: "1.1em"}}>Endpoint</Form.Label>
                     <br/>
                     <Dropdown className="select-dropdown" onToggle={(isOpen, _) => setIsEndpointsDropdownOpen(isOpen)}>
-                        <Dropdown.Toggle disabled={!selectedWorkspace}>
+                        <Dropdown.Toggle disabled={!up9AuthStore.defaultWorkspace}>
                             {selectedEndpoint ? getEndpointDisplayText(selectedEndpoint) : "Select an endpoint"}
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
@@ -147,11 +149,11 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                             <Dropdown.Divider/>
                             {filteredEndpoints?.map((endpoint) => {return <Dropdown.Item title={getEndpointDisplayText(endpoint)} key={endpoint.uuid} onClick={_ => {setEndpointFilterInput(""); setSelectedEndpoint(endpoint)}}>{getEndpointDisplayText(endpoint)}</Dropdown.Item>})}
                         </Dropdown.Menu>
-                    </Dropdown>
+                    </Dropdown></>}
                 </Form.Group>
             </div>
             <hr/>
-            <TestCodeViewer workspace={selectedWorkspace} endpoint={selectedEndpoint} spans={workspaceSpans} workspaceOAS={workspaceOAS} />
+            <TestCodeViewer workspace={up9AuthStore.defaultWorkspace} endpoint={selectedEndpoint} spans={workspaceSpans} workspaceOAS={workspaceOAS} />
         </>;
 });
 
