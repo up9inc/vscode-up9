@@ -4,7 +4,7 @@ import { up9AuthStore } from "../stores/up9AuthStore";
 import {sendApiMessage, setExtensionDefaultWorkspace} from "../providers/extensionConnectionProvider";
 import { ApiMessageType } from "../../../models/internal";
 import {Form, FormControl, Dropdown} from 'react-bootstrap';
-import { userIcon } from "./svgs";
+import { userIcon, logoIcon } from "./svgs";
 
 import { LoadingOverlay } from "./loadingOverlay";
 import TestCodeViewer from "./testCodeViewer";
@@ -112,11 +112,15 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
 
     return <>
             <div className="user-info">
+                <div style={{padding: "5px 0"}}>
+                    {logoIcon}
+                </div>
                 <div>
                     <p>{up9AuthStore.username}</p>
                     {userIcon}
                 </div>
             </div>
+            <hr style={{margin: "0"}}/>
             <div className="select-test-form">
                 <Form.Group className="workspaces-form-group">
                 <Form.Label style={{fontSize: "1.1em", minWidth: "250px"}}>{up9AuthStore.defaultWorkspace ? up9AuthStore.defaultWorkspace : <Dropdown className="select-dropdown" onToggle={(isOpen, _) => setIsWorkspaceDropDownOpen(isOpen)}>

@@ -14,11 +14,6 @@ table {
 	height: 2%;
 }
 
-.select-test-form {
-	height: 5%;
-	min-height: 65px;
-}
-
 .tests-list-container {
 	height: 85%;
 }
@@ -49,7 +44,10 @@ table {
 }
 
 .select-test-form {
-	margin: 15px 20px;
+	height: 5%;
+	min-height: 65px;
+
+	margin: 15px 20px 24px;
 	display: flex;
 	justify-content: space-around;
 	gap: 10px;
@@ -60,9 +58,11 @@ table {
 }
 
 .user-info {
+	height: 64px;
 	display: flex;
-	flex-direction: row-reverse;
-	padding-right: 20px;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0 20px;
 }
 
 .clickable {
@@ -70,14 +70,40 @@ table {
 	user-select: none;
 }
 
-.user-info svg {
+.user-info .svg-icon {
 	display: inline-block;
 	margin-left: 8px;
+	margin-top: 4px;
+	margin-bottom: 4px;
 }
 
 .user-info p {
 	margin: 0;
+	border-radius: 3px;
+	background: var(--vscode-input-background);
 	display: inline-block;
+	padding: 0 5px;
+}
+
+.anchor-tab {
+	text-decoration: none;
+	color: var(--vscode-editor-foreground);
+	opacity: 0.8;
+	text-transform: capitalize;
+	margin-right: 24px;
+	user-select: none;
+	padding: 8px 0;
+	cursor: pointer;
+}
+
+.anchor-tab.active {
+	border-bottom: 1px solid var(--vscode-editor-foreground) !important;
+}
+
+.anchor-tab:active, .anchor-tab:hover {
+	color: var(--vscode-editor-foreground);
+	opacity: 1;
+	border-bottom: 1px solid var(--vscode-input-background);
 }
 
 .select-test-form select {
@@ -179,6 +205,7 @@ hr {
 .select-dropdown .dropdown-item {
 	background: var(--vscode-input-background);
 	color: var(--vscode-input-foreground);
+	border-radius: 3px;
 	border: none !important;
 	box-shadow: none !important;
 	outline: none !important;
