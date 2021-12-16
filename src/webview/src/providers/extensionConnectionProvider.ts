@@ -709,10 +709,13 @@ export const sendErrorToast = (text: string) => {
 }
 
 export const setExtensionDefaultWorkspace = (workspaceId: string) => {
-    vsCodeApi.postMessage({
-        command: MessageCommandType.SetDefaultWorkspace,
-        workspaceId
-});
+  if (isDebug) {
+    return;
+  }
+  vsCodeApi.postMessage({
+      command: MessageCommandType.SetDefaultWorkspace,
+      workspaceId
+  });
 }
 
 export const sendPushCodeToEditor = (code: string, header: string) => {
