@@ -165,6 +165,10 @@ hr {
 	opacity: 0.75;
 }
 
+.workspaces-form-group .form-label {
+	font-size: 1.1em;
+}
+
 .select-dropdown {
 	width: 100%;
 }
