@@ -8,6 +8,7 @@ import { userIcon, logoIcon } from "./svgs";
 
 import { LoadingOverlay } from "./loadingOverlay";
 import TestCodeViewer from "./testCodeViewer";
+import $ from "jquery";
 
 const TestsBrowserComponent: React.FC<{}> = observer(() => {
     const [workspaces, setWorkspaces] = useState(null);
@@ -123,7 +124,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             <hr style={{margin: "0"}}/>
             <div className="select-test-form">
                 <Form.Group className="workspaces-form-group">
-                <Form.Label style={{fontSize: "1.1em", minWidth: "250px"}}>{up9AuthStore.defaultWorkspace ? up9AuthStore.defaultWorkspace : <Dropdown className="select-dropdown" onToggle={(isOpen, _) => setIsWorkspaceDropDownOpen(isOpen)}>
+                <Form.Label style={!up9AuthStore.defaultWorkspace ? {width: "100%"} : {}}>{up9AuthStore.defaultWorkspace ? up9AuthStore.defaultWorkspace : <Dropdown className="select-dropdown" onToggle={(isOpen, _) => setIsWorkspaceDropDownOpen(isOpen)}>
                             <Dropdown.Toggle>Select a workspace</Dropdown.Toggle>
                             <Dropdown.Menu>
                                 {isWorkspaceDropDownOpen && <FormControl className="dropdown-filter" autoFocus placeholder="Type to filter..." value={workspaceFilterInput} onChange={e => setWorkspaceFilterInput(e.target.value)} />}
@@ -131,24 +132,29 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                                 {filteredWorkspaces?.map((workspace) => {return <Dropdown.Item key={workspace} onClick={_ => {setWorkspaceFilterInput(""); setDefaultWorkspace(workspace)}}>{workspace}</Dropdown.Item>})}
                             </Dropdown.Menu>
                         </Dropdown>}
-                    </Form.Label>
                     <br/>
-                    {up9AuthStore.defaultWorkspace && <><a className="anchor-button clickable" style={{marginLeft: "4px"}} onClick={_ => setDefaultWorkspace(null)}>Change</a></>}
+                    {up9AuthStore.defaultWorkspace && <><a className="anchor-button clickable" style={{marginLeft: "4px", float: "right", fontSize: "0.75em"}} onClick={_ => setDefaultWorkspace(null)}>Change</a></>}
                     <br/>
+                </Form.Label>
                 </Form.Group>
 
                 <Form.Group className="endpoints-form-group">
                     {up9AuthStore.defaultWorkspace && <><Form.Label style={{fontSize: "1.1em"}}>Endpoint</Form.Label>
                     <br/>
-                    <Dropdown className="select-dropdown" onToggle={(isOpen, _) => setIsEndpointsDropdownOpen(isOpen)}>
+                    <Dropdown className="select-dropdown" onToggle={(isOpen, _) => {
+                            setIsEndpointsDropdownOpen(isOpen)
+                            if (isOpen) {
+                                $('.select-dropdown .dropdown-menu').hide().show(0); //this is a very strange workaround for a very strange html bug, without this the drop down sometimes shifts the entire page until anything changes in the dom
+                            }
+                        }}>
                         <Dropdown.Toggle disabled={!up9AuthStore.defaultWorkspace}>
                             {selectedEndpoint ? getEndpointDisplayText(selectedEndpoint) : "Select an endpoint"}
                         </Dropdown.Toggle>
-                        <Dropdown.Menu>
+                        {isEndpointsDropdownOpen && <Dropdown.Menu>
                             {isEndpointsDropdownOpen && <FormControl className="dropdown-filter" autoFocus placeholder="Type to filter..." value={endpointFilterInput} onChange={e => setEndpointFilterInput(e.target.value)} />}
                             <Dropdown.Divider/>
                             {filteredEndpoints?.map((endpoint) => {return <Dropdown.Item title={getEndpointDisplayText(endpoint)} key={endpoint.uuid} onClick={_ => {setEndpointFilterInput(""); setSelectedEndpoint(endpoint)}}>{getEndpointDisplayText(endpoint)}</Dropdown.Item>})}
-                        </Dropdown.Menu>
+                        </Dropdown.Menu>}
                     </Dropdown></>}
                 </Form.Group>
             </div>
