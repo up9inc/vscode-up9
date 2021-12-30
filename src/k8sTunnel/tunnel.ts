@@ -109,8 +109,8 @@ export class K8STunnel {
         const newServiceDnsDict = {};
 
         const services = await this.k8sApi.listServiceForAllNamespaces();
-        for (const service of services.body.items) {
-            for (const port of service.spec.ports) {
+        for (const service of services?.body?.items ?? []) {
+            for (const port of service?.spec?.ports ?? []) {
                 const proxyPath = `/api/v1/namespaces/${service.metadata.namespace}/services/${service.metadata.name}:${port.port}/proxy`;
 
                 newServiceDnsDict[`${service.metadata.name}.${service.metadata.namespace}.svc.cluster.local:${port.port}`] = proxyPath;
