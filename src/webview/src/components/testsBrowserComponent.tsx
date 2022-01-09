@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useMemo } from "react";
 import {observer} from "mobx-react";
 import { up9AuthStore } from "../stores/up9AuthStore";
-import {sendApiMessage, setExtensionDefaultWorkspace} from "../providers/extensionConnectionProvider";
+import {sendApiMessage, setExtensionDefaultWorkspace, signOut} from "../providers/extensionConnectionProvider";
 import { ApiMessageType } from "../../../models/internal";
-import {Form, FormControl, Dropdown} from 'react-bootstrap';
+import {Form, FormControl, Dropdown, Popover, OverlayTrigger} from 'react-bootstrap';
 import { userIcon, logoIcon } from "./svgs";
 
 import { LoadingOverlay } from "./loadingOverlay";
@@ -118,24 +118,32 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                 </div>
                 <div>
                     <p>{up9AuthStore.username}</p>
-                    {userIcon}
+                    <Dropdown className="discreet-dropdown">
+                        <Dropdown.Toggle>
+                            {userIcon}
+                        </Dropdown.Toggle>
+
+                        <Dropdown.Menu>
+                            <Dropdown.Item onClick={signOut}>Log out</Dropdown.Item>
+                        </Dropdown.Menu>
+                    </Dropdown>
                 </div>
             </div>
             <hr style={{margin: "0"}}/>
             <div className="select-test-form">
                 <Form.Group className="workspaces-form-group">
-                <Form.Label style={!up9AuthStore.defaultWorkspace ? {width: "100%"} : {}}>{up9AuthStore.defaultWorkspace ? up9AuthStore.defaultWorkspace : <Dropdown className="select-dropdown" onToggle={(isOpen, _) => setIsWorkspaceDropDownOpen(isOpen)}>
-                            <Dropdown.Toggle>Select a workspace</Dropdown.Toggle>
-                            <Dropdown.Menu>
-                                {isWorkspaceDropDownOpen && <FormControl className="dropdown-filter" autoFocus placeholder="Type to filter..." value={workspaceFilterInput} onChange={e => setWorkspaceFilterInput(e.target.value)} />}
-                                <Dropdown.Divider/>
-                                {filteredWorkspaces?.map((workspace) => {return <Dropdown.Item key={workspace} onClick={_ => {setWorkspaceFilterInput(""); setDefaultWorkspace(workspace)}}>{workspace}</Dropdown.Item>})}
-                            </Dropdown.Menu>
-                        </Dropdown>}
-                    <br/>
-                    {up9AuthStore.defaultWorkspace && <><a className="anchor-button clickable" style={{marginLeft: "4px", float: "right", fontSize: "0.75em"}} onClick={_ => setDefaultWorkspace(null)}>Change</a></>}
-                    <br/>
-                </Form.Label>
+                    <Form.Label style={!up9AuthStore.defaultWorkspace ? {width: "100%"} : {}}>{up9AuthStore.defaultWorkspace ? up9AuthStore.defaultWorkspace : <Dropdown className="select-dropdown" onToggle={(isOpen, _) => setIsWorkspaceDropDownOpen(isOpen)}>
+                                <Dropdown.Toggle>Select a workspace</Dropdown.Toggle>
+                                <Dropdown.Menu>
+                                    {isWorkspaceDropDownOpen && <FormControl className="dropdown-filter" autoFocus placeholder="Type to filter..." value={workspaceFilterInput} onChange={e => setWorkspaceFilterInput(e.target.value)} />}
+                                    <Dropdown.Divider/>
+                                    {filteredWorkspaces?.map((workspace) => {return <Dropdown.Item key={workspace} onClick={_ => {setWorkspaceFilterInput(""); setDefaultWorkspace(workspace)}}>{workspace}</Dropdown.Item>})}
+                                </Dropdown.Menu>
+                            </Dropdown>}
+                        <br/>
+                        {up9AuthStore.defaultWorkspace && <><a className="anchor-button clickable" style={{marginLeft: "4px", float: "right", fontSize: "0.75em"}} onClick={_ => setDefaultWorkspace(null)}>Change</a></>}
+                        <br/>
+                    </Form.Label>
                 </Form.Group>
 
                 <Form.Group className="endpoints-form-group">

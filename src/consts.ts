@@ -8,6 +8,8 @@ export const internalRunTestCommandName = "up9.runTest";
 export const authGlobalStorageKey = "up9.auth.data";
 export const authEnvStorageKey = "up9.auth.env";
 
+export const defaultUP9Env = "https://up9.app";
+
 export const microTestsHeader = `import requests
 import unittest
 from urllib.parse import urlencode

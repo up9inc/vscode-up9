@@ -48,6 +48,14 @@ table {
 	gap: 10px;
 }
 
+.discreet-dropdown button {
+	box-shadow: none !important;
+}
+
+.discreet-dropdown button::after {
+	display: none;
+}
+
 .svg-icon {
 	fill: var(--vscode-input-foreground);
 }
@@ -280,6 +288,11 @@ hr {
 	flex-direction: column;
 	max-width: 500px;
 	margin-top: 8px;
+}
+
+.auth-control-container {
+	display: flex;
+	flex-direction: row;
 }
 
 .login-button {
@@ -627,6 +640,7 @@ div.appRoot > header {
 .sign-in-button {
 	background: var(--vscode-button-background);
 	color: var(--vscode-button-foreground);
+	margin-left: 10px;
 }
 
 .sign-in-button:hover {

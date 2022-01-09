@@ -93,8 +93,6 @@ export class UP9Auth {
         await this.resetTokenStorage();
         this._token = null;
         this.callOnAuthListeners(false);
-
-        vscode.window.showInformationMessage("Signed out successfully");
     }
 
     public tryToLoadStoredToken = async(): Promise<boolean> => {
@@ -121,7 +119,8 @@ export class UP9Auth {
         return null;
     };
 
-    public startNewAuthentication = async(): Promise<void> => {
+    public startNewAuthentication = async(env: string): Promise<void> => {
+        this._env = env;
         this._token = await this.getTokenByWebApp(listenPorts, this._env);
         this.saveTokenToStorage();
 
@@ -134,6 +133,15 @@ export class UP9Auth {
     }
 
     private getOAuth2Client = (redirectUri?: string, clientId: string = "cli", clientSecret?: string): ClientOAuth2 => {
+        // let protocol = "https://";
+        // let hostname = this._env;
+        // // handle envs with protocol and without
+        // if (this._env.indexOf("://") > 0) {
+        //     const parsedUrl = new URL(this._env);
+        //     protocol = `${parsedUrl.protocol}://`;
+        //     hostname = parsedUrl.hostname;
+        // } //TODO: FIX OR REMOVE
+
         const tokenHost = `https://auth.${this._env}`;
         const accessTokenUri = `${tokenHost}/auth/realms/testr/protocol/openid-connect/token`;
         const authorizationUri = `${tokenHost}/auth/realms/testr/protocol/openid-connect/auth`;

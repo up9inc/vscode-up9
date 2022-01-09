@@ -7,7 +7,7 @@ import {
     UP9Panel
 } from './panel';
 import { UP9Auth } from './providers/up9Auth';
-import { readConfigValue } from './utils';
+import { readStoredValue } from './utils';
 
 var http = require('http');
 
@@ -21,18 +21,18 @@ const createTunneledConfigCommandName = 'up9.createTunneledLaunchConfig';
 
 
 // onTerminalEmit is used by tests to intercept terminal contents, theres no way to directly get terminal contents otherwise sadly
-export async function onRunCodeInCloudCommand(up9Auth: UP9Auth, onTerminalEmit?: (terminalMessage: string) => void): Promise<void> {
+export async function onRunCodeInCloudCommand(context: vscode.ExtensionContext, up9Auth: UP9Auth, onTerminalEmit?: (terminalMessage: string) => void): Promise<void> {
     const cloudRunner = new CloudRunner(up9Auth, onTerminalEmit);
-    await cloudRunner.startTestRun(vscode.window.activeTextEditor.document.getText());
+    await cloudRunner.startTestRun(context, vscode.window.activeTextEditor.document.getText());
 }
 
 export async function activate(context: vscode.ExtensionContext): Promise<vscode.ExtensionContext> {
-    const up9Env = await readConfigValue(envConfigKey);
+    const up9Env = await readStoredValue(context, envConfigKey);
     const up9Auth = await UP9Auth.getInstance(up9Env, context);
 
     const openTestBrowserCommand = vscode.commands.registerCommand(testBrowserCommandName, () => UP9Panel.createOrShow(context, up9Auth));
-    const runCodeInCloudCommand = vscode.commands.registerCommand(runTestInCloudCommandName, () => onRunCodeInCloudCommand(up9Auth));
-    const startAuthCommand = vscode.commands.registerCommand(startAuthCommandName, () => up9Auth.startNewAuthentication());
+    const runCodeInCloudCommand = vscode.commands.registerCommand(runTestInCloudCommandName, () => onRunCodeInCloudCommand(context, up9Auth));
+    const startAuthCommand = vscode.commands.registerCommand(startAuthCommandName, () => up9Auth.startNewAuthentication(up9Env));
     const signOutCommand = vscode.commands.registerCommand(signOutCommandName, () => up9Auth.signOut());
     const startTunnelCommand = vscode.commands.registerCommand(startTunnelCommandName, () => {
         const tunnel = K8STunnel.getInstance();

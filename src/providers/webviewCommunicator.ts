@@ -2,8 +2,8 @@ import * as vscode from 'vscode';
 import { UP9ApiProvider } from './up9Api';
 import { UP9Auth } from './up9Auth';
 import { WebViewApiMessage, MessageCommandType, ApiMessageType } from '../models/internal';
-import { defaultWorkspaceConfigKey } from '../consts';
-import { readConfigValue, setConfigValue } from '../utils';
+import { defaultUP9Env, defaultWorkspaceConfigKey, envConfigKey } from '../consts';
+import { readStoredValue, setStoredValue } from '../utils';
 
 
 // this class is the only link the webview has to the "outside world", the webview is limited by CORS which means all up9 api https requests have to go through here where CORS isnt an issue.
@@ -11,11 +11,13 @@ export class UP9WebviewCommunicator {
     private _panel: vscode.WebviewPanel;
     private _authProvider: UP9Auth;
     private _apiProvider: UP9ApiProvider;
+    private _context: vscode.ExtensionContext;
 
-    public constructor(panel: vscode.WebviewPanel, up9Auth: UP9Auth) {
+    public constructor(context: vscode.ExtensionContext, panel: vscode.WebviewPanel, up9Auth: UP9Auth) {
         this._panel = panel;
         this._authProvider = up9Auth;
         this._apiProvider = new UP9ApiProvider(up9Auth.getEnv()); //TODO: this has to reload somehow on config change, maybe theres a way to reset the extension completely on config change
+        this._context = context;
 
         this._authProvider.onAuth(authStatus => {
             this.notifyPanelOfAuthStateChange(authStatus);
@@ -36,8 +38,9 @@ export class UP9WebviewCommunicator {
                     case MessageCommandType.StartAuth:
                         (async () => {
                             try {
-                                await this._authProvider.startNewAuthentication();
+                                await this._authProvider.startNewAuthentication(message.env);
                                 this.notifyPanelOfAuthStateChange(true);
+                                await setStoredValue(this._context, envConfigKey, message.env);
                             } catch (error) {
                                 this._panel.webview.postMessage({
                                     command: MessageCommandType.AuthError,
@@ -51,10 +54,21 @@ export class UP9WebviewCommunicator {
                         break;
                     case MessageCommandType.SetDefaultWorkspace:
                         (async () => {
-                            await setConfigValue(defaultWorkspaceConfigKey, message.workspaceId);
+                            await setStoredValue(this._context, defaultWorkspaceConfigKey, message.workspaceId);
                         })();
                     case MessageCommandType.PushText:
                         this.pushCodeToActiveEditor(message.code, message.header);
+                        break;
+                    case MessageCommandType.AuthSignOut:
+                        (async () => {
+                            try {
+                                await this._authProvider.signOut();
+                                this.notifyPanelOfAuthStateChange(false);
+                            } catch (error) {
+                                console.error(error);
+                                vscode.window.showErrorMessage('An unexpected error occured while signing out');
+                            }
+                        })();
                         break;
                 }
             },
@@ -86,10 +100,12 @@ export class UP9WebviewCommunicator {
     }
 
     private async sendStoredDataToPanel(): Promise<void> {
-        const defaultWorkspace = await readConfigValue(defaultWorkspaceConfigKey);
+        const defaultWorkspace = await readStoredValue(this._context, defaultWorkspaceConfigKey);
+        const env = await readStoredValue(this._context, envConfigKey, defaultUP9Env);
         this._panel.webview.postMessage({
             command: MessageCommandType.StoredData,
-            defaultWorkspace: defaultWorkspace
+            defaultWorkspace,
+            env
         });
     }
 

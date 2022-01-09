@@ -43,7 +43,7 @@ export class UP9Panel {
     private constructor(panel: vscode.WebviewPanel, context: vscode.ExtensionContext, up9Auth: UP9Auth) {
         this._panel = panel;
         this._context = context;
-        this._webviewCommunicator = new UP9WebviewCommunicator(this._panel, up9Auth);
+        this._webviewCommunicator = new UP9WebviewCommunicator(context, this._panel, up9Auth);
 
         // Set the webview's initial html content
         this._panel.webview.html = this._getHtmlForWebview();

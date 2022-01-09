@@ -22,7 +22,7 @@ const runTestFileAndGetTerminalOutput = async (extensionContext: vscode.Extensio
     const up9Auth = await UP9Auth.getInstance(process.env.UP9_ENV, extensionContext);
     await up9Auth.authenticateUsingClientCredentials(process.env.UP9_CLIENT_ID, process.env.UP9_CLIENT_SECRET);
 
-    await onRunCodeInCloudCommand(up9Auth, terminalMessage => terminalOutput += terminalMessage);
+    await onRunCodeInCloudCommand(extensionContext, up9Auth, terminalMessage => terminalOutput += terminalMessage);
 
     return terminalOutput.split(terminalLineDelimeter)
 };

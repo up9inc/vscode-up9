@@ -688,9 +688,10 @@ export const getDebugReply = (apiMessageType: ApiMessageType): Promise < any > =
     return Promise.resolve(response);
 }
 
-export const startNewAuth = () => {
+export const startNewAuth = (env: string) => {
     vsCodeApi.postMessage({
         command: MessageCommandType.StartAuth,
+        env
     });
 }
 
@@ -725,6 +726,12 @@ export const sendPushCodeToEditor = (code: string, header: string) => {
     header
   });
 };
+
+export const signOut = () => {
+  vsCodeApi.postMessage({
+    command: MessageCommandType.AuthSignOut
+  });
+}
 
 //handle messages incoming from the extension
 window.addEventListener('message', event => {
@@ -761,7 +768,7 @@ window.addEventListener('message', event => {
             up9AuthStore.setIsAuthConfigured(false);
             break;
         case MessageCommandType.StoredData:
-            console.log('received storedData', message);
             up9AuthStore.setDefaultWorkspace(message.defaultWorkspace);
+            up9AuthStore.setUP9Env(message.env);
     }
 });

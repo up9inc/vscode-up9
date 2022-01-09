@@ -19,7 +19,6 @@
     "onCommand:up9.openTestsBrowser",
     "onCommand:up9.runTest",
     "onCommand:up9.testAuth",
-    "onCommand:up9.signOut",
     "onCommand:up9.startTunnel",
     "onCommand:up9.stopTunnel",
     "onCommand:up9.createTunneledLaunchConfig"
@@ -72,26 +71,13 @@
         {
           "command": "up9.webAuth",
           "when": "false"
+        },
+        {
+          "command": "up9.signOut",
+          "when": "false"
         }
       ]
-    },
-    "configuration": [
-      {
-        "title": "UP9 Extension Configuration",
-        "order": 1,
-        "properties": {
-          "up9.env": {
-            "type": "string",
-            "description": "UP9 API Hostname",
-            "default": "stg.testr.io"
-          },
-          "up9.defaultWorkspace": {
-            "type": "string",
-            "description": "Workspace for test running"
-          }
-        }
-      }
-    ]
+    }
   },
   "scripts": {
     "setup-browser": "cd src/webview && npm install && cd ../../",
