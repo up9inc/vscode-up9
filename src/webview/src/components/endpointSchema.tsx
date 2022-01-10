@@ -19,7 +19,7 @@ const SchemaAccordion: React.FC<SchemaAccordionProps> = ({header, key, children}
     return <Accordion className="accordion" style={{background: `${inputBackgroundColor}15 !important`}}>
         <Accordion.Item eventKey={key} style={{background: `${inputBackgroundColor}15 !important`}}>
             <Accordion.Header style={{background: `${inputBackgroundColor}15 !important`}}>{header}</Accordion.Header>
-            <Accordion.Body style={{maxHeight: "700px", overflowY: "auto", background: `${inputBackgroundColor}15 !important`}}>
+            <Accordion.Body style={{background: `${inputBackgroundColor}15 !important`}}>
                 {children}
             </Accordion.Body>
         </Accordion.Item>
@@ -57,7 +57,7 @@ const EndpointSchema: React.FC<EndpointSchemaProps> = ({schema, isThemeDark}) =>
         return responses;
     }, schema);
 
-    return <div style={{marginTop: "6px"}}>
+    return <div style={{marginTop: "6px", overflowY: "auto", maxHeight: "calc(100% - 65px)"}}>
         {schema?.parameters && <SchemaAccordion header="Parameters" key={"params"}>
             <table>
                 <thead>
