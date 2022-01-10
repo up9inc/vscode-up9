@@ -11,18 +11,22 @@ export interface EndpointSchemaProps {
 interface SchemaAccordionProps {
     header: string;
     key: string;
+    hideOnStart?: boolean;
 }
 
-const SchemaAccordion: React.FC<SchemaAccordionProps> = ({header, key, children}) => {
+const noneAccordionKey = "none";
+
+const SchemaAccordion: React.FC<SchemaAccordionProps> = ({header, key, hideOnStart, children}) => {
     const inputBackgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--vscode-input-background');
 
-    return <Accordion className="accordion" style={{background: `${inputBackgroundColor}15 !important`}}>
+    return <Accordion className="accordion" style={{background: `${inputBackgroundColor}15 !important`}} defaultActiveKey={hideOnStart ? noneAccordionKey : key}>
         <Accordion.Item eventKey={key} style={{background: `${inputBackgroundColor}15 !important`}}>
             <Accordion.Header style={{background: `${inputBackgroundColor}15 !important`}}>{header}</Accordion.Header>
             <Accordion.Body style={{background: `${inputBackgroundColor}15 !important`}}>
                 {children}
             </Accordion.Body>
         </Accordion.Item>
+        {hideOnStart && <Accordion.Item eventKey={noneAccordionKey} style={{height: 0, visibility: "hidden"}} /> }
     </Accordion>;
 };
 
@@ -85,7 +89,7 @@ const EndpointSchema: React.FC<EndpointSchemaProps> = ({schema, isThemeDark}) =>
                                 theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={requestBody}  className="schema-code" 
                                     setOptions={{showGutter: false, hScrollBarAlwaysVisible: false, highlightActiveLine: false, enableEmmet: false}}/>
         </SchemaAccordion>}
-        <SchemaAccordion header="Responses" key="responseBody">
+        {responses?.length > 0 && <SchemaAccordion header="Responses" key="responseBody" hideOnStart={true}>
             {responses.map(response => {
                 return <div>
                     <table>
@@ -107,7 +111,7 @@ const EndpointSchema: React.FC<EndpointSchemaProps> = ({schema, isThemeDark}) =>
                                     setOptions={{showGutter: false, hScrollBarAlwaysVisible: false, highlightActiveLine: false, enableEmmet: false}}/>}
                 </div>
             })}
-        </SchemaAccordion>
+        </SchemaAccordion>}
         {/* {responseBody?.length > 5 && <SchemaAccordion header="Response Body" key={"responseBody"}>
             <AceEditor width="100%" mode="python" fontSize="15px" maxLines={1000}
                                 theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={responseBody}
