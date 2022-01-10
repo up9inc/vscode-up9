@@ -3,7 +3,7 @@ import {observer} from "mobx-react";
 import { up9AuthStore } from "../stores/up9AuthStore";
 import {sendApiMessage, setExtensionDefaultWorkspace, signOut} from "../providers/extensionConnectionProvider";
 import { ApiMessageType } from "../../../models/internal";
-import {Form, FormControl, Dropdown, Popover, OverlayTrigger} from 'react-bootstrap';
+import {Form, FormControl, Dropdown} from 'react-bootstrap';
 import { userIcon, logoIcon } from "./svgs";
 
 import { LoadingOverlay } from "./loadingOverlay";
@@ -95,7 +95,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
         if (up9AuthStore.isAuthConfigured) {
             refreshWorkspaces();
         }
-    }, [up9AuthStore.isAuthConfigured]);
+    }, [up9AuthStore.isAuthConfigured, up9AuthStore.up9Env]);
 
     const setDefaultWorkspace = (workspace: string) => {
         setExtensionDefaultWorkspace(workspace);

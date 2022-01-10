@@ -47,7 +47,7 @@ export class CloudRunner {
 
             //TODO: reuse the same terminal (will require having only 1 simultaneous test run)
             const terminalOutputter = this.createAndShowTerminal("Running test through UP9...\n\r", promise);
-            const up9Api = new UP9ApiProvider(this._up9Auth.getEnv());
+            const up9Api = new UP9ApiProvider(this._up9Auth.getEnv(), this._up9Auth.getEnvProtocol());
             try {
                 const res = await up9Api.testRunSingle(defaultWorkspace, code, token);
                 if (!res.testLog) {

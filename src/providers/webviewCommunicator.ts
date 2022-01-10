@@ -2,8 +2,9 @@ import * as vscode from 'vscode';
 import { UP9ApiProvider } from './up9Api';
 import { UP9Auth } from './up9Auth';
 import { WebViewApiMessage, MessageCommandType, ApiMessageType } from '../models/internal';
-import { defaultUP9Env, defaultWorkspaceConfigKey, envConfigKey } from '../consts';
+import { defaultUP9Env, defaultUP9EnvProtocol, defaultWorkspaceConfigKey, envConfigKey, envProtocolConfigKey } from '../consts';
 import { readStoredValue, setStoredValue } from '../utils';
+import { env } from 'process';
 
 
 // this class is the only link the webview has to the "outside world", the webview is limited by CORS which means all up9 api https requests have to go through here where CORS isnt an issue.
@@ -16,7 +17,7 @@ export class UP9WebviewCommunicator {
     public constructor(context: vscode.ExtensionContext, panel: vscode.WebviewPanel, up9Auth: UP9Auth) {
         this._panel = panel;
         this._authProvider = up9Auth;
-        this._apiProvider = new UP9ApiProvider(up9Auth.getEnv()); //TODO: this has to reload somehow on config change, maybe theres a way to reset the extension completely on config change
+        this._apiProvider = new UP9ApiProvider(up9Auth.getEnv(), up9Auth.getEnvProtocol());
         this._context = context;
 
         this._authProvider.onAuth(authStatus => {
@@ -38,9 +39,7 @@ export class UP9WebviewCommunicator {
                     case MessageCommandType.StartAuth:
                         (async () => {
                             try {
-                                await this._authProvider.startNewAuthentication(message.env);
-                                this.notifyPanelOfAuthStateChange(true);
-                                await setStoredValue(this._context, envConfigKey, message.env);
+                                await this.handleNewAuth(message.env);
                             } catch (error) {
                                 this._panel.webview.postMessage({
                                     command: MessageCommandType.AuthError,
@@ -99,40 +98,67 @@ export class UP9WebviewCommunicator {
         }   
     }
 
+    private async handleNewAuth(up9EnvUrl: string): Promise<void> {
+        const {env, protocol} = this.getEnvHostAndProtocol(up9EnvUrl);
+
+        await this._authProvider.startNewAuthentication(env, protocol);
+        this._apiProvider = new UP9ApiProvider(this._authProvider.getEnv(), this._authProvider.getEnvProtocol());
+        await setStoredValue(this._context, envConfigKey, env);
+        await setStoredValue(this._context, envProtocolConfigKey, protocol);
+        await setStoredValue(this._context, defaultWorkspaceConfigKey, null);
+        await this.sendStoredDataToPanel();
+        this.notifyPanelOfAuthStateChange(true);
+
+    }
+
+    private getEnvHostAndProtocol(up9EnvUrl: string): { env: string, protocol: string } {
+        let protocol = defaultUP9EnvProtocol;
+        let env = up9EnvUrl;
+        if (up9EnvUrl.indexOf("://") > 0) {
+            const parsedUrl = new URL(up9EnvUrl);
+            protocol = parsedUrl.protocol.replace(":", "");
+            env = parsedUrl.host;
+        }
+
+        return {env, protocol};
+    }
+
     private async sendStoredDataToPanel(): Promise<void> {
         const defaultWorkspace = await readStoredValue(this._context, defaultWorkspaceConfigKey);
         const env = await readStoredValue(this._context, envConfigKey, defaultUP9Env);
+        const envProtocol = await readStoredValue(this._context, envProtocolConfigKey, defaultUP9EnvProtocol);
         this._panel.webview.postMessage({
             command: MessageCommandType.StoredData,
             defaultWorkspace,
-            env
+            env: `${envProtocol}://${env}`
         });
     }
 
     private handlePanelUP9APIRequest = async (messageData: WebViewApiMessage) => {
         if (!this._apiProvider || !this._authProvider) {
             console.error('panel attempted to send http request when apiProvider or auth provider are null');
-            return;
         }
-        let token = await this._authProvider.getToken();
         try {
             let response;
             switch (messageData.messageType) {
                 case ApiMessageType.WorkspacesList:
-                    response = await this._apiProvider.getWorkspaces(token);
+                    response = await this._apiProvider.getWorkspaces(await this._authProvider.getToken());
                     break;
                 case ApiMessageType.EndpointsList:
-                    response = await this._apiProvider.getWorkspaceEndpoints(messageData.params.workspaceId, token);
+                    response = await this._apiProvider.getWorkspaceEndpoints(messageData.params.workspaceId, await this._authProvider.getToken());
                     break;
                 case ApiMessageType.EndpointTests:
-                    response = await this._apiProvider.getTestsForSpan(messageData.params.workspaceId, messageData.params.spanGuid, token);
+                    response = await this._apiProvider.getTestsForSpan(messageData.params.workspaceId, messageData.params.spanGuid, await this._authProvider.getToken());
                     break;
                 case ApiMessageType.Swagger:
-                    response = await this._apiProvider.getSwagger(messageData.params.workspaceId, token);
+                    response = await this._apiProvider.getSwagger(messageData.params.workspaceId, await this._authProvider.getToken());
                     break;
                 case ApiMessageType.Spans:
-                    response = await this._apiProvider.getSpans(messageData.params.workspaceId, messageData.params.spanId, token);
+                    response = await this._apiProvider.getSpans(messageData.params.workspaceId, messageData.params.spanId, await this._authProvider.getToken());
                     break;
+                case ApiMessageType.EnvCheck:
+                    const {env, protocol} = this.getEnvHostAndProtocol(messageData.params.env);
+                    response = await this._apiProvider.checkEnv(protocol, env);
             }
 
             this.handlePanelUP9ApiResponse(messageData, response, null);

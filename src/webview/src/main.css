@@ -48,12 +48,23 @@ table {
 	gap: 10px;
 }
 
+.discreet-dropdown {
+	box-shadow: none !important;
+	background: none !important;
+	color: var(--vscode-editor-foreground);
+}
+
 .discreet-dropdown button {
 	box-shadow: none !important;
+	background: none !important;
+	border: none !important;
+	margin-left: 6px;
+	padding: 2px;
 }
 
 .discreet-dropdown button::after {
 	display: none;
+	background: none;
 }
 
 .svg-icon {
@@ -75,9 +86,7 @@ table {
 
 .user-info .svg-icon {
 	display: inline-block;
-	margin-left: 8px;
-	margin-top: 4px;
-	margin-bottom: 4px;
+	margin-bottom: 5px;
 }
 
 .user-info p {
@@ -209,7 +218,7 @@ hr {
 	position: absolute;
 }
 
-.select-dropdown .dropdown-item {
+.select-dropdown .dropdown-item, .discreet-dropdown .dropdown-item {
 	background: var(--vscode-input-background);
 	color: var(--vscode-input-foreground);
 	border-radius: 3px;
@@ -285,9 +294,21 @@ hr {
 
 .auth-container {
 	display: flex;
-	flex-direction: column;
-	max-width: 500px;
-	margin-top: 8px;
+	flex-direction: row;
+	max-width: 600px;
+	margin-top: 20px;
+	justify-content: space-between;
+}
+
+.auth-icon-container {
+	flex-grow: 1;
+	margin-right: 12px;
+}
+
+@media screen and (max-width: 400px) {
+    .auth-icon-container {
+        display: none !important;
+    }
 }
 
 .auth-control-container {
