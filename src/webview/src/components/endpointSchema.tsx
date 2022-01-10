@@ -16,8 +16,6 @@ interface SchemaAccordionProps {
 const SchemaAccordion: React.FC<SchemaAccordionProps> = ({header, key, children}) => {
     const inputBackgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--vscode-input-background');
 
-    console.log('inputBackgroundColor', `${inputBackgroundColor}15 !important`)
-
     return <Accordion className="accordion" style={{background: `${inputBackgroundColor}15 !important`}}>
         <Accordion.Item eventKey={key} style={{background: `${inputBackgroundColor}15 !important`}}>
             <Accordion.Header style={{background: `${inputBackgroundColor}15 !important`}}>{header}</Accordion.Header>
@@ -32,7 +30,32 @@ const EndpointSchema: React.FC<EndpointSchemaProps> = ({schema, isThemeDark}) =>
 
 
     const requestBody = useMemo(() => JSON.stringify(getRequestBodySchemaForView(schema), null, 4), [schema]);
-    const responseBody = useMemo(() => JSON.stringify(getResponseBodySchemaForView(schema), null, 4), [schema]);
+
+    const backgroundContrastColor = getComputedStyle(document.documentElement).getPropertyValue('--vscode-editor-foreground');
+
+    const responses = useMemo(() => {
+        const responses = [];
+        for (const [responseCode, responseCodeValue] of Object.entries<any>(schema.responses ?? {})) {
+            if (!responseCodeValue.content) {
+                responses.push({
+                    code: responseCode,
+                    description: responseCodeValue.description
+                });
+                continue
+            }
+
+            for (const [contentType, contentTypeValue] of Object.entries<any>(responseCodeValue.content ?? {})) {
+                responses.push({
+                    code: responseCode,
+                    description: responseCodeValue.description,
+                    contentType: contentType,
+                    schema: JSON.stringify(contentTypeValue.schema?.properties, null, 4)
+                });
+            }
+        };
+        console.log('responses', responses);
+        return responses;
+    }, schema);
 
     return <div style={{marginTop: "6px"}}>
         {schema?.parameters && <SchemaAccordion header="Parameters" key={"params"}>
@@ -57,16 +80,39 @@ const EndpointSchema: React.FC<EndpointSchemaProps> = ({schema, isThemeDark}) =>
                 </tbody>
             </table>
         </SchemaAccordion>}
-        {requestBody?.length > 5 && <SchemaAccordion header="Request Body" key={"requestBody"}>
-            <AceEditor width="100%" mode="python" fontSize="15px" maxLines={1000}
-                                theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={requestBody}
+        {requestBody?.length > 5 && <SchemaAccordion header="Request Body" key="requestBody">
+            <AceEditor width="100%" mode="python" fontSize="15px" maxLines={1000} style={{background: `${backgroundContrastColor}15`}}
+                                theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={requestBody}  className="schema-code" 
                                     setOptions={{showGutter: false, hScrollBarAlwaysVisible: false, highlightActiveLine: false, enableEmmet: false}}/>
         </SchemaAccordion>}
-        {responseBody?.length > 5 && <SchemaAccordion header="Response Body" key={"responseBody"}>
+        <SchemaAccordion header="Responses" key="responseBody">
+            {responses.map(response => {
+                return <div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Description</th>
+                                {response.contentType && <th>Content Type</th>}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <td>{response.code}</td>
+                            <td>{response.description}</td>
+                            {response.contentType && <td>{response.contentType}</td>}
+                        </tbody>
+                    </table>
+                    {response.schema && <AceEditor width="100%" mode="python" fontSize="15px" maxLines={1000} style={{background: `${backgroundContrastColor}15`}}
+                                theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={response.schema}  className="schema-code" 
+                                    setOptions={{showGutter: false, hScrollBarAlwaysVisible: false, highlightActiveLine: false, enableEmmet: false}}/>}
+                </div>
+            })}
+        </SchemaAccordion>
+        {/* {responseBody?.length > 5 && <SchemaAccordion header="Response Body" key={"responseBody"}>
             <AceEditor width="100%" mode="python" fontSize="15px" maxLines={1000}
                                 theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={responseBody}
                                     setOptions={{showGutter: false, hScrollBarAlwaysVisible: false, highlightActiveLine: false, enableEmmet: false}}/>
-        </SchemaAccordion>}
+        </SchemaAccordion>} */}
     </div>;
 };
 

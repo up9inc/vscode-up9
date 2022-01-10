@@ -125,7 +125,7 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = ({ workspace, endpoint, sp
                 </Form.Group> 
                 <Container className="test-code-container">
                 <Card className="test-row">
-                    {testCodeMode === TestCodeMode.Schema ? <EndpointSchema schema={getEndpointSchema(endpoint, workspaceOAS)} isThemeDark={true} /> : 
+                    {testCodeMode === TestCodeMode.Schema ? <EndpointSchema schema={endpointSchema} isThemeDark={true} /> : 
                     <>
                         <Card.Header className="test-row-card-header">
                             <Container>
