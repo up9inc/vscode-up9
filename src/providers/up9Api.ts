@@ -5,8 +5,8 @@ import {raiseForBadResponse} from'../utils';
 export class UP9ApiProvider {
     private readonly _trccUrl: string
 
-    constructor(up9Env: string) {
-        this._trccUrl = `https://trcc.${up9Env}`;
+    constructor(up9Env: string, protocol: string) {
+        this._trccUrl = `${protocol}://trcc.${up9Env}`;
     }
 
     public getWorkspaces = async (token: string): Promise<string[]> => {
@@ -46,5 +46,11 @@ export class UP9ApiProvider {
         const response = await axios.get<any>(`${this._trccUrl}/models/${workspaceId}/lastResults/all/dataDependency`, {headers: {'Authorization': `Bearer ${token}`}});
         raiseForBadResponse(response);
         return response.data;
+    }
+
+    public checkEnv = async(protocol: string, env: string): Promise<boolean> => {
+        const response = await axios.get<any>(`${protocol}://trcc.${env}/apidocs`);
+        raiseForBadResponse(response);
+        return true;
     }
 }

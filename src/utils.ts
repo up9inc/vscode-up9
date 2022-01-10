@@ -9,16 +9,12 @@ export const raiseForBadResponse = (response: AxiosResponse): void => {
     }
 };
 
-export const readConfigValue = async (configSubKey: string): Promise<any> => {
-    const up9ConfigSection = vscode.workspace.getConfiguration(up9ConfigSectionName);
-    const value = await up9ConfigSection.get(configSubKey, null);
-
-    return value;
+export const readStoredValue = (context: vscode.ExtensionContext, valueKey: string, defaultValue: any=null): any => {
+    return context.globalState.get(valueKey, defaultValue);
 };
 
-export const setConfigValue = async (configSubKey: string, newValue: any): Promise<void> => {
-    const up9ConfigSection = vscode.workspace.getConfiguration(up9ConfigSectionName);
-    await up9ConfigSection.update(configSubKey, newValue, vscode.ConfigurationTarget.Global);
+export const setStoredValue = async (context: vscode.ExtensionContext, valueKey: string, newValue: any): Promise<void> => {
+    return context.globalState.update(valueKey, newValue);
 };
 
 export const indentString = (str: string, count: number) => str.replace(/^/gm, ' '.repeat(count));

@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as assert from 'assert';
 import { after, test, before } from 'mocha';
 import * as vscode from 'vscode';
-import { defaultWorkspaceConfigKey, envConfigKey, up9ConfigSectionName, internalExtensionName } from '../../consts';
+import { defaultWorkspaceConfigKey, envConfigKey, up9ConfigSectionName, internalExtensionName, defaultUP9EnvProtocol } from '../../consts';
 import { onRunCodeInCloudCommand } from '../../extension';
 import { terminalLineDelimeter } from '../../commands/runInCloud';
 import { UP9Auth } from '../../providers/up9Auth';
@@ -19,10 +19,10 @@ const runTestFileAndGetTerminalOutput = async (extensionContext: vscode.Extensio
     let terminalOutput = "";
 
 
-    const up9Auth = await UP9Auth.getInstance(process.env.UP9_ENV, extensionContext);
+    const up9Auth = await UP9Auth.getInstance(process.env.UP9_ENV, defaultUP9EnvProtocol, extensionContext);
     await up9Auth.authenticateUsingClientCredentials(process.env.UP9_CLIENT_ID, process.env.UP9_CLIENT_SECRET);
 
-    await onRunCodeInCloudCommand(up9Auth, terminalMessage => terminalOutput += terminalMessage);
+    await onRunCodeInCloudCommand(extensionContext, up9Auth, terminalMessage => terminalOutput += terminalMessage);
 
     return terminalOutput.split(terminalLineDelimeter)
 };

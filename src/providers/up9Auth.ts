@@ -14,15 +14,16 @@ export class UP9Auth {
 
 
     private _env: string;
+    private _envProtocol: string;
     private _extensionContext: vscode.ExtensionContext;
 
     private _token: ClientOAuth2.Token;
 
     private _onAuthListeners: ((authStatus: boolean) => void)[] = [];
 
-    public static async getInstance(up9Env: string, extensionContext: vscode.ExtensionContext): Promise<UP9Auth> {
+    public static async getInstance(up9Env: string, envProtocol: string, extensionContext: vscode.ExtensionContext): Promise<UP9Auth> {
         if (!this._instance) {
-            this._instance = new UP9Auth(up9Env, extensionContext);
+            this._instance = new UP9Auth(up9Env, envProtocol, extensionContext);
             await this._instance.tryToLoadStoredToken();
         }
         return this._instance;
@@ -36,8 +37,9 @@ export class UP9Auth {
         this._onAuthListeners.forEach(listener => listener(authStatus));
     }
 
-    private constructor(up9Env: string, extensionContext: vscode.ExtensionContext) {
+    private constructor(up9Env: string, envProtocol: string, extensionContext: vscode.ExtensionContext) {
         this._env = up9Env;
+        this._envProtocol = envProtocol;
         this._extensionContext = extensionContext;
     }
 
@@ -93,8 +95,6 @@ export class UP9Auth {
         await this.resetTokenStorage();
         this._token = null;
         this.callOnAuthListeners(false);
-
-        vscode.window.showInformationMessage("Signed out successfully");
     }
 
     public tryToLoadStoredToken = async(): Promise<boolean> => {
@@ -121,11 +121,12 @@ export class UP9Auth {
         return null;
     };
 
-    public startNewAuthentication = async(): Promise<void> => {
+    public startNewAuthentication = async(env: string, protocol: string): Promise<void> => {
+        this._env = env;
+        this._envProtocol = protocol;
         this._token = await this.getTokenByWebApp(listenPorts, this._env);
         this.saveTokenToStorage();
 
-        vscode.window.showInformationMessage("Signed in to UP9 successfully");
         this.callOnAuthListeners(true);
     };
 
@@ -133,8 +134,12 @@ export class UP9Auth {
         return this._env;
     }
 
+    public getEnvProtocol = (): string => {
+        return this._envProtocol;
+    }
+
     private getOAuth2Client = (redirectUri?: string, clientId: string = "cli", clientSecret?: string): ClientOAuth2 => {
-        const tokenHost = `https://auth.${this._env}`;
+        const tokenHost = `${this._envProtocol}://auth.${this._env}`;
         const accessTokenUri = `${tokenHost}/auth/realms/testr/protocol/openid-connect/token`;
         const authorizationUri = `${tokenHost}/auth/realms/testr/protocol/openid-connect/auth`;
 

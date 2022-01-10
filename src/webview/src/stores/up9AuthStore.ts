@@ -5,6 +5,7 @@ class UP9AuthStore {
     isAuthConfigured: boolean; //indicates whether user intervention is necessary for authentication
     username: string;
     defaultWorkspace: string; //TODO: move this to separate store
+    up9Env: string;
 
     constructor() {
         makeObservable(this, {
@@ -12,6 +13,8 @@ class UP9AuthStore {
             isAuthConfigured: observable,
             username: observable,
             defaultWorkspace: observable,
+            up9Env: observable,
+
 
             setAuthError: action,
             setIsAuthConfigured: action,
@@ -33,8 +36,11 @@ class UP9AuthStore {
     }
 
     setDefaultWorkspace(defaultWorkspace: string) {
-        console.log('setting default workspace', defaultWorkspace);
         this.defaultWorkspace = defaultWorkspace;
+    }
+
+    setUP9Env(up9Env: string) {
+        this.up9Env = up9Env;
     }
 }
 

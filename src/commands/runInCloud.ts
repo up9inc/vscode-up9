@@ -1,4 +1,4 @@
-import { indentString, readConfigValue } from "../utils";
+import { indentString, readStoredValue } from "../utils";
 import * as vscode from 'vscode';
 import { UP9Auth } from "../providers/up9Auth";
 import { UP9ApiProvider } from "../providers/up9Api";
@@ -21,7 +21,7 @@ export class CloudRunner {
         this._onTerminalEmitCallback = onTerminalEmit;
     }
 
-    public startTestRun = (code: string): Promise<void> => {
+    public startTestRun = (context: vscode.ExtensionContext, code: string): Promise<void> => {
         const promise = new Promise<any>(async (resolve, reject) => {
             let token: string;
 
@@ -39,7 +39,7 @@ export class CloudRunner {
                 return reject(error);
             }
 
-            const defaultWorkspace = await readConfigValue(defaultWorkspaceConfigKey);
+            const defaultWorkspace = await readStoredValue(context, defaultWorkspaceConfigKey);
             if (!defaultWorkspace) {
                 this.showSettingsError('No default workspace has been configured for test runs, please configure a default workspace in the up9 extension configuration');
                 return reject(new Error("default workspace not configured"));
@@ -47,7 +47,7 @@ export class CloudRunner {
 
             //TODO: reuse the same terminal (will require having only 1 simultaneous test run)
             const terminalOutputter = this.createAndShowTerminal("Running test through UP9...\n\r", promise);
-            const up9Api = new UP9ApiProvider(this._up9Auth.getEnv());
+            const up9Api = new UP9ApiProvider(this._up9Auth.getEnv(), this._up9Auth.getEnvProtocol());
             try {
                 const res = await up9Api.testRunSingle(defaultWorkspace, code, token);
                 if (!res.testLog) {
