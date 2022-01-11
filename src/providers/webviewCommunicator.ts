@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { UP9ApiProvider } from './up9Api';
 import { UP9Auth } from './up9Auth';
 import { WebViewApiMessage, MessageCommandType, ApiMessageType } from '../models/internal';
-import { defaultUP9Env, defaultUP9EnvProtocol, defaultWorkspaceConfigKey, envConfigKey, envProtocolConfigKey, microTestsClassDef, microTestsHeader } from '../consts';
+import { defaultUP9Env, defaultUP9EnvProtocol, defaultWorkspaceConfigKey, envConfigKey, envProtocolConfigKey, microTestsClassDef, microTestsHeader, microTestsImports } from '../consts';
 import { readStoredValue, setStoredValue } from '../utils';
 import { env } from 'process';
 
@@ -195,14 +195,43 @@ export class UP9WebviewCommunicator {
 
         const currentEditorContents = editor.document.getText();
         if (currentEditorContents) {
+            //inset missing imports at the top
+            editor.edit(editBuilder => {
+                editBuilder.insert(new vscode.Position(0, 0), this.getMissingImportsInCode(currentEditorContents));
+            });
+
             if (currentEditorContents.indexOf("class ") == -1) {
                 editor.insertSnippet(new vscode.SnippetString(`${microTestsClassDef}\n${code}`));
             } else {
                 editor.insertSnippet(new vscode.SnippetString(`\n\n${code.replace('    ', '')}`));
             }
-            
         } else {
             editor.insertSnippet(new vscode.SnippetString(`${microTestsHeader}\n${code}`));
         }
+    }
+
+    private getMissingImportsInCode = (editorCode: string): string => {
+        const missingImports = [];
+
+        const presentImports = new Set();
+
+        for (const editorCodeLine of editorCode.split('\n')) {
+            const line = editorCodeLine.replace("#", "").trim();
+            if (line.startsWith("import ") || line.startsWith("from ")) {
+                presentImports.add(line);
+            }
+        }
+        for (const importLine of microTestsImports.split('\n')) {
+            const sanitizedImportLine = importLine.replace("#", "").trim();
+            if (!presentImports.has(sanitizedImportLine)) {
+                missingImports.push(importLine);
+            }
+        }
+
+        if (missingImports.length == 0) {
+            return '';
+        }
+
+        return `${missingImports.join("\n")}\n`;
     }
 }
