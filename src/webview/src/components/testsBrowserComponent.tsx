@@ -4,7 +4,7 @@ import { up9AuthStore } from "../stores/up9AuthStore";
 import {sendApiMessage, setExtensionDefaultWorkspace, signOut} from "../providers/extensionConnectionProvider";
 import { ApiMessageType } from "../../../models/internal";
 import {Form, FormControl, Dropdown} from 'react-bootstrap';
-import { userIcon, logoIcon } from "./svgs";
+import { logoIcon } from "./svgs";
 
 import { LoadingOverlay } from "./loadingOverlay";
 import TestCodeViewer from "./testCodeViewer";
