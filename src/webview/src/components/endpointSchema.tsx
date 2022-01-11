@@ -1,7 +1,8 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Accordion, Table } from "react-bootstrap";
 import AceEditor from "react-ace";
 import { getRequestBodySchemaForView, getResponseBodySchemaForView } from "../utils";
+import { getHeapCodeStatistics } from "v8";
 
 export interface EndpointSchemaProps {
     schema: any;
@@ -11,17 +12,26 @@ export interface EndpointSchemaProps {
 interface SchemaAccordionProps {
     header: string;
     key: string;
+    collapsedSuffix?: string;
     hideOnStart?: boolean;
 }
 
 const noneAccordionKey = "none";
 
-const SchemaAccordion: React.FC<SchemaAccordionProps> = ({header, key, hideOnStart, children}) => {
+const SchemaAccordion: React.FC<SchemaAccordionProps> = ({header, key, hideOnStart, collapsedSuffix, children}) => {
     const inputBackgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--vscode-input-background');
+    const [isCollapsed, setIsCollapsed] = useState(hideOnStart);
 
-    return <Accordion className="accordion" style={{background: `${inputBackgroundColor}15 !important`}} defaultActiveKey={hideOnStart ? noneAccordionKey : key}>
+    return <Accordion className="accordion" style={{background: `${inputBackgroundColor}15 !important`}} activeKey={isCollapsed ? noneAccordionKey : key}>
         <Accordion.Item eventKey={key} style={{background: `${inputBackgroundColor}15 !important`}}>
-            <Accordion.Header style={{background: `${inputBackgroundColor}15 !important`}}>{header}</Accordion.Header>
+            <Accordion.Header style={{background: `${inputBackgroundColor}15 !important`}} onClick={_ => setIsCollapsed(!isCollapsed)}>
+                {header}
+                {isCollapsed ?
+                    <span style={{fontWeight: "bold", marginLeft: "0.5em"}}>
+                        {collapsedSuffix ?? ""}
+                    </span> : ""
+                }
+            </Accordion.Header>
             <Accordion.Body style={{background: `${inputBackgroundColor}15 !important`}}>
                 {children}
             </Accordion.Body>
@@ -57,12 +67,16 @@ const EndpointSchema: React.FC<EndpointSchemaProps> = ({schema, isThemeDark}) =>
                 });
             }
         };
-        console.log('responses', responses);
         return responses;
     }, schema);
 
+    const responseCodes = useMemo(() => {
+        const codes = new Set(responses.map(response => response.code));
+        return Array.from(codes);
+    }, [responses]);
+
     return <div style={{marginTop: "6px", overflowY: "auto", maxHeight: "calc(100% - 65px)"}}>
-        {schema?.parameters && <SchemaAccordion header="Parameters" key={"params"}>
+        {schema?.parameters?.length ? <SchemaAccordion header="Parameters" key={"params"}>
             <table>
                 <thead>
                     <tr>
@@ -83,13 +97,13 @@ const EndpointSchema: React.FC<EndpointSchemaProps> = ({schema, isThemeDark}) =>
                     })}
                 </tbody>
             </table>
-        </SchemaAccordion>}
+        </SchemaAccordion> : null}
         {requestBody?.length > 5 && <SchemaAccordion header="Request Body" key="requestBody">
             <AceEditor width="100%" mode="python" fontSize="15px" maxLines={1000} style={{background: `${backgroundContrastColor}15`}}
                                 theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={requestBody}  className="schema-code" 
                                     setOptions={{showGutter: false, hScrollBarAlwaysVisible: false, highlightActiveLine: false, enableEmmet: false}}/>
         </SchemaAccordion>}
-        {responses?.length > 0 && <SchemaAccordion header="Responses" key="responseBody" hideOnStart={true}>
+        {responses?.length > 0 && <SchemaAccordion header="Response" key="responseBody" hideOnStart={true} collapsedSuffix={responseCodes.join(", ")}>
             {responses.map(response => {
                 return <div>
                     <table>
