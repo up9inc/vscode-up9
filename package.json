@@ -7,9 +7,6 @@
   "engines": {
     "vscode": "^1.61.0"
   },
-  "categories": [
-    "Other"
-  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/up9inc/vscode-up9"
@@ -24,6 +21,10 @@
     "onCommand:up9.createTunneledLaunchConfig"
   ],
   "main": "./out/extension.js",
+  "categories": [
+    "Programming Languages",
+    "Snippets"
+  ],
   "contributes": {
     "commands": [
       {
