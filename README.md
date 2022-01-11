@@ -23,4 +23,5 @@ This extension for Microsoft Visual Studio Code popular IDE allows developers ea
 	* screen should now offer drop-down-lists titled WORKSPACE and ENDPOINTS
 * select workspace and endpoint from the drop-down lists
 	* now you can view sample code for selected endpoint on the screen
+	* use push button to push the code inside your browser, in case the file is empty full code will be pushed, otherwise only function to the location of the cursor
 	* use COPY button to copy code into clipboard .. 
