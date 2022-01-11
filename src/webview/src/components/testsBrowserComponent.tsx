@@ -9,6 +9,7 @@ import { userIcon, logoIcon } from "./svgs";
 import { LoadingOverlay } from "./loadingOverlay";
 import TestCodeViewer from "./testCodeViewer";
 import $ from "jquery";
+import GravatarProfile from "./gravatarProfile";
 
 const TestsBrowserComponent: React.FC<{}> = observer(() => {
     const [workspaces, setWorkspaces] = useState(null);
@@ -30,6 +31,12 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
         }
     }, [up9AuthStore.defaultWorkspace]);
 
+
+    const setDefaultWorkspace = (workspace: string) => {
+        setExtensionDefaultWorkspace(workspace);
+        up9AuthStore.setDefaultWorkspace(workspace);
+    }
+
     const getEndpointDisplayText = (endpoint) => {
         return `${endpoint.method.toUpperCase()} ${endpoint.service}${endpoint.path}`;
     }
@@ -50,7 +57,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
 
     useEffect(() => {
         if (workspaces && !up9AuthStore.defaultWorkspace) {
-            setExtensionDefaultWorkspace(workspaces?.[0]);
+            setDefaultWorkspace(workspaces?.[0]);
         }
     }, [workspaces])
 
@@ -105,11 +112,6 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
         }
     }, [up9AuthStore.isAuthConfigured, up9AuthStore.up9Env]);
 
-    const setDefaultWorkspace = (workspace: string) => {
-        setExtensionDefaultWorkspace(workspace);
-        up9AuthStore.setDefaultWorkspace(workspace);
-    }
-
     const onWorkspaceDropdownToggle = (isOpen: boolean) => {
         setIsWorkspaceDropDownOpen(isOpen);
         if (!isOpen && !up9AuthStore.defaultWorkspace && lastSelectedWorkspace) {
@@ -136,7 +138,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                     <p>{up9AuthStore.username}</p>
                     <Dropdown className="discreet-dropdown">
                         <Dropdown.Toggle>
-                            {userIcon}
+                            <GravatarProfile email={up9AuthStore.username}/>
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>

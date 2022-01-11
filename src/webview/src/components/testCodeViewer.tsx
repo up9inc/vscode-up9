@@ -71,7 +71,6 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = ({ workspace, endpoint, sp
 
     const endpointSpan = useMemo(() => {
         if (!spans || !endpoint) {
-            console.log('returning cause null');
             return null;
         }
 
