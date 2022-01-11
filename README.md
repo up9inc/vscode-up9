@@ -25,3 +25,4 @@ This extension for Microsoft Visual Studio Code popular IDE allows developers ea
 	* now you can view sample code for selected endpoint on the screen
 	* use push button to push the code inside your browser, in case the file is empty full code will be pushed, otherwise only function to the location of the cursor
 	* use COPY button to copy code into clipboard .. 
+	* in order to run the code please right click-> UP9: run code with UP9
