@@ -12,13 +12,15 @@ export const authEnvStorageKey = "up9.auth.env";
 export const defaultUP9Env = "up9.app";
 export const defaultUP9EnvProtocol = "https";
 
-export const microTestsClassDef = 'class Tests(unittest.TestCase):'
-
-export const microTestsHeader = `import requests
+export const microTestsImports = `import requests
 import unittest
 from urllib.parse import urlencode
 # from jsonpath_ng import parse
-# from lxml import html
+# from lxml import html`;
+
+export const microTestsClassDef = 'class Tests(unittest.TestCase):'
+
+export const microTestsHeader = `${microTestsImports}
 
 
 ${microTestsClassDef}
