@@ -28,7 +28,6 @@ export class UP9WebviewCommunicator {
     public async registerOnMessageListeners(disposables: vscode.Disposable[]): Promise<void> {
         this._panel.webview.onDidReceiveMessage(
             message => {
-                console.log('received message', message);
                 switch (message.command) {
                     case MessageCommandType.Alert:
                         vscode.window.showErrorMessage(message.text);
