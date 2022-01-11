@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { UP9ApiProvider } from './up9Api';
 import { UP9Auth } from './up9Auth';
 import { WebViewApiMessage, MessageCommandType, ApiMessageType } from '../models/internal';
-import { defaultUP9Env, defaultUP9EnvProtocol, defaultWorkspaceConfigKey, envConfigKey, envProtocolConfigKey } from '../consts';
+import { defaultUP9Env, defaultUP9EnvProtocol, defaultWorkspaceConfigKey, envConfigKey, envProtocolConfigKey, microTestsClassDef, microTestsHeader } from '../consts';
 import { readStoredValue, setStoredValue } from '../utils';
 import { env } from 'process';
 
@@ -195,9 +195,14 @@ export class UP9WebviewCommunicator {
 
         const currentEditorContents = editor.document.getText();
         if (currentEditorContents) {
-            editor.insertSnippet(new vscode.SnippetString(`\n\n${code.replace('    ', '')}`));
+            if (currentEditorContents.indexOf("class ") == -1) {
+                editor.insertSnippet(new vscode.SnippetString(`${microTestsClassDef}\n${code}`));
+            } else {
+                editor.insertSnippet(new vscode.SnippetString(`\n\n${code.replace('    ', '')}`));
+            }
+            
         } else {
-            editor.insertSnippet(new vscode.SnippetString(`${header}\n${code}`));
+            editor.insertSnippet(new vscode.SnippetString(`${microTestsHeader}\n${code}`));
         }
     }
 }

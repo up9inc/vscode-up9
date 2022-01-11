@@ -12,6 +12,8 @@ export const authEnvStorageKey = "up9.auth.env";
 export const defaultUP9Env = "up9.app";
 export const defaultUP9EnvProtocol = "https";
 
+export const microTestsClassDef = 'class Tests(unittest.TestCase):'
+
 export const microTestsHeader = `import requests
 import unittest
 from urllib.parse import urlencode
@@ -19,5 +21,5 @@ from urllib.parse import urlencode
 # from lxml import html
 
 
-class Tests(unittest.TestCase):
-`;
+${microTestsClassDef}
+`
