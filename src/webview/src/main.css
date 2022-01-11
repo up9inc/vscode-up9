@@ -45,23 +45,6 @@ table {
 	overflow-y: auto;
 }
 
-.profile-icon {
-	position: relative;
-	padding-left: 21px;
-}
-
-.gravatar {
-	background-size: cover;
-	margin: 0 0 3px 0;
-	margin-bottom: 1px;
-	width: 24px;
-	height: 24px;
-	border-radius: 24px;
-	border: 2px solid var(--vscode-editor-foreground);
-	cursor: pointer;
-}
-	
-
 .select-test-form {
 	height: 5%;
 	min-height: 65px;
@@ -84,7 +67,7 @@ table {
 	border: none !important;
 	margin-left: 6px;
 	padding: 2px;
-	padding-bottom: 5px;
+	padding-bottom: 9px;
 }
 
 .discreet-dropdown button::after {

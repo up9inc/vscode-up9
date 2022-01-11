@@ -4,12 +4,11 @@ import { up9AuthStore } from "../stores/up9AuthStore";
 import {sendApiMessage, setExtensionDefaultWorkspace, signOut} from "../providers/extensionConnectionProvider";
 import { ApiMessageType } from "../../../models/internal";
 import {Form, FormControl, Dropdown} from 'react-bootstrap';
-import { logoIcon } from "./svgs";
+import { userIcon, logoIcon } from "./svgs";
 
 import { LoadingOverlay } from "./loadingOverlay";
 import TestCodeViewer from "./testCodeViewer";
 import $ from "jquery";
-import GravatarProfile from "./gravatarProfile";
 
 const TestsBrowserComponent: React.FC<{}> = observer(() => {
     const [workspaces, setWorkspaces] = useState(null);
@@ -138,7 +137,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                     <p>{up9AuthStore.username}</p>
                     <Dropdown className="discreet-dropdown">
                         <Dropdown.Toggle>
-                            <GravatarProfile email={up9AuthStore.username}/>
+                            {userIcon}
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>
