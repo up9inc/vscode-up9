@@ -51,7 +51,7 @@ export class CloudRunner {
             try {
                 const res = await up9Api.testRunSingle(defaultWorkspace, code, token);
                 if (!res.testLog) {
-                    throw "UP9 API returned empty response, does this workspace have a live agent?";
+                    throw "Cannot run the test due to an unexpected error, does this workspace have an agent?";
                 }
                 const log = res.testLog + `\n${this.getLogOutputForRCA(res.rcaData)}`
                 this.processTerminalOutputAndPrint(log, terminalOutputter);

@@ -67,6 +67,7 @@ table {
 	border: none !important;
 	margin-left: 6px;
 	padding: 2px;
+	padding-bottom: 9px;
 }
 
 .discreet-dropdown button::after {

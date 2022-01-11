@@ -30,6 +30,12 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
         }
     }, [up9AuthStore.defaultWorkspace]);
 
+
+    const setDefaultWorkspace = (workspace: string) => {
+        setExtensionDefaultWorkspace(workspace);
+        up9AuthStore.setDefaultWorkspace(workspace);
+    }
+
     const getEndpointDisplayText = (endpoint) => {
         return `${endpoint.method.toUpperCase()} ${endpoint.service}${endpoint.path}`;
     }
@@ -50,7 +56,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
 
     useEffect(() => {
         if (workspaces && !up9AuthStore.defaultWorkspace) {
-            setExtensionDefaultWorkspace(workspaces?.[0]);
+            setDefaultWorkspace(workspaces?.[0]);
         }
     }, [workspaces])
 
@@ -104,11 +110,6 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             refreshWorkspaces();
         }
     }, [up9AuthStore.isAuthConfigured, up9AuthStore.up9Env]);
-
-    const setDefaultWorkspace = (workspace: string) => {
-        setExtensionDefaultWorkspace(workspace);
-        up9AuthStore.setDefaultWorkspace(workspace);
-    }
 
     const onWorkspaceDropdownToggle = (isOpen: boolean) => {
         setIsWorkspaceDropDownOpen(isOpen);

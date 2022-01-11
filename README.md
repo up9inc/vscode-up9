@@ -2,7 +2,7 @@
 
 This extension for Microsoft Visual Studio Code popular IDE allows developers easy access to UP9-generated code samples for Web APIs.
 
-## INSTALLATION
+## Installation
 
 * install latest MS VS Code
 	* 	we tested version 1.62 from October 2021
@@ -14,25 +14,13 @@ This extension for Microsoft Visual Studio Code popular IDE allows developers ea
 
 
 	
-## BASIC USE
+## Quick Start
 
 * press COMMAND-SHIFT-P to access VS Code command launcher
 * type or select "UP9: Open Code Browser" command from the list
-	* this opens right-pane dialog with credentials to fill (UP9 address, clientID, clientSecret)
+	* this opens right-panel dialog with connection details to fill of the desired UP9 env (URL)
 	* fill the required details and press OK
 	* screen should now offer drop-down-lists titled WORKSPACE and ENDPOINTS
 * select workspace and endpoint from the drop-down lists
 	* now you can view sample code for selected endpoint on the screen
 	* use COPY button to copy code into clipboard .. 
-
-	
-## RUNNING CODE in UP9 - Python
-
-* copy test sample code as it is
-* remove @xxx annotations 
-* right-click and select "UP9: Run Code with UP9" from the menu
-*  
-
-## RUNNING CODE locally - Python
-
-* TBD
