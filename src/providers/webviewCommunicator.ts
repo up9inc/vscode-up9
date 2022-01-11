@@ -195,7 +195,7 @@ export class UP9WebviewCommunicator {
 
         const currentEditorContents = editor.document.getText();
         if (currentEditorContents) {
-            //inset missing imports at the top
+            //insert missing imports at the top
             editor.edit(editBuilder => {
                 editBuilder.insert(new vscode.Position(0, 0), this.getMissingImportsInCode(currentEditorContents));
             });
