@@ -131,7 +131,7 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = ({ workspace, endpoint, sp
                                 <Row>
                                     <Col xs="2" md="2" lg="2" style={{"padding": "0"}}>
                                         <span className="clickable" style={{marginRight: "5px"}} onClick={_ => sendPushCodeToEditor(testCode, microTestsHeader)}>{inputIcon}</span>
-                                        <span className="clickable" onClick={_ => copyToClipboard(testCode)}>{copyIcon}</span>
+                                        <span className="clickable" onClick={_ => copyToClipboard(`${microTestsHeader}\n${testCode}`)}>{copyIcon}</span>
                                     </Col>
                                     <Col xs="10" md="10" lg="10" style={{"paddingLeft": "5px"}}></Col>
                                 </Row>
