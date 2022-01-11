@@ -124,8 +124,8 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = ({ workspace, endpoint, sp
                     {endpointSchema && <a className={"anchor-tab" + (testCodeMode == TestCodeMode.Schema ? " active" : "")} onClick={_ => setTestCodeMode(TestCodeMode.Schema)}>Schema</a>}
                 </Form.Group> 
                 <Container className="test-code-container">
-                <Card className="test-row">
-                    {testCodeMode === TestCodeMode.Schema ? <EndpointSchema schema={getEndpointSchema(endpoint, workspaceOAS)} isThemeDark={true} /> : 
+                <Card className="test-row" style={{height: "100%"}}>
+                    {testCodeMode === TestCodeMode.Schema ? <EndpointSchema schema={endpointSchema} isThemeDark={true} /> : 
                     <>
                         <Card.Header className="test-row-card-header">
                             <Container>
@@ -138,7 +138,7 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = ({ workspace, endpoint, sp
                                 </Row>
                             </Container>
                         </Card.Header>
-                        <Card.Body style={{height: "100%", overflowY: "auto"}}>
+                        <Card.Body style={{height: "100%"}}>
                                 <AceEditor width="100%" mode="python" fontSize="14px" maxLines={1000}
                                 theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={`${microTestsHeader}\n${testCode}`}
                                     setOptions={{showGutter: false, hScrollBarAlwaysVisible: false, highlightActiveLine: false}}/>

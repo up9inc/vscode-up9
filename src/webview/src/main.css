@@ -8,6 +8,13 @@ table {
 	border-collapse: separate;
 	border-spacing: 1em;
 	position: relative;
+	table-layout: fixed;
+}
+
+.schema-code {
+	margin-left: 50px;
+	border-radius: 4px;
+	width: auto !important;
 }
 
 .user-info {

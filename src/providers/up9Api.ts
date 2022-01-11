@@ -2,11 +2,15 @@ import axios from 'axios';
 import { Workspace, TestResponse, Endpoint } from '../models/up9';
 import {raiseForBadResponse} from'../utils';
 
+const LATEST_REVISION_CACHE_TTL_MS = 120 * 1000; //2 minutes
+
 export class UP9ApiProvider {
-    private readonly _trccUrl: string
+    private readonly _trccUrl: string;
+    private _latestRevisionCache: {[key: string]: {id: string, cachedAt: number}}
 
     constructor(up9Env: string, protocol: string) {
         this._trccUrl = `${protocol}://trcc.${up9Env}`;
+        this._latestRevisionCache = {};
     }
 
     public getWorkspaces = async (token: string): Promise<string[]> => {
@@ -16,13 +20,17 @@ export class UP9ApiProvider {
     }
 
     public getWorkspaceEndpoints = async (workspaceId: string, token: string): Promise<Endpoint[]> => {
-        const response = await axios.get<Endpoint[]>(`${this._trccUrl}/models/${workspaceId}/lastResults/all/endpoints`, {headers: {'Authorization': `Bearer ${token}`}})
+        const latestRevision = await this.getLatestRevisionForWorkspace(workspaceId, token);
+
+        const response = await axios.get<Endpoint[]>(`${this._trccUrl}/models/${workspaceId}/${latestRevision}/all/endpoints`, {headers: {'Authorization': `Bearer ${token}`}})
         raiseForBadResponse(response);
         return response.data;
     }
 
     public getTestsForSpan = async(workspaceId: string, spanGuid: string, token: string): Promise<TestResponse> => {
-        const url = `${this._trccUrl}/models/${workspaceId}/lastResults/all/tests?base64Code=false&addTestData=true`;
+        const latestRevision = await this.getLatestRevisionForWorkspace(workspaceId, token);
+
+        const url = `${this._trccUrl}/models/${workspaceId}/${latestRevision}/all/tests?base64Code=false&addTestData=true`;
         const body = {spanGuids: [spanGuid], microTestsOnly: true};
         const response = await axios.post<TestResponse>(url, body, {headers: {'Authorization': `Bearer ${token}`, 'Content-Type': "application/json"}});
         raiseForBadResponse(response);
@@ -37,13 +45,15 @@ export class UP9ApiProvider {
     }
 
     public getSwagger = async(workspaceId: string, token: string): Promise<any> => {
-        const response = await axios.get<any>(`${this._trccUrl}/models/${workspaceId}/lastResults/all/swagger`, {headers: {'Authorization': `Bearer ${token}`}});
+        const latestRevision = await this.getLatestRevisionForWorkspace(workspaceId, token);
+        const response = await axios.get<any>(`${this._trccUrl}/models/${workspaceId}/${latestRevision}/all/swagger`, {headers: {'Authorization': `Bearer ${token}`}});
         raiseForBadResponse(response);
         return response.data;
     }
 
     public getSpans = async(workspaceId: string, spanId: string, token: string): Promise<any> => {
-        const response = await axios.get<any>(`${this._trccUrl}/models/${workspaceId}/lastResults/all/dataDependency`, {headers: {'Authorization': `Bearer ${token}`}});
+        const latestRevision = await this.getLatestRevisionForWorkspace(workspaceId, token);
+        const response = await axios.get<any>(`${this._trccUrl}/models/${workspaceId}/${latestRevision}/all/dataDependency`, {headers: {'Authorization': `Bearer ${token}`}});
         raiseForBadResponse(response);
         return response.data;
     }
@@ -52,5 +62,30 @@ export class UP9ApiProvider {
         const response = await axios.get<any>(`${protocol}://trcc.${env}/apidocs`);
         raiseForBadResponse(response);
         return true;
+    }
+
+    private getLatestRevisionForWorkspace = async(workspaceId: string, token: string): Promise<string> => {
+        const cachedRevision = this._latestRevisionCache[workspaceId];
+        if (cachedRevision) {
+            const cacheAge = (+new Date()) - cachedRevision.cachedAt;
+            // ignore cache and remove key if expired
+            if (cacheAge > LATEST_REVISION_CACHE_TTL_MS) {
+                this._latestRevisionCache[workspaceId] = null;
+            } else {
+                return cachedRevision.id;
+            }
+        }
+
+        const response = await axios.get<any>(`${this._trccUrl}/models/${workspaceId}/revisions`, {headers: {'Authorization': `Bearer ${token}`}});
+        raiseForBadResponse(response);
+        const latestRevision = response.data[0];
+
+        //cache the result
+        this._latestRevisionCache[workspaceId] = {
+            id: latestRevision.id,
+            cachedAt: (+new Date())
+        };
+
+        return latestRevision.id;
     }
 }

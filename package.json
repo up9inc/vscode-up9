@@ -1,15 +1,12 @@
 {
   "name": "up9",
-  "displayName": "UP9",
-  "publisher": "up9",
-  "description": "",
+  "displayName": "UP9 API Integration Tool",
+  "publisher": "UP9",
+  "description": "Integration code helper for API development",
   "version": "0.0.0",
   "engines": {
     "vscode": "^1.61.0"
   },
-  "categories": [
-    "Other"
-  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/up9inc/vscode-up9"
@@ -24,6 +21,10 @@
     "onCommand:up9.createTunneledLaunchConfig"
   ],
   "main": "./out/extension.js",
+  "categories": [
+    "Programming Languages",
+    "Snippets"
+  ],
   "contributes": {
     "commands": [
       {
