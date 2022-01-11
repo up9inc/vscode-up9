@@ -15,6 +15,7 @@ if (!("acquireVsCodeApi" in window)) {
     up9AuthStore.setIsAuthConfigured(true);
     up9AuthStore.setUsername("testuser@gmail.com");
     up9AuthStore.setDefaultWorkspace("rb-reg");
+    up9AuthStore.setUP9Env("stg.testr.io");
     isDebug = true;
 }
 

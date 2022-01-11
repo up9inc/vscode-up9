@@ -133,7 +133,10 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                 <div style={{padding: "5px 0"}}>
                     {logoIcon}
                 </div>
-                <div>
+                <span className="env-text">
+                    {up9AuthStore.up9Env}
+                </span>
+                <div className="user-name-container">
                     <p>{up9AuthStore.username}</p>
                     <Dropdown className="discreet-dropdown">
                         <Dropdown.Toggle>
@@ -158,7 +161,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                                 </Dropdown.Menu>
                             </Dropdown>}
                         <br/>
-                        {up9AuthStore.defaultWorkspace && <><a className="anchor-button clickable" style={{marginLeft: "4px", float: "right", fontSize: "0.75em"}} onClick={_ => setDefaultWorkspace(null)}>Change</a></>}
+                        {up9AuthStore.defaultWorkspace && <><a className="anchor-button clickable" style={{marginLeft: "4px", float: "right", fontSize: "0.6em"}} onClick={_ => setDefaultWorkspace(null)}>Edit</a></>}
                         <br/>
                     </Form.Label>
                 </Form.Group>

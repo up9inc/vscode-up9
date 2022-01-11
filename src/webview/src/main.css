@@ -87,6 +87,16 @@ table {
 	padding: 0 20px;
 }
 
+.env-text {
+	flex-grow: 2;
+	margin-left: 8px;
+}
+
+.user-name-container {
+	font-size: 0.8em;
+	height: 32px
+}
+
 .clickable {
 	cursor: pointer;
 	user-select: none;
