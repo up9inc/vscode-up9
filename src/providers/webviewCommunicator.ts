@@ -55,6 +55,7 @@ export class UP9WebviewCommunicator {
                         (async () => {
                             await setStoredValue(this._context, defaultWorkspaceConfigKey, message.workspaceId);
                         })();
+                        break;
                     case MessageCommandType.PushText:
                         this.pushCodeToActiveEditor(message.code, message.header);
                         break;

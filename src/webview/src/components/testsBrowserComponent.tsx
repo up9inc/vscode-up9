@@ -20,7 +20,15 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
     const [selectedEndpoint, setSelectedEndpoint] = useState(null);
     const [workspaceSpans, setWorkspaceSpans] = useState(null);
 
+    const [lastSelectedWorkspace, setLastSelectedWorkspace] = useState("");
+
     const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        if (up9AuthStore.defaultWorkspace) {
+            setLastSelectedWorkspace(up9AuthStore.defaultWorkspace);
+        }
+    }, [up9AuthStore.defaultWorkspace]);
 
     const getEndpointDisplayText = (endpoint) => {
         return `${endpoint.method.toUpperCase()} ${endpoint.service}${endpoint.path}`;
@@ -102,6 +110,14 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
         up9AuthStore.setDefaultWorkspace(workspace);
     }
 
+    const onWorkspaceDropdownToggle = (isOpen: boolean) => {
+        setIsWorkspaceDropDownOpen(isOpen);
+        if (!isOpen && !up9AuthStore.defaultWorkspace && lastSelectedWorkspace) {
+            // prevent user from reaching state where nothing is selected
+            setDefaultWorkspace(lastSelectedWorkspace);
+        }
+    }
+
     // TODO: refactor this
     // ugly workaround for having the dropdowns apply focus to the filter form repeatedly
     const [isWorkspaceDropDownOpen, setIsWorkspaceDropDownOpen] = useState(false);
@@ -132,12 +148,12 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             <hr style={{margin: "0"}}/>
             <div className="select-test-form">
                 <Form.Group className="workspaces-form-group">
-                    <Form.Label style={!up9AuthStore.defaultWorkspace ? {width: "100%"} : {}}>{up9AuthStore.defaultWorkspace ? up9AuthStore.defaultWorkspace : <Dropdown className="select-dropdown" onToggle={(isOpen, _) => setIsWorkspaceDropDownOpen(isOpen)}>
+                    <Form.Label style={!up9AuthStore.defaultWorkspace ? {width: "100%"} : {}}>{up9AuthStore.defaultWorkspace ? up9AuthStore.defaultWorkspace : <Dropdown className="select-dropdown" onToggle={(isOpen, _) => onWorkspaceDropdownToggle(isOpen)}>
                                 <Dropdown.Toggle>Select a workspace</Dropdown.Toggle>
                                 <Dropdown.Menu>
                                     {isWorkspaceDropDownOpen && <FormControl className="dropdown-filter" autoFocus placeholder="Type to filter..." value={workspaceFilterInput} onChange={e => setWorkspaceFilterInput(e.target.value)} />}
                                     <Dropdown.Divider/>
-                                    {filteredWorkspaces?.map((workspace) => {return <Dropdown.Item key={workspace} onClick={_ => {setWorkspaceFilterInput(""); setDefaultWorkspace(workspace)}}>{workspace}</Dropdown.Item>})}
+                                    {filteredWorkspaces?.map((workspace) => {return <Dropdown.Item key={workspace} onClick={_ => {setWorkspaceFilterInput(""); setDefaultWorkspace(workspace ?? lastSelectedWorkspace)}}>{workspace}</Dropdown.Item>})}
                                 </Dropdown.Menu>
                             </Dropdown>}
                         <br/>
