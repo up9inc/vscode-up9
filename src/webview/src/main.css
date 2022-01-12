@@ -233,7 +233,6 @@ hr {
 .select-dropdown button::after {
 	float: right;
 	margin-top: 0.6em;
-	position: absolute;
 }
 
 .select-dropdown .dropdown-item, .discreet-dropdown .dropdown-item {
@@ -266,6 +265,8 @@ hr {
 .select-dropdown > button {
 	overflow-x: hidden;
 	text-overflow: ellipsis;
+	border-radius: 8px;
+	padding: 2px 12px !important;
 }
 
 .tests-list-container {
