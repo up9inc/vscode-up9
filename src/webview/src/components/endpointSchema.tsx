@@ -20,11 +20,12 @@ const noneAccordionKey = "none";
 
 const SchemaAccordion: React.FC<SchemaAccordionProps> = ({header, key, hideOnStart, collapsedSuffix, children}) => {
     const inputBackgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--vscode-input-background');
+    const inputForegroundColor = getComputedStyle(document.documentElement).getPropertyValue('--vscode-input-foreground');
     const [isCollapsed, setIsCollapsed] = useState(hideOnStart);
 
-    return <Accordion className="accordion" style={{background: `${inputBackgroundColor}15 !important`}} activeKey={isCollapsed ? noneAccordionKey : key}>
-        <Accordion.Item eventKey={key} style={{background: `${inputBackgroundColor}15 !important`}}>
-            <Accordion.Header style={{background: `${inputBackgroundColor}15 !important`}} onClick={_ => setIsCollapsed(!isCollapsed)}>
+    return <Accordion className="accordion" activeKey={isCollapsed ? noneAccordionKey : key}>
+        <Accordion.Item eventKey={key}>
+            <Accordion.Header onClick={_ => setIsCollapsed(!isCollapsed)} style={{background: `${inputForegroundColor}10`}}>
                 {header}
                 {isCollapsed ?
                     <span style={{fontWeight: "bold", marginLeft: "0.5em"}}>
@@ -32,7 +33,7 @@ const SchemaAccordion: React.FC<SchemaAccordionProps> = ({header, key, hideOnSta
                     </span> : ""
                 }
             </Accordion.Header>
-            <Accordion.Body style={{background: `${inputBackgroundColor}15 !important`}}>
+            <Accordion.Body>
                 {children}
             </Accordion.Body>
         </Accordion.Item>
@@ -103,7 +104,7 @@ const EndpointSchema: React.FC<EndpointSchemaProps> = ({schema, isThemeDark}) =>
                                 theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={requestBody}  className="schema-code" 
                                     setOptions={{showGutter: false, hScrollBarAlwaysVisible: false, highlightActiveLine: false, enableEmmet: false}}/>
         </SchemaAccordion>}
-        {responses?.length > 0 && <SchemaAccordion header="Response" key="responseBody" hideOnStart={true} collapsedSuffix={responseCodes.join(", ")}>
+        {responses?.length > 0 && <SchemaAccordion header={"Response " + responseCodes.join(", ")} key="responseBody" hideOnStart={true}>
             {responses.map(response => {
                 return <div>
                     <table>

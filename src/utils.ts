@@ -20,3 +20,7 @@ export const setStoredValue = async (context: vscode.ExtensionContext, valueKey:
 export const indentString = (str: string, count: number) => str.replace(/^/gm, ' '.repeat(count));
 
 export const randomString = (length: number) => crypto.randomBytes(length).toString('hex');
+
+export const delay = (ms: number): Promise<void> => {
+    return new Promise( resolve => setTimeout(resolve, ms));
+}

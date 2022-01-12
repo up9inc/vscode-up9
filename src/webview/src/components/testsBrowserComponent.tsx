@@ -152,22 +152,20 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             <hr style={{margin: "0"}}/>
             <div className="select-test-form">
                 <Form.Group className="workspaces-form-group">
-                    <Form.Label style={!up9AuthStore.defaultWorkspace ? {width: "100%"} : {}}>{up9AuthStore.defaultWorkspace ? up9AuthStore.defaultWorkspace : <Dropdown className="select-dropdown" onToggle={(isOpen, _) => onWorkspaceDropdownToggle(isOpen)}>
-                                <Dropdown.Toggle>Select a workspace</Dropdown.Toggle>
-                                <Dropdown.Menu>
-                                    {isWorkspaceDropDownOpen && <FormControl className="dropdown-filter" autoFocus placeholder="Type to filter..." value={workspaceFilterInput} onChange={e => setWorkspaceFilterInput(e.target.value)} />}
-                                    <Dropdown.Divider/>
-                                    {filteredWorkspaces?.map((workspace) => {return <Dropdown.Item key={workspace} onClick={_ => {setWorkspaceFilterInput(""); setDefaultWorkspace(workspace ?? lastSelectedWorkspace)}}>{workspace}</Dropdown.Item>})}
-                                </Dropdown.Menu>
-                            </Dropdown>}
-                        <br/>
-                        {up9AuthStore.defaultWorkspace && <><a className="anchor-button clickable" style={{marginLeft: "4px", float: "right", fontSize: "0.6em"}} onClick={_ => setDefaultWorkspace(null)}>Edit</a></>}
-                        <br/>
-                    </Form.Label>
+                    <Form.Label>Workspace</Form.Label>
+                    <br/>
+                    <Dropdown className="select-dropdown" onToggle={(isOpen, _) => onWorkspaceDropdownToggle(isOpen)}>
+                        <Dropdown.Toggle>{up9AuthStore.defaultWorkspace ? up9AuthStore.defaultWorkspace : "Select a workspace"}</Dropdown.Toggle>
+                        {isWorkspaceDropDownOpen && <Dropdown.Menu>
+                            {isWorkspaceDropDownOpen && <FormControl className="dropdown-filter" autoFocus placeholder="Type to filter..." value={workspaceFilterInput} onChange={e => setWorkspaceFilterInput(e.target.value)} />}
+                            <Dropdown.Divider/>
+                            {filteredWorkspaces?.map((workspace) => {return <Dropdown.Item key={workspace} onClick={_ => {setWorkspaceFilterInput(""); setDefaultWorkspace(workspace ?? lastSelectedWorkspace)}}>{workspace}</Dropdown.Item>})}
+                        </Dropdown.Menu>}
+                    </Dropdown>
                 </Form.Group>
 
                 <Form.Group className="endpoints-form-group">
-                    {up9AuthStore.defaultWorkspace && <><Form.Label style={{fontSize: "1.1em"}}>Endpoint</Form.Label>
+                    <Form.Label>Endpoint</Form.Label>
                     <br/>
                     <Dropdown className="select-dropdown" onToggle={(isOpen, _) => {
                             setIsEndpointsDropdownOpen(isOpen)
@@ -183,7 +181,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                             <Dropdown.Divider/>
                             {filteredEndpoints?.map((endpoint) => {return <Dropdown.Item title={getEndpointDisplayText(endpoint)} key={endpoint.uuid} onClick={_ => {setEndpointFilterInput(""); setSelectedEndpoint(endpoint)}}>{getEndpointDisplayText(endpoint)}</Dropdown.Item>})}
                         </Dropdown.Menu>}
-                    </Dropdown></>}
+                    </Dropdown>
                 </Form.Group>
             </div>
             <hr/>

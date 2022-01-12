@@ -37,9 +37,9 @@ export class UP9ApiProvider {
         return response.data;
     }
 
-    public testRunSingle = async(workspaceId: string, testCode: string, token: string) => {
+    public runTestCodeOnAgent = async(workspaceId: string, testCode: string, token: string) => {
         const serializedCode = `data:text/plain;base64,${Buffer.from(testCode).toString('base64')}`;
-        const response = await axios.post<any>(`${this._trccUrl}/agents/runSingleTest`, {model: workspaceId, code: serializedCode, isRawCode: true}, {headers: {'Authorization': `Bearer ${token}`}});
+        const response = await axios.post<any>(`${this._trccUrl}/agents/runSingleTest`, {model: workspaceId, code: serializedCode, isRawCode: true}, {headers: {'Authorization': `Bearer ${token}`}, timeout: 30000});
         raiseForBadResponse(response);
         return response.data;
     }

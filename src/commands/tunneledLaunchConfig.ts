@@ -1,8 +1,11 @@
 import * as vscode from 'vscode';
 import { startTunnelCommandName } from '../extension';
+import * as open from 'open';
 
 const up9ConfigNameSuffix = "(UP9 tunneled)";
 const startTunnelDialogOption = "Start tunnel now";
+const showVSCodeDocsDialogOption = "Open Launch Config Documentation";
+const vscodeDocsLink = "https://code.visualstudio.com/docs/python/debugging";
 
 const getModifiedConfigName = (configName: string): string => {
     return `${configName} ${up9ConfigNameSuffix}`;
@@ -49,9 +52,23 @@ const showUserMessageWithStartTunnelAction = async (message: string) => {
     }
 }
 
+//TODO: repetitive code can be made more generic
+const showUserMessageWithOpenLaunchConfigDocAction = async (message: string) => {
+    const userAction = await vscode.window.showErrorMessage(message, showVSCodeDocsDialogOption)
+
+    if (userAction === showVSCodeDocsDialogOption) {
+        open(vscodeDocsLink);
+    }
+}
+
 export const runCreateTunneledLaunchConfig = async (tunnelAddress: string) => {
     try {
         const launchConfigs = getLaunchConfigs();
+
+        if (launchConfigs.length === 0) {
+            showUserMessageWithOpenLaunchConfigDocAction("No launch.json configurations found, please create a launch configuration before proceeding");
+            return;
+        }
 
         const unTunneledLaunchConfigs = launchConfigs.filter(config => !config.name.endsWith(up9ConfigNameSuffix));
     
