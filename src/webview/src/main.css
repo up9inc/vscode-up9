@@ -75,7 +75,7 @@ table {
 	background: none;
 }
 
-.svg-icon {
+.svg-icon, .svg-icon > path {
 	fill: var(--vscode-input-foreground);
 }
 
@@ -207,7 +207,7 @@ hr {
 	opacity: 0.75;
 }
 
-.workspaces-form-group .form-label {
+.workspaces-form-group .form-label, .endpoints-form-group .form-label {
 	font-size: 0.9em;
 	opacity: 0.8
 }
@@ -317,7 +317,7 @@ hr {
 }
 
 .ace_editor {
-	background: transparent
+	background: transparent !important;
 }
 
 .auth-container {

@@ -104,7 +104,7 @@ const EndpointSchema: React.FC<EndpointSchemaProps> = ({schema, isThemeDark}) =>
                                 theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={requestBody}  className="schema-code" 
                                     setOptions={{showGutter: false, hScrollBarAlwaysVisible: false, highlightActiveLine: false, enableEmmet: false}}/>
         </SchemaAccordion>}
-        {responses?.length > 0 && <SchemaAccordion header={"Response " + responseCodes.join(", ")} key="responseBody" hideOnStart={true}>
+        {responses?.length > 0 && <SchemaAccordion header={"Response"} key="responseBody" hideOnStart={true} collapsedSuffix={responseCodes.join(", ")}>
             {responses.map(response => {
                 return <div>
                     <table>
@@ -127,11 +127,6 @@ const EndpointSchema: React.FC<EndpointSchemaProps> = ({schema, isThemeDark}) =>
                 </div>
             })}
         </SchemaAccordion>}
-        {/* {responseBody?.length > 5 && <SchemaAccordion header="Response Body" key={"responseBody"}>
-            <AceEditor width="100%" mode="python" fontSize="15px" maxLines={1000}
-                                theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={responseBody}
-                                    setOptions={{showGutter: false, hScrollBarAlwaysVisible: false, highlightActiveLine: false, enableEmmet: false}}/>
-        </SchemaAccordion>} */}
     </div>;
 };
 
