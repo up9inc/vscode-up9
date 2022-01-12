@@ -152,7 +152,9 @@ export class UP9Auth {
         });
     }
 
-    public authenticateUsingClientCredentials = async (clientId: string, clientSecret: string): Promise<void> => {
+    public authenticateUsingClientCredentials = async (env: string, envProtocol: string, clientId: string, clientSecret: string): Promise<void> => {
+        this._env = env;
+        this._envProtocol = envProtocol;
         const up9AuthClient = this.getOAuth2Client(undefined, clientId, clientSecret);
         const token = await up9AuthClient.credentials.getToken();
         

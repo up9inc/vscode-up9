@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { CloudRunner } from './commands/runInCloud';
 import { runCreateTunneledLaunchConfig } from './commands/tunneledLaunchConfig';
-import { envConfigKey, envProtocolConfigKey } from './consts';
+import { defaultUP9EnvProtocol, envConfigKey, envProtocolConfigKey } from './consts';
 import { K8STunnel } from './k8sTunnel/tunnel';
 import {
     UP9Panel
@@ -28,7 +28,7 @@ export async function onRunCodeInCloudCommand(context: vscode.ExtensionContext, 
 
 export async function activate(context: vscode.ExtensionContext): Promise<vscode.ExtensionContext> {
     const up9Env = await readStoredValue(context, envConfigKey);
-    const up9EnvProtocol = await readStoredValue(context, envProtocolConfigKey);
+    const up9EnvProtocol = await readStoredValue(context, envProtocolConfigKey, defaultUP9EnvProtocol);
     const up9Auth = await UP9Auth.getInstance(up9Env, up9EnvProtocol, context);
 
     const openTestBrowserCommand = vscode.commands.registerCommand(testBrowserCommandName, () => UP9Panel.createOrShow(context, up9Auth));
@@ -43,7 +43,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<vscode
     });
     const stopTunnelCommand = vscode.commands.registerCommand(stopTunnelCommandName, () => K8STunnel.getInstance().stop());
     const createTunneledConfigCommand = vscode.commands.registerCommand(createTunneledConfigCommandName, () => runCreateTunneledLaunchConfig(K8STunnel.getInstance().getProxyAddress()));
-    
 
     context.subscriptions.push(openTestBrowserCommand);
     context.subscriptions.push(runCodeInCloudCommand);
