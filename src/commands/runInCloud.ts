@@ -1,9 +1,10 @@
-import { indentString, readStoredValue } from "../utils";
+import { delay, indentString, readStoredValue } from "../utils";
 import * as vscode from 'vscode';
 import { UP9Auth } from "../providers/up9Auth";
 import { UP9ApiProvider } from "../providers/up9Api";
 import { startAuthCommandName } from "../extension";
 import { defaultWorkspaceConfigKey } from "../consts";
+import axios from "axios";
 
 const openUP9SettingsDialogOption = 'Open UP9 Settings';
 const openUP9SignInDialogOption = 'Sign In To UP9';
@@ -47,30 +48,22 @@ export class CloudRunner {
 
             //TODO: reuse the same terminal (will require having only 1 simultaneous test run)
             const terminalOutputter = this.createAndShowTerminal("Running test through UP9...\n\r", promise);
+
+            // terminal takes a second to properly initialize, calls to print before its ready will result in nothing being printed
+            await delay(1000);
+
             const up9Api = new UP9ApiProvider(this._up9Auth.getEnv(), this._up9Auth.getEnvProtocol());
             try {
-                const res = await up9Api.testRunSingle(defaultWorkspace, code, token);
+                const res = await up9Api.runTestCodeOnAgent(defaultWorkspace, code, token);
                 if (!res.testLog) {
-                    throw "Cannot run the test due to an unexpected error, does this workspace have an agent?";
+                    throw "Unknown error occured: received unexpected response from UP9";
                 }
                 const log = res.testLog + `\n${this.getLogOutputForRCA(res.rcaData)}`
                 this.processTerminalOutputAndPrint(log, terminalOutputter);
                 resolve(null);
             } catch (err) {
-                console.error(err);
-                let terminalErrorMessage: string;
-                if (typeof err === 'string') {
-                    terminalErrorMessage = err;
-                } else {
-                    if (err?.response) {
-                        const responseBody = JSON.stringify(err?.response?.data, null, 4).replace('\n', '\n\r');
-                        terminalErrorMessage = `API returned error: ${err.response.status} ${responseBody}`
-                    } else {
-                        terminalErrorMessage = `Unknown error occured: ${JSON.stringify(err)}`;
-                    }
-                }
-                
-                this.processTerminalOutputAndPrint(terminalErrorMessage, terminalOutputter);
+                console.error(err);                
+                this.processTerminalOutputAndPrint(this.getTestRunErrorForPrinting(err), terminalOutputter);
                 
                 reject(err);
             }
@@ -132,6 +125,26 @@ export class CloudRunner {
         }
 
         return logOutput;
+    }
+
+    private getTestRunErrorForPrinting = (error: any): string => {
+        let errorMessage: string;
+        if (typeof error === 'string') {
+            errorMessage = error;
+        } else {
+            if (error?.response) {
+                const responseBody = JSON.stringify(error?.response?.data, null, 4).replace('\n', '\n\r');
+                errorMessage = `API returned error: ${error.response.status} ${responseBody}`
+            } else {
+                if (error?.code) {
+                    errorMessage = `Could not connect to UP9, please check your network connection (${error.message})`;
+                } else {
+                    errorMessage = `Unknown error occured: ${JSON.stringify(error)}`;
+                }
+            }
+        }
+    
+        return errorMessage;
     }
 
     private showSettingsError = async (message: string): Promise<void> => {
