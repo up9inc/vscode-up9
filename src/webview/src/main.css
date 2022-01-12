@@ -181,7 +181,7 @@ hr {
 	position: relative;
 }
 
-.accordion, .accordion-item, .accordion-header, .accordion-button {
+.accordion, .accordion-item, .accordion-button {
 	background: transparent !important;
 	color: var(--vscode-input-foreground) !important;
 	box-shadow: none !important;
@@ -189,6 +189,13 @@ hr {
 
 .accordion-header {
 	border:1px solid var(--vscode-window-inactiveBorder);
+	color: var(--vscode-input-foreground) !important;
+	box-shadow: none !important;
+}
+
+.accordion-header > button {
+	font-size: 0.65em;
+	font-weight: bold;
 }
 
 .accordion-header:active, .accordion-header:hover, .accordion-header:focus {
@@ -201,7 +208,8 @@ hr {
 }
 
 .workspaces-form-group .form-label {
-	font-size: 1.1em;
+	font-size: 0.9em;
+	opacity: 0.8
 }
 
 .select-dropdown {
@@ -231,7 +239,8 @@ hr {
 }
 
 .select-dropdown button::after {
-	float: right;
+	position: absolute;
+	right: 12px;
 	margin-top: 0.6em;
 }
 
@@ -265,8 +274,8 @@ hr {
 .select-dropdown > button {
 	overflow-x: hidden;
 	text-overflow: ellipsis;
-	border-radius: 8px;
-	padding: 2px 12px !important;
+	border-radius: 8px !important;
+	padding: 2px 25px 2px 12px !important;
 }
 
 .tests-list-container {

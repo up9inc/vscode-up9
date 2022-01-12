@@ -152,7 +152,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             <hr style={{margin: "0"}}/>
             <div className="select-test-form">
                 <Form.Group className="workspaces-form-group">
-                    <Form.Label style={{fontSize: "1.1em"}}>Workspace</Form.Label>
+                    <Form.Label>Workspace</Form.Label>
                     <br/>
                     <Dropdown className="select-dropdown" onToggle={(isOpen, _) => onWorkspaceDropdownToggle(isOpen)}>
                         <Dropdown.Toggle>{up9AuthStore.defaultWorkspace ? up9AuthStore.defaultWorkspace : "Select a workspace"}</Dropdown.Toggle>
@@ -165,7 +165,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                 </Form.Group>
 
                 <Form.Group className="endpoints-form-group">
-                    <Form.Label style={{fontSize: "1.1em"}}>Endpoint</Form.Label>
+                    <Form.Label>Endpoint</Form.Label>
                     <br/>
                     <Dropdown className="select-dropdown" onToggle={(isOpen, _) => {
                             setIsEndpointsDropdownOpen(isOpen)
