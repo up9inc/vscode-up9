@@ -130,16 +130,23 @@ export class CloudRunner {
     private getTestRunErrorForPrinting = (error: any): string => {
         let errorMessage: string;
         if (typeof error === 'string') {
-            errorMessage = error;
+            errorMessage = error; ``
         } else {
             if (error?.response) {
-                const responseBody = JSON.stringify(error?.response?.data, null, 4).replace('\n', '\n\r');
-                errorMessage = `API returned error: ${error.response.status} ${responseBody}`
+                switch (error.response?.data?.errorCode) {
+                    case "noAgentAvailable":
+                        errorMessage = "Test run failed: UP9 could not find a live agent associated with this workspace, try selecting a different workspace in UP9 code browser or check your agent's status";
+                        break;
+                    default:
+                        const responseBody = JSON.stringify(error?.response?.data, null, 4).replace('\n', '\n\r');
+                        errorMessage = `Test run failed: API returned error ${error.response.status} ${responseBody}`
+                        break;
+                }
             } else {
                 if (error?.code) {
-                    errorMessage = `Could not connect to UP9, please check your network connection (${error.message})`;
+                    errorMessage = `Test run failed: Could not connect to UP9, please check your network connection (${error.message})`;
                 } else {
-                    errorMessage = `Unknown error occured: ${JSON.stringify(error)}`;
+                    errorMessage = `Test run failed: Unknown error occured ${JSON.stringify(error)}`;
                 }
             }
         }
