@@ -29,15 +29,15 @@ const runTestFileAndGetTerminalOutput = async (extensionContext: vscode.Extensio
 
 suite('Run In UP9 Command', () => {
   before(async () => {
+    const extension = await vscode.extensions.getExtension(internalExtensionName);
+    extensionContext = await extension.activate();
+
     const up9Env = process.env.UP9_ENV; 
     const defaultWorkspace = process.env.DEFAULT_WORKSPACE;
 
     // initialize extension config
     await extensionContext.globalState.update(envConfigKey, up9Env);
     await extensionContext.globalState.update(defaultWorkspaceConfigKey, defaultWorkspace);
-
-    const extension = await vscode.extensions.getExtension(internalExtensionName);
-    extensionContext = await extension.activate();
   });
 
   after(async () => {
