@@ -137,7 +137,7 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = ({ workspace, endpoint, sp
                                 </Row>
                             </Container>
                         </Card.Header>
-                        <Card.Body style={{height: "100%"}}>
+                        <Card.Body style={{height: "100%", marginTop: 0, paddingTop: 0}}>
                                 <AceEditor width="100%" mode="python" fontSize="14px" maxLines={1000}
                                 theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={`${microTestsHeader}\n${testCode}`}
                                     setOptions={{showGutter: false, hScrollBarAlwaysVisible: false, highlightActiveLine: false}}/>
