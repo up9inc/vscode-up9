@@ -1,49 +1,116 @@
 {
   "name": "up9",
-  "displayName": "UP9",
-  "publisher": "UP9, INC",
-  "description": "",
-  "version": "0.0.1",
+  "displayName": "UP9 API Integration Tool",
+  "publisher": "UP9",
+  "description": "Integration code helper for API development",
+  "version": "0.0.0",
   "engines": {
-    "vscode": "^1.36.0"
+    "vscode": "^1.61.0"
   },
-  "categories": [
-    "Other"
-  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/up9inc/vscode-up9"
+  },
+  "icon": "images/logo128x128.png",
   "activationEvents": [
-    "onCommand:up9.openTestsBrowser"
+    "onCommand:up9.openTestsBrowser",
+    "onCommand:up9.runTest",
+    "onCommand:up9.testAuth",
+    "onCommand:up9.startTunnel",
+    "onCommand:up9.stopTunnel",
+    "onCommand:up9.createTunneledLaunchConfig"
   ],
   "main": "./out/extension.js",
+  "categories": [
+    "Programming Languages",
+    "Snippets"
+  ],
   "contributes": {
     "commands": [
       {
         "command": "up9.openTestsBrowser",
-        "title": "UP9: Open Tests Browser"
+        "title": "UP9: Open Code Browser"
+      },
+      {
+        "command": "up9.runTest",
+        "title": "UP9: Run Code With UP9"
+      },
+      {
+        "command": "up9.webAuth",
+        "title": "UP9: Web Authentication"
+      },
+      {
+        "command": "up9.signOut",
+        "title": "UP9: Sign Out"
+      },
+      {
+        "command": "up9.startTunnel",
+        "title": "UP9: Start Tunnel"
+      },
+      {
+        "command": "up9.stopTunnel",
+        "title": "UP9: Stop Tunnel"
+      },
+      {
+        "command": "up9.createTunneledLaunchConfig",
+        "title": "UP9: Create Tunneled Launch Config"
       }
-    ]
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "up9.runTest",
+          "group": "up9",
+          "when": "resourceLangId == python"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "up9.runTest",
+          "when": "false"
+        },
+        {
+          "command": "up9.webAuth",
+          "when": "false"
+        },
+        {
+          "command": "up9.signOut",
+          "when": "false"
+        }
+      ]
+    }
   },
   "scripts": {
+    "setup-browser": "cd src/webview && npm install && cd ../../",
     "vscode:prepublish": "npm run compile",
-    "compile": "cd react-app && npm run build && cd ../ && tsc -p ./ && cpy react-app/dist/index.html out/",
-    "test-compile": "tsc -p ./ && cpy react-app/dist/index.html out/",
-    "pretest": "npm run compile",
-    "test": "node ./out/test/runTest.js"
+    "compile": "cd src/webview && npm run build && cd ../../ && tsc -p ./ && cp ./src/webview/dist/index.html ./out/",
+    "compile-no-browser": "tsc -p ./",
+    "pretest": "mkdir -p ./out/tests/integration/resources/ && cp -r ./src/tests/integration/resources/* ./out/tests/integration/resources/",
+    "test": "node ./out/tests/integration/runIntegrationTests.js"
   },
   "devDependencies": {
-    "@types/glob": "^7.1.1",
-    "@types/mocha": "^5.2.6",
+    "@types/glob": "^7.2.0",
+    "@types/http-proxy": "^1.17.7",
+    "@types/mocha": "^9.0.0",
     "@types/node": "^10.12.21",
     "@types/tmp": "^0.2.2",
-    "@types/vscode": "^1.62.0",
+    "@types/vscode": "^1.61.0",
     "@types/vscode-webview": "^1.57.0",
-    "axios": "^0.24.0",
-    "cpy-cli": "^3.1.1",
-    "glob": "^7.1.4",
-    "mocha": "^6.1.4",
-    "tmp": "^0.2.1",
+    "@vscode/test-electron": "^1.6.2",
+    "glob": "^7.2.0",
+    "mocha": "^9.1.3",
+    "ts-node": "^10.4.0",
     "tslint": "^5.12.1",
-    "typescript": "^3.3.1",
-    "vscode-test": "^1.0.0-next.0",
-    "webpack": "^5.63.0"
+    "typescript": "^4.4.4",
+    "webpack": "^5.63.0",
+    "webpack-cli": "^4.9.1"
+  },
+  "dependencies": {
+    "@kubernetes/client-node": "^0.16.1",
+    "axios": "^0.24.0",
+    "client-oauth2": "^4.3.3",
+    "http-proxy": "^1.18.1",
+    "jsonwebtoken": "^8.5.1",
+    "open": "^8.4.0"
   }
 }

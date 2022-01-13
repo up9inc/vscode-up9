@@ -1,0 +1,28 @@
+name: Validate PR
+
+on:
+  pull_request:
+
+jobs:
+  Build_And_Test_Extension:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '16.13.x'
+    - run: npm install
+    - name: Setup webview depedencies
+      run: npm run setup-browser
+    - name: Compile
+      run: npm run compile
+    - name: Start xvfb
+      run: /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+    - name: Run extension tests
+      env:
+        DISPLAY: ':99.0'
+        UP9_AUTH_ENV: ${{ secrets.UP9_AUTH_ENV }}
+        UP9_CLIENT_ID: ${{ secrets.UP9_CLIENT_ID }}
+        UP9_CLIENT_SECRET: ${{ secrets.UP9_CLIENT_SECRET }}
+        DEFAULT_WORKSPACE: ${{ secrets.DEFAULT_WORKSPACE }}
+      run: npm run test

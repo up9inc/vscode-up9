@@ -1,0 +1,43 @@
+{
+    "compilerOptions": {
+        "useDefineForClassFields": true,
+        "sourceMap": true,
+        "target": "es6",
+        "jsx": "react",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "declaration": false,
+        "esModuleInterop": true,
+        "noImplicitAny": false,
+        "noImplicitReturns": false,
+        "removeComments": true,
+        "strictNullChecks": false,
+        "outDir": "build",
+        "lib": [
+            "es6",
+            "dom"
+        ],
+        "types": ["node"],
+        "strict": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitThis": true,
+        "noUnusedLocals": false,
+        "noUnusedParameters": false,
+        "suppressImplicitAnyIndexErrors": true,
+        "baseUrl": ".",
+        "rootDirs": [
+            "src",
+            "stories"
+        ],
+    },
+    "include": [
+        "src/**/*"
+    ],
+    "exclude": [
+        "dist",
+        "build",
+        "node_modules"
+    ]
+}

@@ -1,0 +1,4 @@
+react-app/
+.gitignore
+tsconfig.json
+src/
