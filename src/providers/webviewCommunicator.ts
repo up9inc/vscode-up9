@@ -196,15 +196,15 @@ export class UP9WebviewCommunicator {
         const currentEditorContents = editor.document.getText();
         if (currentEditorContents) {
             //insert missing imports at the top
+            const missingImports = this.getMissingImportsInCode(currentEditorContents);
             editor.edit(editBuilder => {
-                editBuilder.insert(new vscode.Position(0, 0), this.getMissingImportsInCode(currentEditorContents));
+                editBuilder.insert(new vscode.Position(0, 0), missingImports);
+                if (currentEditorContents.indexOf("class ") == -1) {
+                    editBuilder.insert(editor.selection.active, `${microTestsClassDef}\n${code}`);
+                } else {
+                    editBuilder.insert(editor.selection.active, `\n\n${code.replace('    ', '')}`);
+                }
             });
-
-            if (currentEditorContents.indexOf("class ") == -1) {
-                editor.insertSnippet(new vscode.SnippetString(`${microTestsClassDef}\n${code}`));
-            } else {
-                editor.insertSnippet(new vscode.SnippetString(`\n\n${code.replace('    ', '')}`));
-            }
         } else {
             editor.insertSnippet(new vscode.SnippetString(`${microTestsHeader}\n${code}`));
         }

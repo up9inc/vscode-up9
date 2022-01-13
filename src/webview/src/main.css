@@ -128,12 +128,12 @@ table {
 
 .anchor-tab.active {
 	border-bottom: 1px solid var(--vscode-editor-foreground) !important;
-	font-weight: bold;
+	opacity: 1 !important;
 }
 
 .anchor-tab:active, .anchor-tab:hover {
 	color: var(--vscode-editor-foreground);
-	opacity: 1;
+	opacity: 0.8;
 	border-bottom: 1px solid var(--vscode-input-background);
 }
 
