@@ -118,7 +118,7 @@ table {
 .anchor-tab {
 	text-decoration: none;
 	color: var(--vscode-editor-foreground);
-	opacity: 0.8;
+	opacity: 0.6;
 	text-transform: capitalize;
 	margin-right: 24px;
 	user-select: none;
