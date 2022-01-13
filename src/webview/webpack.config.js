@@ -1,7 +1,4 @@
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebPackPlugin = require("html-webpack-plugin");
-const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin');
-const HTMLInlineCSSWebpackPlugin = require("html-inline-css-webpack-plugin").default;
 const path = require("path");
 
 const htmlWebpackPlugin = new HtmlWebPackPlugin({
@@ -9,12 +6,11 @@ const htmlWebpackPlugin = new HtmlWebPackPlugin({
     filename: "./index.html",
     inlineSource: '.(js|css)$'
 });
-const htmlWebpackInlineSourcePlugin = new HtmlWebpackInlineSourcePlugin();
 
-const contextDir = path.join(__dirname, "src");
+// const contextDir = path.join(__dirname, "src");
 
 module.exports = {
-    entry: ['./src/index.tsx', './src/main.css'],
+    entry: ['./src/index.tsx'],
     resolve: {
         extensions: ['.js', '.jsx', '.ts', '.tsx'],
     },
@@ -27,14 +23,7 @@ module.exports = {
                     configFile: 'tsconfig.json',
                 }
             },
-            {
-                test: /\.css$/,
-                use: [
-                  MiniCssExtractPlugin.loader,
-                  "css-loader"
-                ]
-            },
         ],
     },
-    plugins: [htmlWebpackPlugin, htmlWebpackInlineSourcePlugin, new MiniCssExtractPlugin({filename: "[name].css",chunkFilename: "[id].css"}), HTMLInlineCSSWebpackPlugin]
+    plugins: [htmlWebpackPlugin]
 };
