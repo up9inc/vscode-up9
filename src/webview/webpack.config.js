@@ -1,17 +1,14 @@
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebPackPlugin = require("html-webpack-plugin");
-const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin');
 const HTMLInlineCSSWebpackPlugin = require("html-inline-css-webpack-plugin").default;
-const path = require("path");
+const InlineChunkHtmlPlugin = require('react-dev-utils/InlineChunkHtmlPlugin');
 
 const htmlWebpackPlugin = new HtmlWebPackPlugin({
     template: "./src/index.html",
     filename: "./index.html",
-    inlineSource: '.(js|css)$'
+    inlineSource: '.(js|css)$',
+    inject: 'body',
 });
-const htmlWebpackInlineSourcePlugin = new HtmlWebpackInlineSourcePlugin();
-
-const contextDir = path.join(__dirname, "src");
 
 module.exports = {
     entry: ['./src/index.tsx', './src/main.css'],
@@ -33,8 +30,20 @@ module.exports = {
                   MiniCssExtractPlugin.loader,
                   "css-loader"
                 ]
-            },
+            }
         ],
     },
-    plugins: [htmlWebpackPlugin, htmlWebpackInlineSourcePlugin, new MiniCssExtractPlugin({filename: "[name].css",chunkFilename: "[id].css"}), HTMLInlineCSSWebpackPlugin]
+    output: {
+        filename: 'bundle.js',
+        publicPath: '',
+    },
+    plugins: [
+        new MiniCssExtractPlugin({
+            filename: "main.css",
+            chunkFilename: "mainc.css"
+        }),
+        htmlWebpackPlugin,
+        new HTMLInlineCSSWebpackPlugin(),
+        new InlineChunkHtmlPlugin(HtmlWebPackPlugin, [/bundle/]),
+    ]
 };
