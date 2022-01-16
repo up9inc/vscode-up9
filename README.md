@@ -44,7 +44,7 @@ You can find the UP9 Extension in the Visual Studio Code Marketplace. To install
     ![View API endpoint parameters and request/response body schema](images/image4.png)
 
 3. You can use **COPY** button to copy the sample code into clipboard, or use **INSERT** button to include sample code into the file edited in the left-pane. If the edited file is empty, the entire code will be included, otherwise - code will be inserted as function at the cursor location.
-  * **NOTE**: You may notice somem assertions that are commented out at the bottom of the code sample. These are   there to help you create API tests easily and efficiently. Uncomment those to use them in your tests.
+  * **NOTE**: You may notice some assertions that are commented out at the bottom of the code sample. These are there to help you create API tests easily and efficiently. Uncomment those to use them in your tests.
 
 ## Running your code using UP9
 1. Select **UP9: Run Code with UP9** in right-click menu of your Python code browser to run code via UP9 agent configured in your Kubernetes cluster.
