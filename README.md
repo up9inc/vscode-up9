@@ -4,7 +4,7 @@ The UP9 IDE enables you to ensure your APIs perform reliably and prevent securit
 
 This comes in the form of an Integrated Developer Environment (IDE) as a VS Code extension.
 
-![](images/image7.png)
+![overview screenshot](images/image7.png)
 
 ## Features
 By analyzing application traffic in your Kubernetes cluster, UP9 will monitor your mission-critical workflows, gain understanding of your APIs’ behavior, and effortlessly build API integration and API testing code.
@@ -57,7 +57,7 @@ You can find the UP9 Extension in the Visual Studio Code Marketplace. To install
 
 
 # More details
-[Visit here](up9.com/docs/up9-ide) for more details.
+[Visit here](https://up9.com/docs/up9-ide) for more details.
 
 For support, follow these processes:
 
