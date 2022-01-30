@@ -25,6 +25,14 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
 
     const [isLoading, setIsLoading] = useState(true);
 
+    const [isThemeDark, setIsThemeDark] = useState(null);
+
+    const editorBackgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--vscode-editor-background');
+
+    useEffect(() => {
+        setIsThemeDark(isHexColorDark(editorBackgroundColor))
+    }, [editorBackgroundColor]);
+
     const serviceEndpoints = useMemo(() => {
         if (!selectedService || !endpoints) {
             return [];
@@ -117,7 +125,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
         return <LoadingOverlay />;
     }
 
-    return <>
+    return <div className={isThemeDark ? "dark-theme" : "light-theme"}>
             <div className="user-info">
                 <div style={{padding: "5px 0"}} className="user-icon">
                     {logoIcon}
@@ -141,16 +149,16 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             <hr style={{margin: "0"}}/>
             <div className="select-test-form">                
                 <div style={{display: "flex"}}>
-                    <TestBrowserParameterDropdown className="dropdown-container workspaces-form-group" label="Workspace" placeholder="Select workspace"
+                    <TestBrowserParameterDropdown className="dropdown-container workspaces-form-group" label="Workspace" placeholder="Select"
                     items={workspaces?.map((workspace) => ({key: workspace, value: workspace, label: workspace}))}
                     onDropdownToggle={onWorkspaceDropdownToggle} onSelect={setDefaultWorkspace} value={up9AuthStore.defaultWorkspace} />
                 </div>
                 <div className="endpoints-services-container">
-                    <TestBrowserParameterDropdown className="dropdown-container services-form-group" label="Service" placeholder="Select service"
+                    <TestBrowserParameterDropdown className="dropdown-container services-form-group" label="Service" placeholder="Select"
                     items={services?.map((service) => ({key: service, value: service, label: service}))}
                     disabled={!up9AuthStore.defaultWorkspace || services?.length < 1} onSelect={setSelectedService} value={selectedService} />
 
-                    <TestBrowserParameterDropdown className="dropdown-container endpoints-form-group" label="Endpoint" placeholder="Select endpoint" 
+                    <TestBrowserParameterDropdown className="dropdown-container endpoints-form-group" label="Endpoint" placeholder="Select" 
                     items={serviceEndpoints?.map((endpoint) => {return {key: endpoint.uuid, value: endpoint, label: getEndpointDisplayText(endpoint)}})}
                     disabled={!selectedService} onSelect={setSelectedEndpoint} value={selectedEndpoint} />
                 </div>
@@ -158,7 +166,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             </div>
             <hr/>
             <TestCodeViewer workspace={up9AuthStore.defaultWorkspace} endpoint={selectedEndpoint} spans={workspaceSpans} workspaceOAS={workspaceOAS} />
-        </>;
+        </div>;
 });
 
 interface TestBrowserParameterDropdownProps {
@@ -217,7 +225,7 @@ const TestBrowserParameterDropdown: React.FC<TestBrowserParameterDropdownProps> 
                 $('.select-dropdown .dropdown-menu').hide().show(0); //this is a very strange workaround for a very strange html bug, without this the drop down sometimes shifts the entire page until anything changes in the dom
             }
         }}>
-        <Dropdown.Toggle disabled={disabled} style={{color: triggerTextColor}}>
+        <Dropdown.Toggle disabled={disabled} style={{color: triggerTextColor, fontWeight: value ? 400 : 300}}>
             {selectedItem ? selectedItem.label : placeholder}
         </Dropdown.Toggle>
         {isDropdownOpen && <Dropdown.Menu>
