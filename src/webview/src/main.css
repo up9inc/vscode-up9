@@ -224,6 +224,7 @@ hr {
 
 .select-dropdown {
 	width: 100%;
+	left: 87px;
 }
 
 .select-dropdown .dropdown-menu {
@@ -633,7 +634,6 @@ div.appRoot > header {
 .dropdown {
 	position: relative;
 	display: inline-block;
-	left: 87px;
 }
 
 .dropdown-content {
