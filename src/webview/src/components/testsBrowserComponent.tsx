@@ -68,6 +68,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
 
     useEffect(() => {
         (async () => {
+            setSelectedService("");
             setSelectedEndpoint(null);
             setEndpoints(null);
             setWorkspaceOAS(null);
@@ -118,7 +119,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
 
     return <>
             <div className="user-info">
-                <div style={{padding: "5px 0"}}>
+                <div style={{padding: "5px 0"}} className="user-icon">
                     {logoIcon}
                 </div>
                 <span className="env-text">
@@ -139,10 +140,15 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             </div>
             <hr style={{margin: "0"}}/>
             <div className="select-test-form">                
-                <TestBrowserParameterDropdown className="dropdown-container workspaces-form-group" label="Workspace" placeholder="Select workspace"
-                items={workspaces?.map((workspace) => ({key: workspace, value: workspace, label: workspace}))}
-                onDropdownToggle={onWorkspaceDropdownToggle} onSelect={setDefaultWorkspace} value={up9AuthStore.defaultWorkspace} />
                 <div style={{display: "flex"}}>
+                    <TestBrowserParameterDropdown className="dropdown-container workspaces-form-group" label="Workspace" placeholder="Select workspace"
+                    items={workspaces?.map((workspace) => ({key: workspace, value: workspace, label: workspace}))}
+                    onDropdownToggle={onWorkspaceDropdownToggle} onSelect={setDefaultWorkspace} value={up9AuthStore.defaultWorkspace} />
+                    
+                    {/* make flex match the workspace form group's size with the service's form group size */}
+                    <div className="endpoints-form-group" />
+                </div>
+                <div className="endpoints-services-container">
                     <TestBrowserParameterDropdown className="dropdown-container services-form-group" label="Service" placeholder="Select service"
                     items={services?.map((service) => ({key: service, value: service, label: service}))}
                     disabled={!up9AuthStore.defaultWorkspace || services?.length < 1} onSelect={setSelectedService} value={selectedService} />

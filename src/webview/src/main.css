@@ -237,7 +237,7 @@ hr {
 	text-align: left;
 	padding-right: 8px;
 	outline: none !important;
-	border: none !important;
+	border: 1px solid var(--vscode-dropdown-border) !important;
 }
 
 .show>.btn-primary.dropdown-toggle {
@@ -272,21 +272,49 @@ hr {
 
 .workspaces-form-group {
 	margin-bottom: 12px;
+	flex-grow: 2;
+	flex-shrink: 2;
+	flex-basis: 30%;
+	margin-right: 0.5em;
 }
 
 .services-form-group {
 	flex-grow: 2;
-	flex-shrink: 2;
-	flex-basis: 30%;
-	max-width: 50%;
+	flex-shrink: 0;
 	margin-right: 0.5em;
+	min-width: 0;
 }
 
 .endpoints-form-group {
 	flex-grow: 2;
 	flex-shrink: 2;
 	flex-basis: 70%;
-	max-width: 70%;
+	min-width: 0;
+}
+
+@media screen and (max-width: 500px) {
+    .endpoints-services-container {
+        flex-wrap: wrap;
+    }
+	.endpoints-form-group .form-label {
+		margin-right: 25px;
+	}
+	.services-form-group {
+		margin-bottom: 12px;
+	}
+	.select-test-form {
+		height: 105px;
+	}
+
+	.endpoints-form-group, .services-form-group, .workspaces-form-group {
+		flex-basis: 100%;
+		max-width: 100%;
+		margin-right: 0;
+	}
+}
+
+.endpoints-services-container {
+	display: flex;
 }
 
 .select-dropdown > button {
@@ -352,7 +380,7 @@ hr {
 }
 
 @media screen and (max-width: 400px) {
-    .auth-icon-container {
+    .auth-icon-container, .user-icon {
         display: none !important;
     }
 }
