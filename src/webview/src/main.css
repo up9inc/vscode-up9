@@ -46,12 +46,12 @@ table {
 }
 
 .select-test-form {
-	height: 5%;
+	height: 105px;
 	min-height: 65px;
 
 	margin: 15px 20px 24px;
-	display: flex;
-	justify-content: space-around;
+	/* display: flex;
+	justify-content: space-around; */
 	gap: 10px;
 }
 
@@ -144,7 +144,7 @@ table {
 .anchor-button {
 	color: var(--vscode-textLink-foreground);
 	text-decoration: none;
-	font-size: 0.9em;
+	font-size: 0.5em;
 }
 
 .anchor-button:active, .anchor-button:hover, .anchor-button:focus {
@@ -208,9 +208,15 @@ hr {
 	opacity: 0.75;
 }
 
-.workspaces-form-group .form-label, .endpoints-form-group .form-label {
+.workspaces-form-group .form-label, .endpoints-form-group .form-label, .services-form-group .form-label {
 	font-size: 0.9em;
-	opacity: 0.8
+	opacity: 0.8;
+	margin-bottom: 0;
+	margin-right: 0.9em;
+}
+
+.services-form-group .form-label {
+	margin-right: 38px;
 }
 
 .select-dropdown {
@@ -231,7 +237,7 @@ hr {
 	text-align: left;
 	padding-right: 8px;
 	outline: none !important;
-	border: none !important;
+	border: 1px solid var(--vscode-dropdown-border) !important;
 }
 
 .show>.btn-primary.dropdown-toggle {
@@ -259,17 +265,43 @@ hr {
 	color: var(--vscode-button-foreground);
 }
 
+.dropdown-container {
+	display: flex;
+	align-items: center;
+}
+
 .workspaces-form-group {
-	flex-grow: 1;
-	flex-shrink: 1;
-	flex-basis: 33%;
+	margin-bottom: 12px;
+	flex-grow: 2;
+	flex-shrink: 2;
+}
+
+.services-form-group {
+	margin-bottom: 12px;
+	flex-grow: 2;
+	flex-shrink: 0;
+	min-width: 0;
 }
 
 .endpoints-form-group {
 	flex-grow: 2;
 	flex-shrink: 2;
-	flex-basis: 66%;
-	max-width: 50%;
+	min-width: 0;
+}
+
+.endpoints-form-group .form-label {
+	margin-right: 25px;
+}
+
+.endpoints-form-group, .services-form-group, .workspaces-form-group {
+	flex-basis: 100%;
+	max-width: 100%;
+	margin-right: 0;
+}
+
+.endpoints-services-container {
+	display: flex;
+	flex-wrap: wrap;
 }
 
 .select-dropdown > button {
@@ -335,7 +367,7 @@ hr {
 }
 
 @media screen and (max-width: 400px) {
-    .auth-icon-container {
+    .auth-icon-container, .user-icon {
         display: none !important;
     }
 }

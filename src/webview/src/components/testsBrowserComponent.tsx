@@ -12,17 +12,25 @@ import $ from "jquery";
 
 const TestsBrowserComponent: React.FC<{}> = observer(() => {
     const [workspaces, setWorkspaces] = useState(null);
-    const [workspaceFilterInput, setWorkspaceFilterInput] = useState("");
     const [workspaceOAS, setWorkspaceOAS] = useState(null);
 
+    const [services, setServices] = useState(null);
+    const [selectedService, setSelectedService] = useState(null);
+
     const [endpoints, setEndpoints] = useState(null);
-    const [endpointFilterInput, setEndpointFilterInput] = useState("");
     const [selectedEndpoint, setSelectedEndpoint] = useState(null);
     const [workspaceSpans, setWorkspaceSpans] = useState(null);
 
     const [lastSelectedWorkspace, setLastSelectedWorkspace] = useState("");
 
     const [isLoading, setIsLoading] = useState(true);
+
+    const serviceEndpoints = useMemo(() => {
+        if (!selectedService || !endpoints) {
+            return [];
+        }
+        return endpoints.filter(endpoint => endpoint.service === selectedService);
+    }, [selectedService, endpoints]);
 
     useEffect(() => {
         if (up9AuthStore.defaultWorkspace) {
@@ -37,22 +45,8 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
     }
 
     const getEndpointDisplayText = (endpoint) => {
-        return `${endpoint.method.toUpperCase()} ${endpoint.service}${endpoint.path}`;
+        return `${endpoint.method.toUpperCase()} ${endpoint.path}`;
     }
-
-    const filteredEndpoints = useMemo(() => {
-        if (!endpoints || !endpointFilterInput) {
-            return endpoints;
-        }
-        return endpoints.filter(endpoint => getEndpointDisplayText(endpoint).toLocaleLowerCase().indexOf(endpointFilterInput.toLowerCase()) > -1);
-    }, [endpoints, endpointFilterInput]);
-
-    const filteredWorkspaces = useMemo(() => {
-        if (!workspaces || !workspaceFilterInput) {
-            return workspaces;
-        }
-        return workspaces.filter(workspace => workspace.toLocaleLowerCase().indexOf(workspaceFilterInput.toLowerCase()) > -1);
-    }, [workspaces, workspaceFilterInput]);
 
     useEffect(() => {
         if (workspaces && !up9AuthStore.defaultWorkspace) {
@@ -62,7 +56,6 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
 
     const refreshWorkspaces = async () => {
         setIsLoading(true);
-        setWorkspaceFilterInput("");
         try {
             const workspaces = await sendApiMessage(ApiMessageType.WorkspacesList, null);
             setWorkspaces(workspaces);
@@ -75,8 +68,8 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
 
     useEffect(() => {
         (async () => {
+            setSelectedService("");
             setSelectedEndpoint(null);
-            setEndpointFilterInput("");
             setEndpoints(null);
             setWorkspaceOAS(null);
 
@@ -84,6 +77,8 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                 try {
                     const endpoints = await sendApiMessage(ApiMessageType.EndpointsList, {workspaceId: up9AuthStore.defaultWorkspace});
                     setEndpoints(endpoints);
+
+                    setServices(Array.from(new Set(endpoints.map(endpoint => endpoint.service))));
                 } catch (error) {
                     console.error('error loading workspace endpoints', error);
                 }
@@ -112,17 +107,11 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
     }, [up9AuthStore.isAuthConfigured, up9AuthStore.up9Env]);
 
     const onWorkspaceDropdownToggle = (isOpen: boolean) => {
-        setIsWorkspaceDropDownOpen(isOpen);
         if (!isOpen && !up9AuthStore.defaultWorkspace && lastSelectedWorkspace) {
             // prevent user from reaching state where nothing is selected
             setDefaultWorkspace(lastSelectedWorkspace);
         }
     }
-
-    // TODO: refactor this
-    // ugly workaround for having the dropdowns apply focus to the filter form repeatedly
-    const [isWorkspaceDropDownOpen, setIsWorkspaceDropDownOpen] = useState(false);
-    const [isEndpointsDropdownOpen, setIsEndpointsDropdownOpen] = useState(false);
 
     if (isLoading) {
         return <LoadingOverlay />;
@@ -130,7 +119,7 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
 
     return <>
             <div className="user-info">
-                <div style={{padding: "5px 0"}}>
+                <div style={{padding: "5px 0"}} className="user-icon">
                     {logoIcon}
                 </div>
                 <span className="env-text">
@@ -150,43 +139,83 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                 </div>
             </div>
             <hr style={{margin: "0"}}/>
-            <div className="select-test-form">
-                <Form.Group className="workspaces-form-group">
-                    <Form.Label>Workspace</Form.Label>
-                    <br/>
-                    <Dropdown className="select-dropdown" onToggle={(isOpen, _) => onWorkspaceDropdownToggle(isOpen)}>
-                        <Dropdown.Toggle>{up9AuthStore.defaultWorkspace ? up9AuthStore.defaultWorkspace : "Select a workspace"}</Dropdown.Toggle>
-                        {isWorkspaceDropDownOpen && <Dropdown.Menu>
-                            {isWorkspaceDropDownOpen && <FormControl className="dropdown-filter" autoFocus placeholder="Type to filter..." value={workspaceFilterInput} onChange={e => setWorkspaceFilterInput(e.target.value)} />}
-                            <Dropdown.Divider/>
-                            {filteredWorkspaces?.map((workspace) => {return <Dropdown.Item key={workspace} onClick={_ => {setWorkspaceFilterInput(""); setDefaultWorkspace(workspace ?? lastSelectedWorkspace)}}>{workspace}</Dropdown.Item>})}
-                        </Dropdown.Menu>}
-                    </Dropdown>
-                </Form.Group>
+            <div className="select-test-form">                
+                <div style={{display: "flex"}}>
+                    <TestBrowserParameterDropdown className="dropdown-container workspaces-form-group" label="Workspace" placeholder="Select workspace"
+                    items={workspaces?.map((workspace) => ({key: workspace, value: workspace, label: workspace}))}
+                    onDropdownToggle={onWorkspaceDropdownToggle} onSelect={setDefaultWorkspace} value={up9AuthStore.defaultWorkspace} />
+                </div>
+                <div className="endpoints-services-container">
+                    <TestBrowserParameterDropdown className="dropdown-container services-form-group" label="Service" placeholder="Select service"
+                    items={services?.map((service) => ({key: service, value: service, label: service}))}
+                    disabled={!up9AuthStore.defaultWorkspace || services?.length < 1} onSelect={setSelectedService} value={selectedService} />
 
-                <Form.Group className="endpoints-form-group">
-                    <Form.Label>Endpoint</Form.Label>
-                    <br/>
-                    <Dropdown className="select-dropdown" onToggle={(isOpen, _) => {
-                            setIsEndpointsDropdownOpen(isOpen)
-                            if (isOpen) {
-                                $('.select-dropdown .dropdown-menu').hide().show(0); //this is a very strange workaround for a very strange html bug, without this the drop down sometimes shifts the entire page until anything changes in the dom
-                            }
-                        }}>
-                        <Dropdown.Toggle disabled={!up9AuthStore.defaultWorkspace}>
-                            {selectedEndpoint ? getEndpointDisplayText(selectedEndpoint) : "Select an endpoint"}
-                        </Dropdown.Toggle>
-                        {isEndpointsDropdownOpen && <Dropdown.Menu>
-                            {isEndpointsDropdownOpen && <FormControl className="dropdown-filter" autoFocus placeholder="Type to filter..." value={endpointFilterInput} onChange={e => setEndpointFilterInput(e.target.value)} />}
-                            <Dropdown.Divider/>
-                            {filteredEndpoints?.map((endpoint) => {return <Dropdown.Item title={getEndpointDisplayText(endpoint)} key={endpoint.uuid} onClick={_ => {setEndpointFilterInput(""); setSelectedEndpoint(endpoint)}}>{getEndpointDisplayText(endpoint)}</Dropdown.Item>})}
-                        </Dropdown.Menu>}
-                    </Dropdown>
-                </Form.Group>
+                    <TestBrowserParameterDropdown className="dropdown-container endpoints-form-group" label="Endpoint" placeholder="Select endpoint" 
+                    items={serviceEndpoints?.map((endpoint) => {return {key: endpoint.uuid, value: endpoint, label: getEndpointDisplayText(endpoint)}})}
+                    disabled={!selectedService} onSelect={setSelectedEndpoint} value={selectedEndpoint} />
+                </div>
+                
             </div>
             <hr/>
             <TestCodeViewer workspace={up9AuthStore.defaultWorkspace} endpoint={selectedEndpoint} spans={workspaceSpans} workspaceOAS={workspaceOAS} />
         </>;
 });
+
+interface TestBrowserParameterDropdownProps {
+    label: string;
+    className: string;
+    placeholder: string;
+    disabled?: boolean;
+    items: {label: string, value: any, key: any}[];
+    value: any;
+    onSelect: (value: any) => void;
+    onDropdownToggle?: (isOpen: boolean) => void;
+}
+
+const TestBrowserParameterDropdown: React.FC<TestBrowserParameterDropdownProps> = ({label, className, placeholder, disabled, items, value, onSelect, onDropdownToggle}) => {
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [filterInputValue, setFilterInputValue] = useState("");
+
+    const selectedItem = useMemo(() => {
+        if (value) {
+            return items.find(item => item.value === value);
+        } else {
+            return null;
+        }
+    }, [value, items]);
+
+    const filteredItems = useMemo(() => {
+        if (!items || !filterInputValue) {
+            return items;
+        }
+        return items.filter(item => item.label.toLocaleLowerCase().indexOf(filterInputValue.toLowerCase()) > -1);
+    }, [items, filterInputValue]);
+
+    const onDropdownToggled = (isOpen: boolean) => {
+        if (onDropdownToggle) {
+            onDropdownToggle(isOpen);
+        }
+        setIsDropdownOpen(isOpen);
+    }
+
+    return <Form.Group className={className}>
+    <Form.Label>{label}</Form.Label>
+    <Dropdown className="select-dropdown" onToggle={(isOpen, _) => {
+            onDropdownToggled(isOpen)
+            if (isOpen) {
+                $('.select-dropdown .dropdown-menu').hide().show(0); //this is a very strange workaround for a very strange html bug, without this the drop down sometimes shifts the entire page until anything changes in the dom
+            }
+        }}>
+        <Dropdown.Toggle disabled={disabled}>
+            {selectedItem ? selectedItem.label : placeholder}
+        </Dropdown.Toggle>
+        {isDropdownOpen && <Dropdown.Menu>
+            {isDropdownOpen && <FormControl className="dropdown-filter" autoFocus placeholder="Type to filter..." value={filterInputValue} onChange={e => setFilterInputValue(e.target.value)} />}
+            <Dropdown.Divider/>
+            {filteredItems.map((item) => <Dropdown.Item title={item.label} key={item.key} onClick={_ => {setFilterInputValue(""); onSelect(item.value)}}>{item.label}</Dropdown.Item>)}
+        </Dropdown.Menu>}
+    </Dropdown>
+</Form.Group>
+};
 
 export default TestsBrowserComponent;
