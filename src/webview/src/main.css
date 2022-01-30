@@ -41,7 +41,7 @@ table {
 	width: 100%;
 	padding: 0;
 	margin: 0;
-	height: 96%;
+	max-height: calc(100vh - 300px);
 	overflow-y: auto;
 }
 
@@ -659,6 +659,10 @@ div.appRoot > header {
 
 .dropdown:hover .dropdown-content {
 	display: block;
+}
+
+.light-theme .select-dropdown button:disabled {
+	opacity: 0.25;
 }
 
 .dropdown-menu {
