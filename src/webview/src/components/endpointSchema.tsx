@@ -76,7 +76,7 @@ const EndpointSchema: React.FC<EndpointSchemaProps> = ({schema, isThemeDark}) =>
         return Array.from(codes);
     }, [responses]);
 
-    return <div style={{marginTop: "6px", overflowY: "auto", maxHeight: "calc(100% - 65px)"}}>
+    return <div style={{marginTop: "6px", overflowY: "auto", maxHeight: "calc(100vh - 300px)"}}>
         {schema?.parameters?.length ? <SchemaAccordion header="Parameters" key={"params"}>
             <table>
                 <thead>
