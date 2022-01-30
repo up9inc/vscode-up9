@@ -32,7 +32,7 @@ You can find the UP9 Extension in the Visual Studio Code Marketplace. To install
 
 ## Quick Start
 
-*  Press `Command-Shift-P` to access VS Code command launcher and select **UP9: Open Code Browser** from the list. This will open a right-pane window offering you to sign in to your UP9 account:
+*  Press `Command-Shift-P` to access VS Code command launcher and select **UP9: Code Browser** from the list. This will open a right-pane window offering you to sign in to your UP9 account:
 
 ![The right-pane upon opening the code browser](images/image1.png)
 
