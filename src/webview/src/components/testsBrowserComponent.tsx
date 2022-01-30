@@ -144,9 +144,6 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                     <TestBrowserParameterDropdown className="dropdown-container workspaces-form-group" label="Workspace" placeholder="Select workspace"
                     items={workspaces?.map((workspace) => ({key: workspace, value: workspace, label: workspace}))}
                     onDropdownToggle={onWorkspaceDropdownToggle} onSelect={setDefaultWorkspace} value={up9AuthStore.defaultWorkspace} />
-                    
-                    {/* make flex match the workspace form group's size with the service's form group size */}
-                    <div className="endpoints-form-group" />
                 </div>
                 <div className="endpoints-services-container">
                     <TestBrowserParameterDropdown className="dropdown-container services-form-group" label="Service" placeholder="Select service"
