@@ -5,7 +5,7 @@ import {sendApiMessage, setExtensionDefaultWorkspace, signOut} from "../provider
 import { ApiMessageType } from "../../../models/internal";
 import {Form, FormControl, Dropdown} from 'react-bootstrap';
 import { userIcon, logoIcon } from "./svgs";
-
+import { isHexColorDark } from "../utils";
 import { LoadingOverlay } from "./loadingOverlay";
 import TestCodeViewer from "./testCodeViewer";
 import $ from "jquery";
@@ -175,6 +175,17 @@ interface TestBrowserParameterDropdownProps {
 const TestBrowserParameterDropdown: React.FC<TestBrowserParameterDropdownProps> = ({label, className, placeholder, disabled, items, value, onSelect, onDropdownToggle}) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [filterInputValue, setFilterInputValue] = useState("");
+    const [isThemeDark, setIsThemeDark] = useState(null);
+
+    const editorBackgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--vscode-editor-background');
+
+    useEffect(() => {
+        setIsThemeDark(isHexColorDark(editorBackgroundColor))
+    }, [editorBackgroundColor]);
+
+    const inputForegroundColor = getComputedStyle(document.documentElement).getPropertyValue('--vscode-editor-foreground');
+    const alphaTextColorModifier = isThemeDark ? 'c8' : '66';
+    const triggerTextColor = !value && !disabled ? `${inputForegroundColor}${alphaTextColorModifier}` : inputForegroundColor
 
     const selectedItem = useMemo(() => {
         if (value) {
@@ -206,7 +217,7 @@ const TestBrowserParameterDropdown: React.FC<TestBrowserParameterDropdownProps> 
                 $('.select-dropdown .dropdown-menu').hide().show(0); //this is a very strange workaround for a very strange html bug, without this the drop down sometimes shifts the entire page until anything changes in the dom
             }
         }}>
-        <Dropdown.Toggle disabled={disabled}>
+        <Dropdown.Toggle disabled={disabled} style={{color: triggerTextColor}}>
             {selectedItem ? selectedItem.label : placeholder}
         </Dropdown.Toggle>
         {isDropdownOpen && <Dropdown.Menu>
