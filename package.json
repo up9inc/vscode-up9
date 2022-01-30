@@ -29,7 +29,7 @@
     "commands": [
       {
         "command": "up9.openTestsBrowser",
-        "title": "UP9: Open Code Browser"
+        "title": "UP9: Code Browser"
       },
       {
         "command": "up9.runTest",
