@@ -47,7 +47,7 @@ export class CloudRunner {
             }
 
             //TODO: reuse the same terminal (will require having only 1 simultaneous test run)
-            const terminalOutputter = this.createAndShowTerminal("Running test through UP9...\n\r", promise);
+            const terminalOutputter = this.createAndShowTerminal(`Running test through UP9\n\r${this._up9Auth.getEnv()}\n\rworkspace: ${defaultWorkspace}\n\r`, promise);
 
             // terminal takes a second to properly initialize, calls to print before its ready will result in nothing being printed
             await delay(1000);

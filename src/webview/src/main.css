@@ -50,8 +50,8 @@ table {
 	min-height: 65px;
 
 	margin: 15px 20px 24px;
-	display: flex;
-	justify-content: space-around;
+	/* display: flex;
+	justify-content: space-around; */
 	gap: 10px;
 }
 
@@ -144,7 +144,7 @@ table {
 .anchor-button {
 	color: var(--vscode-textLink-foreground);
 	text-decoration: none;
-	font-size: 0.9em;
+	font-size: 0.5em;
 }
 
 .anchor-button:active, .anchor-button:hover, .anchor-button:focus {
@@ -208,9 +208,15 @@ hr {
 	opacity: 0.75;
 }
 
-.workspaces-form-group .form-label, .endpoints-form-group .form-label {
+.workspaces-form-group .form-label, .endpoints-form-group .form-label, .services-form-group .form-label {
 	font-size: 0.9em;
-	opacity: 0.8
+	opacity: 0.8;
+	margin-bottom: 0;
+	margin-right: 0.9em;
+}
+
+.services-form-group .form-label {
+	margin-right: 38px;
 }
 
 .select-dropdown {
@@ -259,17 +265,28 @@ hr {
 	color: var(--vscode-button-foreground);
 }
 
+.dropdown-container {
+	display: flex;
+	align-items: center;
+}
+
 .workspaces-form-group {
-	flex-grow: 1;
-	flex-shrink: 1;
-	flex-basis: 33%;
+	margin-bottom: 12px;
+}
+
+.services-form-group {
+	flex-grow: 2;
+	flex-shrink: 2;
+	flex-basis: 30%;
+	max-width: 50%;
+	margin-right: 0.5em;
 }
 
 .endpoints-form-group {
 	flex-grow: 2;
 	flex-shrink: 2;
-	flex-basis: 66%;
-	max-width: 50%;
+	flex-basis: 70%;
+	max-width: 70%;
 }
 
 .select-dropdown > button {
