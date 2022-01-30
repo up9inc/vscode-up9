@@ -208,15 +208,18 @@ hr {
 	opacity: 0.75;
 }
 
+.empty-dropdown {
+	opacity: 0.7;
+}
+
+.selected-dropdown {
+	font-weight: 500;
+}
+
 .workspaces-form-group .form-label, .endpoints-form-group .form-label, .services-form-group .form-label {
 	font-size: 0.9em;
 	opacity: 0.8;
 	margin-bottom: 0;
-	margin-right: 0.9em;
-}
-
-.services-form-group .form-label {
-	margin-right: 38px;
 }
 
 .select-dropdown {
@@ -249,6 +252,7 @@ hr {
 	position: absolute;
 	right: 12px;
 	margin-top: 0.6em;
+	color: var(--vscode-input-foreground);
 }
 
 .select-dropdown .dropdown-item, .discreet-dropdown .dropdown-item {
@@ -270,6 +274,10 @@ hr {
 	align-items: center;
 }
 
+.dropdown-container .form-label {
+	position: absolute;
+}
+
 .workspaces-form-group {
 	margin-bottom: 12px;
 	flex-grow: 2;
@@ -289,13 +297,10 @@ hr {
 	min-width: 0;
 }
 
-.endpoints-form-group .form-label {
-	margin-right: 25px;
-}
 
 .endpoints-form-group, .services-form-group, .workspaces-form-group {
 	flex-basis: 100%;
-	max-width: 100%;
+	max-width: calc(100% - 87px);
 	margin-right: 0;
 }
 
@@ -367,7 +372,7 @@ hr {
 }
 
 @media screen and (max-width: 400px) {
-    .auth-icon-container, .user-icon {
+    .auth-icon-container {
         display: none !important;
     }
 }
@@ -628,6 +633,7 @@ div.appRoot > header {
 .dropdown {
 	position: relative;
 	display: inline-block;
+	left: 87px;
 }
 
 .dropdown-content {
