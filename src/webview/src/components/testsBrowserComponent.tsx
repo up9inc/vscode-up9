@@ -46,6 +46,10 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
         }
     }, [up9AuthStore.defaultWorkspace]);
 
+    useEffect(() => {
+        setSelectedEndpoint(null);
+    }, [selectedService]);
+
 
     const setDefaultWorkspace = (workspace: string) => {
         setExtensionDefaultWorkspace(workspace);
