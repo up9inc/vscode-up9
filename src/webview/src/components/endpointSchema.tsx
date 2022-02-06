@@ -42,7 +42,9 @@ const SchemaAccordion: React.FC<SchemaAccordionProps> = ({header, key, hideOnSta
 };
 
 const EndpointSchema: React.FC<EndpointSchemaProps> = ({schema, isThemeDark}) => {
-
+    if (!schema) {
+        return <></>;
+    }
 
     const requestBody = useMemo(() => JSON.stringify(getRequestBodySchemaForView(schema), null, 4), [schema]);
 
