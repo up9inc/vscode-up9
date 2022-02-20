@@ -84,13 +84,14 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
             setSelectedEndpoint(null);
             setEndpoints(null);
             setWorkspaceOAS(null);
+            setServices(null);
 
             if (up9AuthStore.defaultWorkspace) {
                 try {
                     const endpoints = await sendApiMessage(ApiMessageType.EndpointsList, {workspaceId: up9AuthStore.defaultWorkspace});
                     setEndpoints(endpoints);
 
-                    setServices(Array.from(new Set(endpoints.map(endpoint => endpoint.service))));
+                    setServices(Array.from(new Set(endpoints?.map(endpoint => endpoint.service))));
                 } catch (error) {
                     console.error('error loading workspace endpoints', error);
                 }
@@ -235,7 +236,7 @@ const TestBrowserParameterDropdown: React.FC<TestBrowserParameterDropdownProps> 
         {isDropdownOpen && <Dropdown.Menu>
             {isDropdownOpen && <FormControl className="dropdown-filter" autoFocus placeholder="Type to filter..." value={filterInputValue} onChange={e => setFilterInputValue(e.target.value)} />}
             <Dropdown.Divider/>
-            {filteredItems.map((item) => <Dropdown.Item title={item.label} key={item.key} onClick={_ => {setFilterInputValue(""); onSelect(item.value)}}>{item.label}</Dropdown.Item>)}
+            {filteredItems?.map((item) => <Dropdown.Item title={item.label} key={item.key} onClick={_ => {setFilterInputValue(""); onSelect(item.value)}}>{item.label}</Dropdown.Item>)}
         </Dropdown.Menu>}
     </Dropdown>
 </Form.Group>
