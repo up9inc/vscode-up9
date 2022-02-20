@@ -56,7 +56,7 @@ export class UP9WebviewCommunicator {
                         })();
                         break;
                     case MessageCommandType.PushText:
-                        this.pushCodeToActiveEditor(message.code, message.testObject);
+                        this.pushCodeToActiveEditor(message.testObject);
                         break;
                     case MessageCommandType.AuthSignOut:
                         (async () => {
@@ -79,6 +79,12 @@ export class UP9WebviewCommunicator {
             this.notifyPanelOfAuthStateChange(true);
         }
         await this.sendStoredDataToPanel();
+    }
+
+    public requestPushCodeFromPanel(): void {
+        this._panel.webview.postMessage({
+            command: MessageCommandType.PushText,
+        });
     }
 
     private notifyPanelOfAuthStateChange(authStatus: boolean): void {
@@ -182,7 +188,7 @@ export class UP9WebviewCommunicator {
         });
     }
 
-    private pushCodeToActiveEditor = (code: string, testObject: any) => { 
+    private pushCodeToActiveEditor = (testObject: any) => { 
         let editor = vscode.window.activeTextEditor;
         if (!editor) {
             editor = vscode.window.visibleTextEditors?.[0];
@@ -197,18 +203,22 @@ export class UP9WebviewCommunicator {
         if (currentEditorContents) {
             //insert missing imports at the top
             editor.edit(editBuilder => {
-                editBuilder.insert(new vscode.Position(this.getFirstLineNumberAfterImports(currentEditorContents), 0), this.getMissingImportsAndGlobalsInCode(currentEditorContents, testObject));
+                const globalsInsertLine = this.getFirstLineNumberAfterImports(currentEditorContents);
+                editBuilder.insert(new vscode.Position(globalsInsertLine, 0), this.getMissingImportsAndGlobalsInCode(currentEditorContents, testObject));
+
                 if (currentEditorContents.indexOf("class ") == -1) {
-                    editBuilder.insert(editor.selection.active, `${microTestsClassDef}\n${code}`);
+                    editBuilder.insert(editor.selection.active, `${microTestsClassDef}\n${testObject.code}`);
                 } else {
-                    editBuilder.insert(editor.selection.active, `\n\n${code}`);
+                    editBuilder.insert(editor.selection.active, `\n\n${testObject.code}`);
                 }
             });
         } else {
-            editor.insertSnippet(new vscode.SnippetString(`${microTestsHeader}\n${code}`));
+            editor.insertSnippet(new vscode.SnippetString(`${microTestsHeader}\n${testObject.code}`));
         }
     }
 
+
+    // gets first available line after imports and before class definition
     private getFirstLineNumberAfterImports = (editorCode: string): number => {
         const lines = editorCode.split("\n");
         let firstLineNumber = 0;
@@ -219,7 +229,8 @@ export class UP9WebviewCommunicator {
             if (line.startsWith("import ") || line.startsWith("from ")) {
                 firstLineNumber = parseInt(lineNumber);
             }
-
+            
+            // globals should always go before the class definition
             if (line.startsWith("class")) {
                 break;
             }
@@ -227,6 +238,7 @@ export class UP9WebviewCommunicator {
         return firstLineNumber + 1;
     }
 
+    // this function completes all necessary imports for our test code and adds a test url global if necessary
     private getMissingImportsAndGlobalsInCode = (editorCode: string, testObject: any): string => {
         const missingImports = [];
 

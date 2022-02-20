@@ -12,8 +12,10 @@ import { copyIcon, inputIcon } from "./svgs";
 import {sendApiMessage, sendInfoToast, sendPushCodeToEditor } from "../providers/extensionConnectionProvider";
 import { isHexColorDark, transformTest, getAssertionsCodeForSpan, getEndpointSchema, getTestCodeHeader } from "../utils";
 import { ApiMessageType } from "../../../models/internal";
-import { microTestsHeader } from "../../../consts";
 import EndpointSchema from "./endpointSchema";
+import { observer } from "mobx-react-lite";
+import { testBrowserStore } from "../stores/testBrowserStore";
+import { toJS } from "mobx";
 
 enum TestCodeMode {
     Test = "test",
@@ -27,14 +29,20 @@ export interface TestCodeViewerProps {
     workspaceOAS: any;
 }
 
-const TestCodeViewer: React.FC<TestCodeViewerProps> = ({ workspace, endpoint, spans, workspaceOAS}) => {
+const TestCodeViewer: React.FC<TestCodeViewerProps> = observer(({ workspace, endpoint, spans, workspaceOAS}) => {
 
     const [isThemeDark, setIsThemeDark] = useState(null);
     const [testsLoaded, setTestsLoaded] = useState(false);
-    const [endpointTest, setEndpointTest] = useState(null);
     const [testCodeMode, setTestCodeMode] = useState(TestCodeMode.Test);
 
     const editorBackgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--vscode-editor-background');
+
+    useEffect(() => {
+        // clean up on dismount
+        return () => {
+            testBrowserStore.setSelectedEndpointTest(null);
+        }
+    }, []);
 
     useEffect(() => {
         setIsThemeDark(isHexColorDark(editorBackgroundColor))
@@ -44,31 +52,6 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = ({ workspace, endpoint, sp
         sendInfoToast("Test code copied to clipboard");
         navigator.clipboard.writeText(text)
     };
-
-    useEffect(() => {
-        (async () => {
-            setEndpointTest(null);
-            setTestsLoaded(false);
-            if (endpoint) {
-                try {
-                    const tests = await sendApiMessage(ApiMessageType.EndpointTests, {workspaceId: workspace, spanGuid: endpoint.uuid});
-                    setTestsLoaded(true);
-                    if (tests?.tests?.length < 1) {
-                        return;
-                    }
-                    const test = transformTest(tests.tests[0]);
-                    console.log('test', test);
-                    test.uuid = uuidv4(); //for react Key prop
-
-                    setEndpointTest(test);
-                } catch (error) {
-                    console.log('error loading tests', error);
-                    setTestsLoaded(false);
-                }
-
-            }
-        })()
-    }, [endpoint?.uuid]);
 
     const endpointSpan = useMemo(() => {
         if (!spans || !endpoint) {
@@ -86,23 +69,43 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = ({ workspace, endpoint, sp
         return getEndpointSchema(endpoint, workspaceOAS);
     }, [endpoint, workspaceOAS]);
 
-    const testCode = useMemo(() => {
-        if (!endpointTest) {
-            return null;
-        }
-        const testCode = endpointTest.code.replace('return resp', '');
+    useEffect(() => {
+        (async () => {
+            testBrowserStore.setSelectedEndpointTest(null);
+            setTestsLoaded(false);
+            if (endpoint) {
+                try {
+                    const tests = await sendApiMessage(ApiMessageType.EndpointTests, {workspaceId: workspace, spanGuid: endpoint.uuid});
+                    setTestsLoaded(true);
+                    if (tests?.tests?.length < 1) {
+                        return;
+                    }
+                    const test = transformTest(tests.tests[0]);
+                    test.uuid = uuidv4(); //for react Key prop
 
-        let generatedAssertions = '';
-        if (endpointSpan) {
-            try {
-                generatedAssertions = getAssertionsCodeForSpan(endpointSpan, '        ');
-            } catch (error) {
-                console.error("error generating assertions", error);
+                    const testCode = test.code.replace('return resp', '');
+                    
+                    //TODO: tidy this bit, this is too much logic for one hook
+                    let generatedAssertions = '';
+                    if (endpointSpan) {
+                        try {
+                            generatedAssertions = getAssertionsCodeForSpan(endpointSpan, '        ');
+                        } catch (error) {
+                            console.error("error generating assertions", error);
+                        }
+                    }
+
+                    test.code = `${testCode}\n${generatedAssertions}`;
+
+                    testBrowserStore.setSelectedEndpointTest(test);
+                } catch (error) {
+                    console.log('error loading tests', error);
+                    setTestsLoaded(false);
+                }
+
             }
-        }
-        
-        return `${testCode}\n${generatedAssertions}`;
-    }, [endpointTest, endpointSchema, endpointSpan]);
+        })()
+    }, [endpoint?.uuid, endpointSchema, endpointSpan]);
 
     useEffect(() => {
         // make sure ui doesnt reach a weird state where no schema is available and we hide the schema radio button
@@ -112,13 +115,13 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = ({ workspace, endpoint, sp
     }, [endpointSchema, testCodeMode]);
 
 
-    if (testsLoaded && !endpointTest) {
+    if (testsLoaded && !testBrowserStore.selectedEndpointTest) {
         return <p>No code found for this endpoint</p>;
-    } else if (!endpointTest) {
+    } else if (!testBrowserStore.selectedEndpointTest) {
         return null;
     }
 
-    const testCodeForDisplay = `${getTestCodeHeader(endpointTest)}\n${testCode}`;
+    const testCodeForDisplay = `${getTestCodeHeader(testBrowserStore.selectedEndpointTest)}\n${testBrowserStore.selectedEndpointTest.code}`;
     
     return <div className="tests-list-container">
                 <Form.Group className="check-box-container">
@@ -133,7 +136,7 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = ({ workspace, endpoint, sp
                             <Container>
                                 <Row>
                                     <Col xs="2" md="2" lg="2" style={{"padding": "0"}}>
-                                        <span className="clickable" style={{marginRight: "10px"}} onClick={_ => sendPushCodeToEditor(testCode, endpointTest)}>{inputIcon}</span>
+                                        <span className="clickable" style={{marginRight: "10px"}} onClick={_ => sendPushCodeToEditor(toJS(testBrowserStore.selectedEndpointTest))}>{inputIcon}</span>
                                         <span className="clickable" onClick={_ => copyToClipboard(testCodeForDisplay)}>{copyIcon}</span>
                                     </Col>
                                     <Col xs="10" md="10" lg="10" style={{"paddingLeft": "5px"}}></Col>
@@ -150,6 +153,6 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = ({ workspace, endpoint, sp
                     </Card>
                 </Container>
     </div>
-};
+});
 
 export default TestCodeViewer;

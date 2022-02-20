@@ -43,6 +43,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<vscode
     });
     const stopTunnelCommand = vscode.commands.registerCommand(stopTunnelCommandName, () => K8STunnel.getInstance().stop());
     const createTunneledConfigCommand = vscode.commands.registerCommand(createTunneledConfigCommandName, () => runCreateTunneledLaunchConfig(K8STunnel.getInstance().getProxyAddress()));
+    const triggerPushTestCodeCommand = vscode.commands.registerCommand('up9.pushCode', () => {
+        UP9Panel?.currentPanel?.webviewCommunicator?.requestPushCodeFromPanel();
+    });
     
 
     context.subscriptions.push(openTestBrowserCommand);
@@ -52,6 +55,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<vscode
     context.subscriptions.push(startTunnelCommand);
     context.subscriptions.push(stopTunnelCommand);
     context.subscriptions.push(createTunneledConfigCommand);
+    context.subscriptions.push(triggerPushTestCodeCommand);
 
     // return the context so its usable by tests
     return context;
