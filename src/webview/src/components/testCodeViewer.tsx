@@ -10,7 +10,7 @@ import "ace-builds/src-noconflict/theme-chrome";
 
 import { copyIcon, inputIcon } from "./svgs";
 import {sendApiMessage, sendInfoToast, sendPushCodeToEditor } from "../providers/extensionConnectionProvider";
-import { isHexColorDark, transformTest, getAssertionsCodeForSpan, getEndpointSchema } from "../utils";
+import { isHexColorDark, transformTest, getAssertionsCodeForSpan, getEndpointSchema, getTestCodeHeader } from "../utils";
 import { ApiMessageType } from "../../../models/internal";
 import { microTestsHeader } from "../../../consts";
 import EndpointSchema from "./endpointSchema";
@@ -57,6 +57,7 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = ({ workspace, endpoint, sp
                         return;
                     }
                     const test = transformTest(tests.tests[0]);
+                    console.log('test', test);
                     test.uuid = uuidv4(); //for react Key prop
 
                     setEndpointTest(test);
@@ -116,6 +117,8 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = ({ workspace, endpoint, sp
     } else if (!endpointTest) {
         return null;
     }
+
+    const testCodeForDisplay = `${getTestCodeHeader(endpointTest)}\n${testCode}`;
     
     return <div className="tests-list-container">
                 <Form.Group className="check-box-container">
@@ -130,8 +133,8 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = ({ workspace, endpoint, sp
                             <Container>
                                 <Row>
                                     <Col xs="2" md="2" lg="2" style={{"padding": "0"}}>
-                                        <span className="clickable" style={{marginRight: "10px"}} onClick={_ => sendPushCodeToEditor(testCode, microTestsHeader)}>{inputIcon}</span>
-                                        <span className="clickable" onClick={_ => copyToClipboard(`${microTestsHeader}\n${testCode}`)}>{copyIcon}</span>
+                                        <span className="clickable" style={{marginRight: "10px"}} onClick={_ => sendPushCodeToEditor(testCode, endpointTest)}>{inputIcon}</span>
+                                        <span className="clickable" onClick={_ => copyToClipboard(testCodeForDisplay)}>{copyIcon}</span>
                                     </Col>
                                     <Col xs="10" md="10" lg="10" style={{"paddingLeft": "5px"}}></Col>
                                 </Row>
@@ -139,7 +142,7 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = ({ workspace, endpoint, sp
                         </Card.Header>
                         <Card.Body style={{height: "100%", marginTop: 0, paddingTop: 0}}>
                                 <AceEditor width="100%" mode="python" fontSize="14px" maxLines={1000}
-                                theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={`${microTestsHeader}\n${testCode}`}
+                                theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={testCodeForDisplay}
                                     setOptions={{showGutter: false, hScrollBarAlwaysVisible: false, highlightActiveLine: false}}/>
                         </Card.Body>
                     </>

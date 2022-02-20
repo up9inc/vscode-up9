@@ -1,3 +1,5 @@
+import { microTestsClassDef, microTestsImports } from "../../consts";
+
 export const unindentString = (str: string) => str.replace(/^    /gm, '');
 
 export const isHexColorDark = (hexColor: string) => {
@@ -15,12 +17,33 @@ export const isHexColorDark = (hexColor: string) => {
     return false;
 }
 
-export const transformTest = (test: any) => {
+export const transformTest = (test: any) => {    
+    test.urlVariableName = getUrlVariableNameForTestTarget(test.target);
+
     test.code = test.code.replace('def ', 'def test_');
-    test.code = test.code.replaceAll('self.base_url', `"${test.target}"`);
+    test.code = test.code.replaceAll('self.base_url', test.urlVariableName);
     test.code = test.code.replaceAll('resp = self.', 'resp = requests.');
 
     return test;
+}
+
+export const getUrlVariableNameForTestTarget = (testTarget: string) => {
+    if (testTarget.indexOf('://') > -1) {
+        testTarget = testTarget.split('://')[1];
+    }
+
+    // convert '.' and '-' to '_' so the variable name is valid in python
+    testTarget = testTarget.replace(/\.|-/g,'_')
+    return `url_${testTarget}`;
+}
+
+export const getTestCodeHeader = (test: any) => {
+    return `${microTestsImports}
+
+${test.urlVariableName} = "${test.target}"
+
+${microTestsClassDef}
+`;
 }
 
 export const getRequestBodySchemaForView = (endpointSchema: any) => {

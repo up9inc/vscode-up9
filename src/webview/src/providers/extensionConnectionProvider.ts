@@ -720,11 +720,11 @@ export const setExtensionDefaultWorkspace = (workspaceId: string) => {
   });
 }
 
-export const sendPushCodeToEditor = (code: string, header: string) => {
+export const sendPushCodeToEditor = (code: string, testObject: any) => {
   vsCodeApi.postMessage({
     command: MessageCommandType.PushText,
     code,
-    header
+    testObject
   });
 };
 
@@ -751,7 +751,7 @@ window.addEventListener('message', event => {
             up9AuthStore.setUsername(message.username);
             break;
         case MessageCommandType.ApiResponse:
-            console.log('received apiResponse', message);
+            console.debug('received apiResponse', message);
             const requestMessage = openApiMessages[message.data.apiMessageId];
             if (!requestMessage) {
                 console.error("received message from extension with no local message object", message);

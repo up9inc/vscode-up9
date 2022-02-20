@@ -56,7 +56,7 @@ export class UP9WebviewCommunicator {
                         })();
                         break;
                     case MessageCommandType.PushText:
-                        this.pushCodeToActiveEditor(message.code, message.header);
+                        this.pushCodeToActiveEditor(message.code, message.testObject);
                         break;
                     case MessageCommandType.AuthSignOut:
                         (async () => {
@@ -182,7 +182,7 @@ export class UP9WebviewCommunicator {
         });
     }
 
-    private pushCodeToActiveEditor = (code: string, header: string) => { 
+    private pushCodeToActiveEditor = (code: string, testObject: any) => { 
         let editor = vscode.window.activeTextEditor;
         if (!editor) {
             editor = vscode.window.visibleTextEditors?.[0];
@@ -197,7 +197,7 @@ export class UP9WebviewCommunicator {
         if (currentEditorContents) {
             //insert missing imports at the top
             editor.edit(editBuilder => {
-                editBuilder.insert(new vscode.Position(0, 0), this.getMissingImportsInCode(currentEditorContents));
+                editBuilder.insert(new vscode.Position(this.getFirstLineNumberAfterImports(currentEditorContents), 0), this.getMissingImportsAndGlobalsInCode(currentEditorContents, testObject));
                 if (currentEditorContents.indexOf("class ") == -1) {
                     editBuilder.insert(editor.selection.active, `${microTestsClassDef}\n${code}`);
                 } else {
@@ -209,13 +209,37 @@ export class UP9WebviewCommunicator {
         }
     }
 
-    private getMissingImportsInCode = (editorCode: string): string => {
+    private getFirstLineNumberAfterImports = (editorCode: string): number => {
+        const lines = editorCode.split("\n");
+        let firstLineNumber = 0;
+
+        for (const lineNumber in lines) {
+            const line = lines[lineNumber].replace("#", "").trim();
+
+            if (line.startsWith("import ") || line.startsWith("from ")) {
+                firstLineNumber = parseInt(lineNumber);
+            }
+
+            if (line.startsWith("class")) {
+                break;
+            }
+        }
+        return firstLineNumber + 1;
+    }
+
+    private getMissingImportsAndGlobalsInCode = (editorCode: string, testObject: any): string => {
         const missingImports = [];
 
         const presentImports = new Set();
+        let isTestUrlGlobalPresent = false;
 
         for (const editorCodeLine of editorCode.split('\n')) {
             const line = editorCodeLine.replace("#", "").trim();
+
+            if (line.startsWith(testObject.urlVariableName)) {
+                isTestUrlGlobalPresent = true;   
+            }
+
             if (line.startsWith("import ") || line.startsWith("from ")) {
                 presentImports.add(line);
             }
@@ -226,11 +250,15 @@ export class UP9WebviewCommunicator {
                 missingImports.push(importLine);
             }
         }
-
-        if (missingImports.length == 0) {
-            return '';
+        
+        let globals = '';
+        if (missingImports.length > 0) {
+            globals = `${missingImports.join("\n")}\n`;
+        }
+        if (!isTestUrlGlobalPresent) {
+            globals += `\n${testObject.urlVariableName} = "${testObject.target}"\n`;
         }
 
-        return `${missingImports.join("\n")}\n`;
+        return globals;
     }
 }
