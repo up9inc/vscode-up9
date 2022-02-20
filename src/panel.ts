@@ -14,9 +14,10 @@ export class UP9Panel {
      */
     public static currentPanel: UP9Panel | undefined;
 
+    public readonly webviewCommunicator: UP9WebviewCommunicator;
+
     private readonly _panel: vscode.WebviewPanel;
     private readonly _context: vscode.ExtensionContext;
-    private readonly _webviewCommunicator: UP9WebviewCommunicator;
     private _disposables: vscode.Disposable[] = [];
 
     public static createOrShow(context: vscode.ExtensionContext, up9Auth: UP9Auth) {
@@ -43,7 +44,7 @@ export class UP9Panel {
     private constructor(panel: vscode.WebviewPanel, context: vscode.ExtensionContext, up9Auth: UP9Auth) {
         this._panel = panel;
         this._context = context;
-        this._webviewCommunicator = new UP9WebviewCommunicator(context, this._panel, up9Auth);
+        this.webviewCommunicator = new UP9WebviewCommunicator(context, this._panel, up9Auth);
 
         // Set the webview's initial html content
         this._panel.webview.html = this._getHtmlForWebview();
@@ -69,7 +70,7 @@ export class UP9Panel {
         }
 
         // Handle messages from the webview
-        this._webviewCommunicator.registerOnMessageListeners(this._disposables);
+        this.webviewCommunicator.registerOnMessageListeners(this._disposables);
     }
 
     public dispose() {

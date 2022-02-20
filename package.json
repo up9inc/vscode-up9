@@ -18,7 +18,8 @@
     "onCommand:up9.testAuth",
     "onCommand:up9.startTunnel",
     "onCommand:up9.stopTunnel",
-    "onCommand:up9.createTunneledLaunchConfig"
+    "onCommand:up9.createTunneledLaunchConfig",
+    "onCommand:up9.pushCode"
   ],
   "main": "./out/extension.js",
   "categories": [
@@ -54,6 +55,10 @@
       {
         "command": "up9.createTunneledLaunchConfig",
         "title": "UP9: Create Tunneled Launch Config"
+      },
+      {
+        "command": "up9.pushCode",
+        "title": "UP9: Push Code"
       }
     ],
     "menus": {
@@ -76,9 +81,19 @@
         {
           "command": "up9.signOut",
           "when": "false"
+        },
+        {
+          "command": "up9.pushCode",
+          "when": "false"
         }
       ]
-    }
+    },
+    "keybindings": [
+      {
+          "command": "up9.pushCode",
+          "key": "ctrl+alt+p"
+      }
+    ]
   },
   "scripts": {
     "setup-browser": "cd src/webview && npm install && cd ../../",

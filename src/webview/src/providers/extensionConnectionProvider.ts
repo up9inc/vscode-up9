@@ -1,6 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import {up9AuthStore} from "../stores/up9AuthStore";
 import { WebViewApiMessage, MessageCommandType, ApiMessageType } from "../../../models/internal";
+import { testBrowserStore } from '../stores/testBrowserStore';
+import { toJS } from 'mobx';
 
 let isDebug = false;
 
@@ -720,10 +722,9 @@ export const setExtensionDefaultWorkspace = (workspaceId: string) => {
   });
 }
 
-export const sendPushCodeToEditor = (code: string, testObject: any) => {
+export const sendPushCodeToEditor = (testObject: any) => {
   vsCodeApi.postMessage({
     command: MessageCommandType.PushText,
-    code,
     testObject
   });
 };
@@ -736,22 +737,18 @@ export const signOut = () => {
 
 //handle messages incoming from the extension
 window.addEventListener('message', event => {
-    console.log('received message', event.data);
     const message = event.data;
     switch (message.command) {
         case MessageCommandType.AuthError:
-            console.log('received authError', message);
             up9AuthStore.setAuthError(message.authError?.message ?? "unknown error occured");
             up9AuthStore.setIsAuthConfigured(false);
             break;
         case MessageCommandType.AuthSuccess:
-            console.log('received authResponse', message);
             up9AuthStore.setAuthError(null);
             up9AuthStore.setIsAuthConfigured(true);
             up9AuthStore.setUsername(message.username);
             break;
         case MessageCommandType.ApiResponse:
-            console.debug('received apiResponse', message);
             const requestMessage = openApiMessages[message.data.apiMessageId];
             if (!requestMessage) {
                 console.error("received message from extension with no local message object", message);
@@ -764,12 +761,17 @@ window.addEventListener('message', event => {
             }
             break;
         case MessageCommandType.AuthSignOut:
-            console.log('received authSignOut', message);
             up9AuthStore.setAuthError(null);
             up9AuthStore.setIsAuthConfigured(false);
             break;
         case MessageCommandType.StoredData:
             up9AuthStore.setDefaultWorkspace(message.defaultWorkspace);
             up9AuthStore.setUP9Env(message.env);
+            break;
+        case MessageCommandType.PushText:
+            if (testBrowserStore.selectedEndpointTest != null) {
+            	sendPushCodeToEditor(toJS(testBrowserStore.selectedEndpointTest));
+            }
+			break;
     }
 });
