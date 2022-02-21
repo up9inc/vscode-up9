@@ -139,7 +139,6 @@
     "client-oauth2": "^4.3.3",
     "clipboardy": "^2.3.0",
     "http-proxy": "^1.18.1",
-    "i": "^0.3.7",
     "jsonwebtoken": "^8.5.1",
     "open": "^8.4.0"
   }
