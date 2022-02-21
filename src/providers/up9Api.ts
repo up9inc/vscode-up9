@@ -20,32 +20,26 @@ export class UP9ApiProvider {
     }
 
     public getWorkspaces = async (token: string): Promise<string[]> => {
-        const start = Date.now();
         const response = await client.get<Workspace[]>(`${this._trccUrl}/models/`, {headers: {'Authorization': `Bearer ${token}`}})
         raiseForBadResponse(response);
-        console.log(`getWorkspaces took ${Date.now() - start}ms`);
         return response.data.map(workspace => workspace.modelId);
     }
 
     public getWorkspaceEndpoints = async (workspaceId: string, token: string): Promise<Endpoint[]> => {
-        const start = Date.now();
         const latestRevision = await this.getLatestRevisionForWorkspace(workspaceId, token);
 
         const response = await client.get<Endpoint[]>(`${this._trccUrl}/models/${workspaceId}/${latestRevision}/all/endpoints`, {headers: {'Authorization': `Bearer ${token}`}})
         raiseForBadResponse(response);
-        console.log(`getWorkspaceEndpoints took ${Date.now() - start}ms`);
         return response.data;
     }
 
     public getTestsForSpan = async(workspaceId: string, spanGuid: string, token: string): Promise<TestResponse> => {
-        const start = Date.now();
         const latestRevision = await this.getLatestRevisionForWorkspace(workspaceId, token);
 
         const url = `${this._trccUrl}/models/${workspaceId}/${latestRevision}/all/tests?base64Code=false&addTestData=true`;
         const body = {spanGuids: [spanGuid], microTestsOnly: true};
         const response = await client.post<TestResponse>(url, body, {headers: {'Authorization': `Bearer ${token}`, 'Content-Type': "application/json"}});
-        raiseForBadResponse(response); 
-        console.log(`getTestsForSpan took ${Date.now() - start}ms`);
+        raiseForBadResponse(response);
         return response.data;
     }
 
@@ -57,28 +51,22 @@ export class UP9ApiProvider {
     }
 
     public getSwagger = async(workspaceId: string, token: string): Promise<any> => {
-        const start = Date.now();
         const latestRevision = await this.getLatestRevisionForWorkspace(workspaceId, token);
         const response = await client.get<any>(`${this._trccUrl}/models/${workspaceId}/${latestRevision}/all/swagger`, {headers: {'Authorization': `Bearer ${token}`}});
         raiseForBadResponse(response);
-        console.log(`getSwagger took ${Date.now() - start}ms`);
         return response.data;
     }
 
     public getSpans = async(workspaceId: string, spanId: string, token: string): Promise<any> => {
-        const start = Date.now();
         const latestRevision = await this.getLatestRevisionForWorkspace(workspaceId, token);
         const response = await client.get<any>(`${this._trccUrl}/models/${workspaceId}/${latestRevision}/all/dataDependency`, {headers: {'Authorization': `Bearer ${token}`}});
         raiseForBadResponse(response);
-        console.log(`getSpans took ${Date.now() - start}ms`);
         return response.data;
     }
 
     public checkEnv = async(protocol: string, env: string): Promise<boolean> => {
-        const start = Date.now();
         const response = await client.get<any>(`${protocol}://trcc.${env}/apidocs`);
         raiseForBadResponse(response);
-        console.log(`checkEnv took ${Date.now() - start}ms`);
         return true;
     }
 
