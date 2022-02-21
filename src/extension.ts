@@ -9,8 +9,6 @@ import {
 import { UP9Auth } from './providers/up9Auth';
 import { readStoredValue } from './utils';
 
-var http = require('http');
-
 const testBrowserCommandName = 'up9.openTestsBrowser';
 const runTestInCloudCommandName = 'up9.runTest';
 export const startAuthCommandName = 'up9.webAuth';
@@ -43,8 +41,12 @@ export async function activate(context: vscode.ExtensionContext): Promise<vscode
     });
     const stopTunnelCommand = vscode.commands.registerCommand(stopTunnelCommandName, () => K8STunnel.getInstance().stop());
     const createTunneledConfigCommand = vscode.commands.registerCommand(createTunneledConfigCommandName, () => runCreateTunneledLaunchConfig(K8STunnel.getInstance().getProxyAddress()));
+
     const triggerPushTestCodeCommand = vscode.commands.registerCommand('up9.pushCode', () => {
         UP9Panel?.currentPanel?.webviewCommunicator?.requestPushCodeFromPanel();
+    });
+    const triggerCopyTestCodeCommand = vscode.commands.registerCommand('up9.copyCode', () => {
+        UP9Panel?.currentPanel?.webviewCommunicator?.requestCopyCodeFromPanel();
     });
     
 
@@ -56,6 +58,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<vscode
     context.subscriptions.push(stopTunnelCommand);
     context.subscriptions.push(createTunneledConfigCommand);
     context.subscriptions.push(triggerPushTestCodeCommand);
+    context.subscriptions.push(triggerCopyTestCodeCommand);
 
     // return the context so its usable by tests
     return context;

@@ -735,6 +735,13 @@ export const signOut = () => {
   });
 }
 
+export const copyCode = (code: string) => {
+  vsCodeApi.postMessage({
+    command: MessageCommandType.TriggerCopyCode,
+    code
+  });
+}
+
 //handle messages incoming from the extension
 window.addEventListener('message', event => {
     const message = event.data;
@@ -773,5 +780,10 @@ window.addEventListener('message', event => {
             	sendPushCodeToEditor(toJS(testBrowserStore.selectedEndpointTest));
             }
 			break;
+		case MessageCommandType.TriggerCopyCode:
+			if (testBrowserStore.codeDisplayText != null) {
+
+				copyCode(testBrowserStore.codeDisplayText);
+			}
     }
 });

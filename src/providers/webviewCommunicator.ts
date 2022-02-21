@@ -1,10 +1,11 @@
 import * as vscode from 'vscode';
+import {write as clipboardWrite} from 'clipboardy';
 import { UP9ApiProvider } from './up9Api';
 import { UP9Auth } from './up9Auth';
 import { WebViewApiMessage, MessageCommandType, ApiMessageType } from '../models/internal';
 import { defaultUP9Env, defaultUP9EnvProtocol, defaultWorkspaceConfigKey, envConfigKey, envProtocolConfigKey, microTestsClassDef, microTestsHeader, microTestsImports } from '../consts';
 import { readStoredValue, setStoredValue } from '../utils';
-import { env } from 'process';
+import { getTestCodeHeader } from '../sharedUtils';
 
 
 // this class is the only link the webview has to the "outside world", the webview is limited by CORS which means all up9 api https requests have to go through here where CORS isnt an issue.
@@ -69,6 +70,17 @@ export class UP9WebviewCommunicator {
                             }
                         })();
                         break;
+                    case MessageCommandType.TriggerCopyCode:
+                        (async () => {
+                            try {
+                                await clipboardWrite(message.code);
+                                vscode.window.showInformationMessage('Test code copied to clipboard');
+                            } catch (error) {
+                                console.error(error);
+                                vscode.window.showErrorMessage('An unexpected error occured while copying to clipboard');
+                            }
+                        })();
+                        break;
                 }
             },
             null,
@@ -84,6 +96,12 @@ export class UP9WebviewCommunicator {
     public requestPushCodeFromPanel(): void {
         this._panel.webview.postMessage({
             command: MessageCommandType.PushText,
+        });
+    }
+
+    public requestCopyCodeFromPanel(): void {
+        this._panel.webview.postMessage({
+            command: MessageCommandType.TriggerCopyCode,
         });
     }
 
@@ -213,7 +231,7 @@ export class UP9WebviewCommunicator {
                 }
             });
         } else {
-            editor.insertSnippet(new vscode.SnippetString(`${microTestsHeader}\n${testObject.code}`));
+            editor.insertSnippet(new vscode.SnippetString(`${getTestCodeHeader(testObject)}\n${testObject.code}`));
         }
     }
 
