@@ -736,8 +736,6 @@ export const signOut = () => {
 }
 
 export const copyCode = (code: string) => {
-	// sendInfoToast("Test code copied to clipboard");
-	// navigator.clipboard.writeText(code)
   vsCodeApi.postMessage({
     command: MessageCommandType.TriggerCopyCode,
     code
