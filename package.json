@@ -19,7 +19,8 @@
     "onCommand:up9.startTunnel",
     "onCommand:up9.stopTunnel",
     "onCommand:up9.createTunneledLaunchConfig",
-    "onCommand:up9.pushCode"
+    "onCommand:up9.pushCode",
+    "onCommand:up9.copyCode"
   ],
   "main": "./out/extension.js",
   "categories": [
@@ -59,6 +60,10 @@
       {
         "command": "up9.pushCode",
         "title": "UP9: Push Code"
+      },
+      {
+        "command": "up9.copyCode",
+        "title": "UP9: Copy Code"
       }
     ],
     "menus": {
@@ -85,13 +90,21 @@
         {
           "command": "up9.pushCode",
           "when": "false"
+        },
+        {
+          "command": "up9.copyCode",
+          "when": "false"
         }
       ]
     },
     "keybindings": [
       {
-          "command": "up9.pushCode",
-          "key": "ctrl+alt+p"
+        "command": "up9.pushCode",
+        "key": "ctrl+alt+p"
+      },
+      {
+        "command": "up9.copyCode",
+        "key": "ctrl+alt+c"
       }
     ]
   },
@@ -124,7 +137,9 @@
     "@kubernetes/client-node": "^0.16.1",
     "axios": "^0.24.0",
     "client-oauth2": "^4.3.3",
+    "clipboardy": "^2.3.0",
     "http-proxy": "^1.18.1",
+    "i": "^0.3.7",
     "jsonwebtoken": "^8.5.1",
     "open": "^8.4.0"
   }

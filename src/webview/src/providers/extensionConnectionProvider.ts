@@ -735,6 +735,15 @@ export const signOut = () => {
   });
 }
 
+export const copyCode = (code: string) => {
+	// sendInfoToast("Test code copied to clipboard");
+	// navigator.clipboard.writeText(code)
+  vsCodeApi.postMessage({
+    command: MessageCommandType.TriggerCopyCode,
+    code
+  });
+}
+
 //handle messages incoming from the extension
 window.addEventListener('message', event => {
     const message = event.data;
@@ -773,5 +782,10 @@ window.addEventListener('message', event => {
             	sendPushCodeToEditor(toJS(testBrowserStore.selectedEndpointTest));
             }
 			break;
+		case MessageCommandType.TriggerCopyCode:
+			if (testBrowserStore.codeDisplayText != null) {
+
+				copyCode(testBrowserStore.codeDisplayText);
+			}
     }
 });

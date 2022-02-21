@@ -10,6 +10,7 @@ export enum MessageCommandType {
     SetDefaultWorkspace = "setDefaultWorkspace",
     StoredData = "storedData",
     PushText = "pushText",
+    TriggerCopyCode = "copyCode",
 }
 
 export enum ApiMessageType {

@@ -37,15 +37,6 @@ export const getUrlVariableNameForTestTarget = (testTarget: string) => {
     return `url_${testTarget}`;
 }
 
-export const getTestCodeHeader = (test: any) => {
-    return `${microTestsImports}
-
-${test.urlVariableName} = "${test.target}"
-
-${microTestsClassDef}
-`;
-}
-
 export const getRequestBodySchemaForView = (endpointSchema: any) => {
     return endpointSchema.requestBody?.content?.['application/json']?.schema?.properties;
 }

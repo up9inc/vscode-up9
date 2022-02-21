@@ -9,8 +9,9 @@ import "ace-builds/src-noconflict/theme-chaos";
 import "ace-builds/src-noconflict/theme-chrome";
 
 import { copyIcon, inputIcon } from "./svgs";
-import {sendApiMessage, sendInfoToast, sendPushCodeToEditor } from "../providers/extensionConnectionProvider";
-import { isHexColorDark, transformTest, getAssertionsCodeForSpan, getEndpointSchema, getTestCodeHeader } from "../utils";
+import {copyCode, sendApiMessage, sendPushCodeToEditor } from "../providers/extensionConnectionProvider";
+import { isHexColorDark, transformTest, getAssertionsCodeForSpan, getEndpointSchema } from "../utils";
+import { getTestCodeHeader } from "../../../sharedUtils";
 import { ApiMessageType } from "../../../models/internal";
 import EndpointSchema from "./endpointSchema";
 import { observer } from "mobx-react-lite";
@@ -41,17 +42,13 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = observer(({ workspace, end
         // clean up on dismount
         return () => {
             testBrowserStore.setSelectedEndpointTest(null);
+            testBrowserStore.setCodeDisplayText(null);
         }
     }, []);
 
     useEffect(() => {
         setIsThemeDark(isHexColorDark(editorBackgroundColor))
     }, [editorBackgroundColor]);
-
-    const copyToClipboard = (text: string) => {
-        sendInfoToast("Test code copied to clipboard");
-        navigator.clipboard.writeText(text)
-    };
 
     const endpointSpan = useMemo(() => {
         if (!spans || !endpoint) {
@@ -114,7 +111,6 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = observer(({ workspace, end
         }
     }, [endpointSchema, testCodeMode]);
 
-
     if (testsLoaded && !testBrowserStore.selectedEndpointTest) {
         return <p>No code found for this endpoint</p>;
     } else if (!testBrowserStore.selectedEndpointTest) {
@@ -122,6 +118,8 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = observer(({ workspace, end
     }
 
     const testCodeForDisplay = `${getTestCodeHeader(testBrowserStore.selectedEndpointTest)}\n${testBrowserStore.selectedEndpointTest.code}`;
+    //store this for copy from keyboard shortcut
+    testBrowserStore.setCodeDisplayText(testCodeForDisplay);
     
     return <div className="tests-list-container">
                 <Form.Group className="check-box-container">
@@ -136,8 +134,8 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = observer(({ workspace, end
                             <Container>
                                 <Row>
                                     <Col xs="2" md="2" lg="2" style={{"padding": "0"}}>
-                                        <span className="clickable" style={{marginRight: "10px"}} onClick={_ => sendPushCodeToEditor(toJS(testBrowserStore.selectedEndpointTest))}>{inputIcon}</span>
-                                        <span className="clickable" onClick={_ => copyToClipboard(testCodeForDisplay)}>{copyIcon}</span>
+                                        <span className="clickable" style={{marginRight: "10px"}} onClick={_ => sendPushCodeToEditor(toJS(testBrowserStore.selectedEndpointTest))} title="Push Code (Ctrl + Alt + P)">{inputIcon}</span>
+                                        <span className="clickable" onClick={_ => copyCode(testCodeForDisplay)} title="Copy Code (Ctrl + Alt + C)">{copyIcon}</span>
                                     </Col>
                                     <Col xs="10" md="10" lg="10" style={{"paddingLeft": "5px"}}></Col>
                                 </Row>
