@@ -3,6 +3,7 @@ import { Accordion, Table } from "react-bootstrap";
 import AceEditor from "react-ace";
 import { getRequestBodySchemaForView, getResponseBodySchemaForView } from "../utils";
 import { getHeapCodeStatistics } from "v8";
+import { Redoc, RedocStandalone } from "redoc";
 
 export interface EndpointSchemaProps {
     schema: any;
@@ -17,7 +18,67 @@ interface SchemaAccordionProps {
 }
 
 const noneAccordionKey = "none";
-
+const OASSchemaTest = {
+    "operationId": "84d60c09-a9a4-49fa-aa8c-aff7d7971293",
+    "parameters": [
+        {
+            "examples": [
+                "LY-007",
+                "LY-011",
+                "LH-213",
+                "BA-411"
+            ],
+            "in": "query",
+            "name": "product_id",
+            "required": true,
+            "schema": {
+                "type": "string"
+            }
+        },
+        {
+            "examples": [
+                "trdemo-client.trdemo"
+            ],
+            "in": "header",
+            "name": "x-mizu-destination",
+            "required": false,
+            "schema": {
+                "type": "string"
+            }
+        }
+    ],
+    "responses": {
+        "302": {
+            "content": {
+                "text/html": {
+                    "example": "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">\n<title>Redirecting...</title>\n<h1>Redirecting...</h1>\n<p>You should be redirected automatically to target URL: <a href=\"/cart\">/cart</a>.  If not click the link.</p>"
+                }
+            },
+            "description": "Found"
+        }
+    },
+    "summary": "Seen 6 requests",
+    "tags": [
+        "cart"
+    ],
+    "x-endpoints": [
+        "84d60c09-a9a4-49fa-aa8c-aff7d7971293"
+    ],
+    "x-kpis": {
+        "avg_rt": 0.006871630716079488,
+        "entries": 6,
+        "err_rate": 0,
+        "failures": 0,
+        "first_seen": 1636036878.146157,
+        "hits_rate": 0.139290034404702,
+        "last_active": 1636036947.421457,
+        "last_seen": 1636036947.421457,
+        "sessions": 2,
+        "sum_duration": 43.075587034225464,
+        "sum_rt": 0.29599952697753906
+    }
+}
+ 
 const SchemaAccordion: React.FC<SchemaAccordionProps> = ({header, key, hideOnStart, collapsedSuffix, children}) => {
     const inputBackgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--vscode-input-background');
     const inputForegroundColor = getComputedStyle(document.documentElement).getPropertyValue('--vscode-input-foreground');

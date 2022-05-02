@@ -1,3 +1,4 @@
+const webpack = require('webpack');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const HTMLInlineCSSWebpackPlugin = require("html-inline-css-webpack-plugin").default;
@@ -14,6 +15,14 @@ module.exports = {
     entry: ['./src/index.tsx', './src/main.css'],
     resolve: {
         extensions: ['.js', '.jsx', '.ts', '.tsx'],
+        fallback: {
+            "path": require.resolve("path-browserify"),
+            "os": require.resolve("os-browserify/browser"),
+            "url": require.resolve("url"),
+            "tty": require.resolve("tty-browserify"),
+            "minimatch": require.resolve("minimatch"),
+            "process": require.resolve("process")
+        },
     },
     module: {
         rules: [{
@@ -38,6 +47,9 @@ module.exports = {
         publicPath: '',
     },
     plugins: [
+        new webpack.ProvidePlugin({
+            process: 'process',
+          }),
         new MiniCssExtractPlugin({
             filename: "main.css",
             chunkFilename: "mainc.css"

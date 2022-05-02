@@ -4,7 +4,6 @@ import { UP9Auth } from "../providers/up9Auth";
 import { UP9ApiProvider } from "../providers/up9Api";
 import { startAuthCommandName } from "../extension";
 import { defaultWorkspaceConfigKey } from "../consts";
-import axios from "axios";
 
 const openUP9SettingsDialogOption = 'Open UP9 Settings';
 const openUP9SignInDialogOption = 'Sign In To UP9';
@@ -166,8 +165,8 @@ export class CloudRunner {
         if (res === openUP9SignInDialogOption) {
             vscode.commands.executeCommand(startAuthCommandName);
         }
-    }
-
+    } 
+ 
     private processTerminalOutputAndPrint = (text: string, terminalEmitter: vscode.EventEmitter<string>) => {
         const formattedMessage = text.replace(/\n/g, terminalLineDelimeter);
         terminalEmitter.fire(formattedMessage);

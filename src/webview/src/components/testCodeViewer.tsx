@@ -10,17 +10,19 @@ import "ace-builds/src-noconflict/theme-chrome";
 
 import { copyIcon, inputIcon } from "./svgs";
 import {copyCode, sendApiMessage, sendPushCodeToEditor } from "../providers/extensionConnectionProvider";
-import { isHexColorDark, transformTest, getAssertionsCodeForSpan, getEndpointSchema } from "../utils";
+import { isHexColorDark, transformTest, getAssertionsCodeForSpan, getEndpointSchema, getServiceSchema } from "../utils";
 import { getTestCodeHeader } from "../../../sharedUtils";
 import { ApiMessageType } from "../../../models/internal";
 import EndpointSchema from "./endpointSchema";
 import { observer } from "mobx-react-lite";
 import { testBrowserStore } from "../stores/testBrowserStore";
 import { toJS } from "mobx";
+import { RedocStandalone } from "redoc";
 
 enum TestCodeMode {
     Test = "test",
-    Schema = "schema"
+    Schema = "schema",
+    OAS = "open api spec"
 }
 
 export interface TestCodeViewerProps {
@@ -30,7 +32,18 @@ export interface TestCodeViewerProps {
     workspaceOAS: any;
 }
 
-const TestCodeViewer: React.FC<TestCodeViewerProps> = observer(({ workspace, endpoint, spans, workspaceOAS}) => {
+const theme = {
+    "sidebar": {
+      "width": "0px",
+      "textColor": "#000000",
+    },
+    "rightPanel": {
+      "backgroundColor": "rgba(55, 53, 71, 1)",
+      "textColor": "#ffffff"
+    }
+  };
+
+const TestCodeViewer: React.FC<TestCodeViewerProps> = observer(({workspace, endpoint, spans, workspaceOAS}) => {
 
     const [isThemeDark, setIsThemeDark] = useState(null);
     const [testsLoaded, setTestsLoaded] = useState(false);
@@ -58,12 +71,11 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = observer(({ workspace, end
         return spans.find(span => span.uuid === endpoint.uuid);
     }, [workspace, endpoint]);
 
-    const endpointSchema = useMemo(() => {
+    const [endpointSchema, serviceSchema] = useMemo(() => {
         if (!endpoint || !workspaceOAS) {
-            return null;
+            return [null, null];
         }
-
-        return getEndpointSchema(endpoint, workspaceOAS);
+        return [getEndpointSchema(endpoint, workspaceOAS), getServiceSchema(endpoint, workspaceOAS)];
     }, [endpoint, workspaceOAS]);
 
     useEffect(() => {
@@ -109,7 +121,12 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = observer(({ workspace, end
         if (!endpointSchema && testCodeMode == TestCodeMode.Schema) {
             setTestCodeMode(TestCodeMode.Test);
         }
-    }, [endpointSchema, testCodeMode]);
+
+        // Same thing for OAS 
+        if (!workspaceOAS && testCodeMode == TestCodeMode.OAS) {
+            setTestCodeMode(TestCodeMode.Test);
+        }
+    }, [endpointSchema, testCodeMode, workspaceOAS]);
 
     if (testsLoaded && !testBrowserStore.selectedEndpointTest) {
         return <p>No code found for this endpoint</p>;
@@ -124,12 +141,14 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = observer(({ workspace, end
     return <div className="tests-list-container">
                 <Form.Group className="check-box-container">
                     <a className={"anchor-tab" + (testCodeMode == TestCodeMode.Test ? " active" : "")} onClick={_ => setTestCodeMode(TestCodeMode.Test)}>Code</a>
+                    {serviceSchema && <a className={"anchor-tab" + (testCodeMode == TestCodeMode.OAS ? " active" : "")} onClick={_ => setTestCodeMode(TestCodeMode.OAS)}>Open Api Spec</a>}
                     {endpointSchema && <a className={"anchor-tab" + (testCodeMode == TestCodeMode.Schema ? " active" : "")} onClick={_ => setTestCodeMode(TestCodeMode.Schema)}>Schema</a>}
                 </Form.Group> 
                 <Container className="test-code-container">
                 <Card className="test-row" style={{height: "100%"}}>
-                    {testCodeMode === TestCodeMode.Schema ? <EndpointSchema schema={endpointSchema} isThemeDark={true} /> : 
-                    <>
+                    {testCodeMode === TestCodeMode.OAS && <RedocStandalone spec={serviceSchema}/>}
+                    {testCodeMode === TestCodeMode.Schema && <EndpointSchema schema={endpointSchema} isThemeDark={true}/>}
+                    {testCodeMode === TestCodeMode.Test && <>
                         <Card.Header className="test-row-card-header">
                             <Container>
                                 <Row>

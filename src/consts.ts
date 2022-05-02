@@ -9,7 +9,7 @@ export const internalRunTestCommandName = "up9.runTest";
 export const authGlobalStorageKey = "up9.auth.data";
 export const authEnvStorageKey = "up9.auth.env";
 
-export const defaultUP9Env = "up9.app";
+export const defaultUP9Env = "stg.testr.io";
 export const defaultUP9EnvProtocol = "https";
 
 export const microTestsImports = `import requests
