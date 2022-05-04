@@ -3,6 +3,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const HTMLInlineCSSWebpackPlugin = require("html-inline-css-webpack-plugin").default;
 const InlineChunkHtmlPlugin = require('react-dev-utils/InlineChunkHtmlPlugin');
+const CircularDependencyPlugin = require('circular-dependency-plugin');
 
 const htmlWebpackPlugin = new HtmlWebPackPlugin({
     template: "./src/index.html",
@@ -27,7 +28,7 @@ module.exports = {
     module: {
         rules: [{
                 test: /\.tsx?$/,
-                exclude: /node_modules/,
+                exclude: /node_modules|dist|\.js$|\.d\.ts$/,
                 loader: 'ts-loader',
                 options: {
                     configFile: 'tsconfig.json',
@@ -47,6 +48,13 @@ module.exports = {
         publicPath: '',
     },
     plugins: [
+        new CircularDependencyPlugin({
+            exclude: /a\.js|node_modules/,
+            include: /src/,
+            failOnError: true,
+            allowAsyncCycles: false,
+            cwd: process.cwd(),
+          }),
         new webpack.ProvidePlugin({
             process: 'process',
           }),
