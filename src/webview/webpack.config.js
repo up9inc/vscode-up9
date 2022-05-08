@@ -64,6 +64,6 @@ module.exports = {
         }),
         htmlWebpackPlugin,
         new HTMLInlineCSSWebpackPlugin(),
-        new InlineChunkHtmlPlugin(HtmlWebPackPlugin, [/bundle/]),
+        new InlineChunkHtmlPlugin(HtmlWebPackPlugin, [/runtime~.+[.]tsx/]),
     ]
 };
