@@ -63,7 +63,7 @@ module.exports = {
             chunkFilename: "mainc.css"
         }),
         htmlWebpackPlugin,
-        new HTMLInlineCSSWebpackPlugin(),
+        //new HTMLInlineCSSWebpackPlugin(), // This plugin stops reload in the dev 
         new InlineChunkHtmlPlugin(HtmlWebPackPlugin, [/runtime~.+[.]tsx/]),
     ]
 };
