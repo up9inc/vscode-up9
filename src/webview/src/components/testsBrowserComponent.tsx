@@ -4,7 +4,7 @@ import { up9AuthStore } from "../stores/up9AuthStore";
 import {sendApiMessage, setExtensionDefaultWorkspace, signOut} from "../providers/extensionConnectionProvider";
 import { ApiMessageType } from "../../../models/internal";
 import {Form, FormControl, Dropdown} from 'react-bootstrap';
-import { userIcon, logoIcon } from "./svgs";
+import { userIcon, logoIconLarge } from "./svgs";
 import { isHexColorDark } from "../utils";
 import { LoadingOverlay } from "./loadingOverlay";
 import TestCodeViewer from "./testCodeViewer";
@@ -132,8 +132,8 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
 
     return <div className={isThemeDark ? "dark-theme" : "light-theme"}>
             <div className="user-info">
-                <div style={{padding: "5px 0"}} className="user-icon">
-                    {logoIcon}
+                <div className="user-icon">
+                    {logoIconLarge}
                 </div>
                 <span className="env-text">
                     {up9AuthStore.up9Env}
@@ -151,7 +151,6 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                     </Dropdown>
                 </div>
             </div>
-            <hr style={{margin: "0"}}/>
             <div className="select-test-form">                
                 <div style={{display: "flex"}}>
                     <TestBrowserParameterDropdown className="dropdown-container workspaces-form-group" label="Workspace" placeholder="Select"
@@ -169,7 +168,6 @@ const TestsBrowserComponent: React.FC<{}> = observer(() => {
                 </div>
                 
             </div>
-            <hr/>
             <TestCodeViewer workspace={up9AuthStore.defaultWorkspace} endpoint={selectedEndpoint} spans={workspaceSpans} workspaceOAS={workspaceOAS} />
         </div>;
 });
