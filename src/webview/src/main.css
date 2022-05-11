@@ -1,6 +1,8 @@
 :root {
 	--border-color: #E9EBF8;
+
 	--highlighted-brackground: #E9EBF8;
+	--code-area-background: #F7F9FC;
 
 	--font-dark: #0C0B1A;
 	--font-light: #8F9BB2;
@@ -8,8 +10,11 @@
 
 	--border-radius: 4px;
 	--input-border-radius: 5px;
+	--code-border-radius:  6px;
+	--editor-border-radius: 10px;
 
 	--dropdown-background: #FFF;
+	--white: #FFF;
 }
 
 #root {
@@ -36,6 +41,10 @@ table {
 }
 
 .tests-list-container {
+	background: var(--code-area-background);
+	border-radius: var(--code-border-radius);
+	border: 1px solid var(--border-color);
+	padding: 17px 22px;
 	height: 85%;
 }
 
@@ -48,7 +57,9 @@ table {
 }
 
 .card-body {
- 	padding-left: 0;
+	background: var(--white);
+	border-radius: var(--editor-border-radius);
+	padding: 20px;
 }
 
 .test-code-container {
@@ -369,7 +380,7 @@ hr {
 }
 
 .tests-list-container {
-	margin: 15px 20px;
+	margin: 15px 40px;
 }
 
 .ace_print-margin {
