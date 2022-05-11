@@ -7,7 +7,7 @@
 	--font-dropdown: #606060;
 
 	--border-radius: 4px;
-	--input-border-radius: 4px;
+	--input-border-radius: 5px;
 
 	--dropdown-background: #FFF;
 }
@@ -62,8 +62,8 @@ table {
 .select-test-form {
 	height: 105px;
 	min-height: 65px;
-
-	margin: 15px 20px 24px;
+	margin: 15px 40px 24px;
+	position: relative;
 	/* display: flex;
 	justify-content: space-around; */
 	gap: 10px;
@@ -245,14 +245,27 @@ hr {
 }
 
 .select-dropdown {
-	width: 100%;
+	box-sizing: border-box;
+	background: var(--dropdown-background);
 	left: 87px;
 	border: 1px solid #CCCCCC;
 	border-radius: var(--input-border-radius);
+	width: 392px;
+	line-height: 18px;
 }
 
 .select-dropdown .bottom-start {
 	background-color: var(--dropdown-background);
+}
+
+.select-dropdown .dropdown-filter {
+	font-size: 11px;
+	line-height: 18px;
+	padding: .275rem .5rem;
+}
+
+.select-dropdown hr {
+	margin: 0.4rem 0;
 }
 
 .select-dropdown .dropdown-menu {
@@ -267,20 +280,20 @@ hr {
 
 .select-dropdown button {
 	background-color: var(--dropdown-background);
-	border: 1px solid var(--input-border-radius) !important;
-	border-radius: var(--input-border-radius);
 	color: var(--font-dropdown);
 	text-align: left;
-	padding-right: 8px;
 	outline: none !important;
 	width:100%;
 }
 
 
 .select-dropdown > button {
+	border: 1px solid var(--input-border-radius) !important;
+	border-radius: var(--input-border-radius);
+	font-size: 11px;
 	overflow-x: hidden;
+	padding: 0 10px 0 12px !important;
 	text-overflow: ellipsis;
-	padding: 2px 25px 2px 12px !important;
 }
 
 .show>.btn-primary.dropdown-toggle {
@@ -298,6 +311,7 @@ hr {
 .select-dropdown .dropdown-item, .discreet-dropdown .dropdown-item {
 	background: var(--vscode-input-background);
 	color: var(--vscode-input-foreground);
+	font-size: 11px;
 	border-radius: 3px;
 	border: none !important;
 	box-shadow: none !important;
@@ -310,11 +324,13 @@ hr {
 }
 
 .dropdown-container {
+	box-sizing: border-box;
 	display: flex;
 	align-items: center;
 }
 
 .dropdown-container .form-label {
+	font-size: 11px;
 	position: absolute;
 	color: var(--font-light);
 	width: 60px;
@@ -343,7 +359,7 @@ hr {
 
 .endpoints-form-group, .services-form-group, .workspaces-form-group {
 	flex-basis: 100%;
-	max-width: calc(100% - 87px);
+	width: 100%;
 	margin-right: 0;
 }
 
