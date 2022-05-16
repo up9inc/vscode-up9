@@ -141,7 +141,6 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = observer(({workspace, endp
     return <div className="tests-list-container">
                 <Form.Group className="tabs">
                     <a className={"anchor-tab" + (testCodeMode == TestCodeMode.Test ? " active" : "")} onClick={_ => setTestCodeMode(TestCodeMode.Test)}>Code</a>
-                    <a className={"anchor-tab" + (testCodeMode == TestCodeMode.OAS ? " active" : "")} onClick={_ => setTestCodeMode(TestCodeMode.Test)}>Else</a>
                     {serviceSchema && <a className={"anchor-tab" + (testCodeMode == TestCodeMode.OAS ? " active" : "")} onClick={_ => setTestCodeMode(TestCodeMode.OAS)}>Open Api Spec</a>}
                     {endpointSchema && <a className={"anchor-tab" + (testCodeMode == TestCodeMode.Schema ? " active" : "")} onClick={_ => setTestCodeMode(TestCodeMode.Schema)}>Schema</a>}
                 </Form.Group> 
