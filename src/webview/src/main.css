@@ -3,6 +3,7 @@
 
 	--highlighted-brackground: #E9EBF8;
 	--code-area-background: #F7F9FC;
+	--icon-color: #205CF5;
 
 	--font-dark: #0C0B1A;
 	--font-light: #8F9BB2;
@@ -101,7 +102,7 @@ table {
 }
 
 .svg-icon, .svg-icon > path {
-	fill: var(--vscode-input-foreground);
+	fill: var(--icon-color);
 }
 
 .user-info {
@@ -160,8 +161,8 @@ table {
 }
 
 .anchor-tab.active {
-	border-bottom: 1px solid var(--vscode-editor-foreground) !important;
-	opacity: 1 !important;
+	border-bottom: 1px solid var(--font-light);
+	opacity: 1;
 }
 
 .anchor-tab:active, .anchor-tab:hover {
@@ -411,10 +412,39 @@ hr {
 	background: var(--vscode-menubar-selectionBackground); */
 }
 
+.test-row.card {
+	position: relative;
+}
+
 .test-row-card-header {
 	background: inherit;
 	border: none;
 	padding-left: 0;
+}
+
+.test-row-card-header.actions {
+	position: absolute;
+	right: 0;
+	z-index: 100;
+}
+
+.test-row-card-header.actions .actions-container{
+	position: relative;
+	margin-right: 0;
+	width: 4rem;
+}
+
+.tabs {
+	margin-bottom: 2rem;
+}
+
+.tabs > a {
+	padding-bottom: 0.5rem;
+	text-transform: uppercase;
+}
+
+.tabs > a.active {
+	border-bottom: 0.0625rem solid var(--font-dark);
 }
 
 .ace_editor {

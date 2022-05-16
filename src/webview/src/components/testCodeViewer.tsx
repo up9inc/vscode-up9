@@ -139,8 +139,9 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = observer(({workspace, endp
     testBrowserStore.setCodeDisplayText(testCodeForDisplay);
     
     return <div className="tests-list-container">
-                <Form.Group className="check-box-container">
+                <Form.Group className="tabs">
                     <a className={"anchor-tab" + (testCodeMode == TestCodeMode.Test ? " active" : "")} onClick={_ => setTestCodeMode(TestCodeMode.Test)}>Code</a>
+                    <a className={"anchor-tab" + (testCodeMode == TestCodeMode.OAS ? " active" : "")} onClick={_ => setTestCodeMode(TestCodeMode.Test)}>Else</a>
                     {serviceSchema && <a className={"anchor-tab" + (testCodeMode == TestCodeMode.OAS ? " active" : "")} onClick={_ => setTestCodeMode(TestCodeMode.OAS)}>Open Api Spec</a>}
                     {endpointSchema && <a className={"anchor-tab" + (testCodeMode == TestCodeMode.Schema ? " active" : "")} onClick={_ => setTestCodeMode(TestCodeMode.Schema)}>Schema</a>}
                 </Form.Group> 
@@ -149,10 +150,10 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = observer(({workspace, endp
                     {testCodeMode === TestCodeMode.OAS && <RedocStandalone spec={serviceSchema}/>}
                     {testCodeMode === TestCodeMode.Schema && <EndpointSchema schema={endpointSchema} isThemeDark={true}/>}
                     {testCodeMode === TestCodeMode.Test && <>
-                        <Card.Header className="test-row-card-header">
+                        <Card.Header className="test-row-card-header actions">
                             <Container>
                                 <Row>
-                                    <Col xs="2" md="2" lg="2" style={{"padding": "0"}}>
+                                    <Col className={'actions-container'} xs="2" md="2" lg="2" style={{"padding": "0"}}>
                                         <span className="clickable" style={{marginRight: "10px"}} onClick={_ => sendPushCodeToEditor(toJS(testBrowserStore.selectedEndpointTest))} title="Push Code (Ctrl + Alt + P)">{inputIcon}</span>
                                         <span className="clickable" onClick={_ => copyCode(testCodeForDisplay)} title="Copy Code (Ctrl + Alt + C)">{copyIcon}</span>
                                     </Col>
