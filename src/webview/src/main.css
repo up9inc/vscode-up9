@@ -60,7 +60,7 @@ table {
 .card-body {
 	background: var(--white);
 	border-radius: var(--editor-border-radius);
-	padding: 20px;
+	padding: 20px!important;
 }
 
 .test-code-container {

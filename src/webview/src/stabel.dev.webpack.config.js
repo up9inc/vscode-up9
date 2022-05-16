@@ -1,9 +1,9 @@
+// Stable webpack for development, however it fails to build and preview the plugin
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const HTMLInlineCSSWebpackPlugin = require("html-inline-css-webpack-plugin").default;
 const InlineChunkHtmlPlugin = require('react-dev-utils/InlineChunkHtmlPlugin');
-const process = require("process/browser");
 
 const htmlWebpackPlugin = new HtmlWebPackPlugin({
     template: "./src/index.html",
@@ -48,15 +48,14 @@ module.exports = {
         publicPath: '',
     },
     plugins: [
-        new webpack.DefinePlugin({
-            process: process,
-          }),
         new MiniCssExtractPlugin({
             filename: "main.css",
             chunkFilename: "mainc.css"
         }),
         htmlWebpackPlugin,
-        new HTMLInlineCSSWebpackPlugin(),
-        new InlineChunkHtmlPlugin(HtmlWebPackPlugin, [/bundle/]),
+        new HTMLInlineCSSWebpackPlugin({
+            filter: (filename) => false
+        }),
+        new InlineChunkHtmlPlugin(HtmlWebPackPlugin, [/runtime~.+[.]tsx/]),
     ]
 };
