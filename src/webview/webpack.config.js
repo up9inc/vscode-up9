@@ -22,7 +22,7 @@ module.exports = {
             "url": require.resolve("url"),
             "tty": require.resolve("tty-browserify"),
             "minimatch": require.resolve("minimatch"),
-            "process": require.resolve('process/browser')
+            "process": require.resolve('process')
         },
     },
     module: {
@@ -48,9 +48,9 @@ module.exports = {
         publicPath: '',
     },
     plugins: [
-        new webpack.DefinePlugin({
-            process: process,
-          }),
+        new webpack.ProvidePlugin({
+            process: 'process/browser.js'
+        }),
         new MiniCssExtractPlugin({
             filename: "main.css",
             chunkFilename: "mainc.css"
