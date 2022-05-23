@@ -75,6 +75,10 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = observer(({workspace, endp
         if (!endpoint || !workspaceOAS) {
             return [null, null];
         }
+
+        console.log('SERVICE SCHEMA:\n\n\n');
+        console.log(getServiceSchema(endpoint, workspaceOAS));
+        console.log('SERVICE SCHEMA \n\n\n\n\n\n\n\n\n');
         return [getEndpointSchema(endpoint, workspaceOAS), getServiceSchema(endpoint, workspaceOAS)];
     }, [endpoint, workspaceOAS]);
 
@@ -147,14 +151,17 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = observer(({workspace, endp
                onClick={_ => setTestCodeMode(TestCodeMode.Test)}>Code</a>
             {serviceSchema && <a className={"anchor-tab" + (testCodeMode == TestCodeMode.OAS ? " active" : "")}
                                  onClick={_ => setTestCodeMode(TestCodeMode.OAS)}>Open Api Spec</a>}
-            {endpointSchema && <a className={"anchor-tab" + (testCodeMode == TestCodeMode.Schema ? " active" : "")}
-                                  onClick={_ => setTestCodeMode(TestCodeMode.Schema)}>Schema</a>}
         </Form.Group>
         <Container className="test-code-container">
             <Card className="test-row" style={{height: "100%"}}>
                 {testCodeMode === TestCodeMode.OAS && <RedocStandalone spec={serviceSchema}/>}
-                {testCodeMode === TestCodeMode.Schema && <EndpointSchema schema={endpointSchema} isThemeDark={true}/>}
+                {/*{testCodeMode === TestCodeMode.Schema && <EndpointSchema schema={endpointSchema} isThemeDark={true}/>}*/}
                 {testCodeMode === TestCodeMode.Test && <>
+                    <div className="codeLanguageTabs">
+                        {/*Add a condition to the active class when more languages added*/}
+                        <a href="" className={'active'}>Python</a>
+                    </div>
+
                     <Card.Header className="test-row-card-header actions">
                         <Container>
                             <Row>
@@ -170,13 +177,20 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = observer(({workspace, endp
                         </Container>
                     </Card.Header>
                     <Card.Body style={{height: "100%", marginTop: 0, paddingTop: 0}}>
-                        <AceEditor width="100%" mode="python" fontSize="14px" maxLines={1000}
-                                   theme={isThemeDark ? "chaos" : "chrome"} readOnly={true} value={testCodeForDisplay}
-                                   setOptions={{
-                                       showGutter: false,
-                                       hScrollBarAlwaysVisible: false,
-                                       highlightActiveLine: false
-                                   }}/>
+                        <AceEditor
+                            width="100%"
+                            mode="python"
+                            fontSize="14px"
+                            maxLines={1000}
+                            theme={isThemeDark ? "chaos" : "chrome"}
+                            readOnly={true}
+                            value={testCodeForDisplay}
+                            setOptions={{
+                               showGutter: false,
+                               hScrollBarAlwaysVisible: false,
+                               highlightActiveLine: false
+                            }}
+                        />
                     </Card.Body>
                 </>
                 }

@@ -1,9 +1,14 @@
 :root {
 	--border-color: #E9EBF8;
 
+	--font-family: sans-serif;
+
 	--highlighted-brackground: #E9EBF8;
 	--code-area-background: #F7F9FC;
 	--icon-color: #205CF5;
+
+	--link-color: #205CF5;
+	--active-link-background: #BCCEFD;
 
 	--font-dark: #0C0B1A;
 	--font-light: #8F9BB2;
@@ -52,7 +57,7 @@ table {
 .check-box-container {
 	height: 2%;
 	min-height: 20px;
-	background-color: var(--vscode-editor-background);
+	background-color: var(--dropdown-background);
 	z-index: 100000;
 	margin-bottom: 16px;
 }
@@ -84,7 +89,7 @@ table {
 .discreet-dropdown {
 	box-shadow: none !important;
 	background: none !important;
-	color: var(--vscode-editor-foreground);
+	color: var(--font-dark);
 }
 
 .discreet-dropdown button {
@@ -92,8 +97,7 @@ table {
 	background: none !important;
 	border: none !important;
 	margin-left: 6px;
-	padding: 2px;
-	padding-bottom: 9px;
+	padding: 2px 2px 9px 2px;
 }
 
 .discreet-dropdown button::after {
@@ -151,7 +155,7 @@ table {
 
 .anchor-tab {
 	text-decoration: none;
-	color: var(--vscode-editor-foreground);
+	color: var(--font-dark);
 	opacity: 0.6;
 	text-transform: capitalize;
 	margin-right: 24px;
@@ -166,9 +170,9 @@ table {
 }
 
 .anchor-tab:active, .anchor-tab:hover {
-	color: var(--vscode-editor-foreground);
+	color: var(--font-dark);
 	opacity: 0.8;
-	border-bottom: 1px solid var(--vscode-input-background);
+	border-bottom: 1px solid var(--dropdown-background);
 }
 
 .select-test-form select {
@@ -176,22 +180,22 @@ table {
 }
 
 .anchor-button {
-	color: var(--vscode-textLink-foreground);
+	color: var(--font-light);
 	text-decoration: none;
 	font-size: 0.5em;
 }
 
 .anchor-button:active, .anchor-button:hover, .anchor-button:focus {
-	color: var(--vscode-textLink-activeForeground);
+	color: var(--font-dark);
 }
 
 .select-test-form select:disabled {
 	opacity: 0.5;
-	background: var(--vscode-input-background);
+	background: var(--dropdown-background);
 }
 
 hr {
-	color: var(--vscode-input-foreground);
+	color: var(--font-dark);
 }
 
 .accordion {
@@ -203,7 +207,7 @@ hr {
 }
 
 .accordion-item::before {    
-      background: var(--vscode-input-background) !important;
+      background: var(--dropdown-background) !important;
       width: 100%;
 	  height: 100%;
       opacity: 0.25;
@@ -218,13 +222,13 @@ hr {
 
 .accordion, .accordion-item, .accordion-button {
 	background: transparent !important;
-	color: var(--vscode-input-foreground) !important;
+	color: var(--font-dark) !important;
 	box-shadow: none !important;
 }
 
 .accordion-header {
-	border:1px solid var(--vscode-window-inactiveBorder);
-	color: var(--vscode-input-foreground) !important;
+	border:1px solid var(--border-color);
+	color: var(--font-dark) !important;
 	box-shadow: none !important;
 }
 
@@ -234,7 +238,7 @@ hr {
 }
 
 .accordion-header:active, .accordion-header:hover, .accordion-header:focus {
-	border:1px solid var(--vscode-window-activeBorder);
+	border:1px solid var(--border-color);
 }
 
 .accordion-button::after {
@@ -310,19 +314,23 @@ hr {
 
 .show>.btn-primary.dropdown-toggle {
 	background: var(--dropdown-background);
-	color: var(--font-dropdown);
+	color: var(--font-dropdown) !important;
+}
+
+.btn.btn-primary.dropdown-toggle {
+	color: var(--font-dropdown) !important;
 }
 
 .select-dropdown button::after {
 	position: absolute;
 	right: 12px;
 	margin-top: 0.6em;
-	color: var(--vscode-input-foreground);
+	color: var(--font-dark);
 }
 
 .select-dropdown .dropdown-item, .discreet-dropdown .dropdown-item {
-	background: var(--vscode-input-background);
-	color: var(--vscode-input-foreground);
+	background: var(--dropdown-background);
+	color: var(--font-dark);
 	font-size: 11px;
 	border-radius: 3px;
 	border: none !important;
@@ -331,8 +339,8 @@ hr {
 }
 
 .select-dropdown .dropdown-item:focus, .select-dropdown .dropdown-item:hover {
-	background: var(--vscode-button-background);
-	color: var(--vscode-button-foreground);
+	background: var(--dropdown-background);
+	color: var(--font-dark);
 }
 
 .dropdown-container {
@@ -424,6 +432,7 @@ hr {
 
 .test-row-card-header.actions {
 	position: absolute;
+	top: 3rem;
 	right: 0;
 	z-index: 100;
 }
@@ -495,10 +504,10 @@ hr {
 }
 
 ::-webkit-scrollbar {
-	background-color: var(--vscode-scrollbarSlider-background);
+	background-color: var(--highlighted-brackground);
 }
 ::-webkit-scrollbar-thumb {
-    background-color: var(--vscode-scrollbarSlider-hoverBackground);
+    background-color: var(--dropdown-background);
 }
 
 ::-webkit-scrollbar-track {
@@ -507,12 +516,13 @@ hr {
 
 html,
 body {
-	background-color: var(--vscode-editor-background);
-	font-family: var(--vscode-font-family);
+	background-color: var(--dropdown-background);
+	font-family: var(--font-family);
 	height: 100%;
 	width: 100%;
 	overflow: hidden;
-	color: var(--vscode-editor-foreground)
+	padding: 0;
+	color: var(--font-dark);
 }
 
 .hidden {
@@ -567,7 +577,7 @@ div.appRoot > header {
 }
 
 .Resizer {
-	background: var(--vscode-scrollbarSlider-hoverBackground);
+	background: var(--dropdown-background);
 	z-index: 1;
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
@@ -683,18 +693,18 @@ div.appRoot > header {
 	top: 0px;
 	width: 100%;
 	height: 100%;
-	background-color: var(--vscode-scrollbarSlider-background);
+	background-color: var(--dropdown-background);
 	z-index: 99999;
 }
 
 #dialog hr {
-	border-top: 1px solid var(--vscode-editorGroup-border);
+	border-top: 1px solid var(--border-color);
 }
 
 #dialog > div {
 	padding: 1em;
-	border: 2px solid var(--vscode-editorGroup-border);
-	background-color: var(--vscode-editor-background);
+	border: 2px solid var(--border-color);
+	background-color: var(--dropdown-background);
 	width: 50%;
 	position: fixed;
 	top: 50%;
@@ -718,7 +728,7 @@ div.appRoot > header {
 }
 
 .Pane2 {
-	background-color: var(--vscode-editor-background);
+	background-color: var(--dropdown-background);
 	overflow-y: auto;
 }
 
@@ -762,23 +772,23 @@ div.appRoot > header {
     max-height: 500px;
     overflow-y: auto;
 	overflow-x: hidden;
-	background-color: var(--vscode-input-background);
+	background-color: var(--dropdown-background);
 }
 
 .dropdown-menu>li>a {
-	color: var(--vscode-input-foreground);
+	color: var(--font-dark);
 }
 
 .dropdown-menu>li>a:hover {
-	background-color: var(--vscode-menubar-selectionBackground);
-	color: var(--vscode-input-foreground);
+	background-color: var(--highlighted-brackground);
+	color: var(--font-dark);
 }
 
 .dropdown-menu>li.divider {
 	background-color: #888888;
 }
 .dropdown-menu > .dropdown-header {
-	padding: 0px 0px;
+	padding: 0;
 }
 
 .form-select {
@@ -786,11 +796,11 @@ div.appRoot > header {
 }
 
 .btn, .btn:focus, .btn:active:focus, .form-select {
-    color: var(--vscode-input-foreground);
-	background: var(--vscode-input-background);
-	border: 1px solid var(--vscode-input-background);
+    color: var(--font-dark);
+	background: var(--dropdown-background);
+	border: 1px solid var(--dropdown-background);
 	border-radius: 0;
-	outline: var(--vscode-input-background);
+	outline: var(--dropdown-background);
 	box-shadow: none;
 }
 
@@ -799,9 +809,9 @@ div.appRoot > header {
 }
 
 .btn:hover, btn:focus, .btn-primary:disabled {
-    color: var(--vscode-breadcrumb-focusForeground);
-    background: var(--vscode-input-background);
-    border: 1px solid var(--vscode-focusBorder);
+    color: var(--font-dark);
+    background: var(--dropdown-background);
+    border: 1px solid var(--border-color);
 	box-shadow: none !important;
 }
 
@@ -811,25 +821,25 @@ div.appRoot > header {
 	padding: 5px 10px;
 	vertical-align: top;
 	width: 250px;
-    color: var(--vscode-input-foreground);
-    background: var(--vscode-input-background);
-    border: 1px solid var(--vscode-input-background);
+    color: var(--font-dark);
+    background: var(--dropdown-background);
+    border: 1px solid var(--dropdown-background);
     border-radius: 0;
 }
 
 .textInput:focus {
     outline: none;
-    border: 1px solid var(--vscode-focusBorder);
+    border: 1px solid var(--border-color);
 }
 
 .sign-in-button {
-	background: var(--vscode-button-background);
-	color: var(--vscode-button-foreground);
+	background: var(--dropdown-background);
+	color: var(--font-dark);
 	margin-left: 10px;
 }
 
 .sign-in-button:hover {
-	background: var(--vscode-button-hoverBackground);
+	background: var(--dropdown-background);
 }
 
 .loading-overlay-container {
@@ -857,7 +867,34 @@ div.appRoot > header {
 	border-right: 6px solid rgba(0, 174, 239, 0.15);
 	border-bottom: 6px solid rgba(0, 174, 239, 0.15);
 	border-top: 6px solid rgba(0, 174, 239, 0.8);
-	border-radius: 100%; }
+	border-radius: 100%;
+}
+
+.codeLanguageTabs {
+	display: flex;
+	margin-bottom: 10px;
+}
+
+.codeLanguageTabs a {
+	background: var(--active-link-background);
+	padding: 3px 6px;
+	border-radius: 10px;
+	text-transform: uppercase;
+	text-decoration: none;
+	font-size: 11px;
+}
+
+.codeLanguageTabs a:not(:first-child) {
+	margin-left: 0.5rem;
+}
+
+.codeLanguageTabs a.active {
+	background: var(--active-link-background);
+}
+
+.redoc-wrap .menu-content {
+	display: none;
+}
 
 @-webkit-keyframes rotation {
 	from {
