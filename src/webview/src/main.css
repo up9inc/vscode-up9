@@ -833,13 +833,13 @@ div.appRoot > header {
 }
 
 .sign-in-button {
-	background: var(--dropdown-background);
-	color: var(--font-dark);
+	background: var(--link-color);
+	color: var(--white);
 	margin-left: 10px;
 }
 
 .sign-in-button:hover {
-	background: var(--dropdown-background);
+	opacity: 0.9;
 }
 
 .loading-overlay-container {
