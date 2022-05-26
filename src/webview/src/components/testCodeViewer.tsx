@@ -13,7 +13,6 @@ import {copyCode, sendApiMessage, sendPushCodeToEditor} from "../providers/exten
 import {isHexColorDark, transformTest, getAssertionsCodeForSpan, getEndpointSchema, getServiceSchema} from "../utils";
 import {getTestCodeHeader} from "../../../sharedUtils";
 import {ApiMessageType} from "../../../models/internal";
-import EndpointSchema from "./endpointSchema";
 import {observer} from "mobx-react-lite";
 import {testBrowserStore} from "../stores/testBrowserStore";
 import {toJS} from "mobx";
@@ -182,7 +181,7 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = observer(({workspace, endp
                             mode="python"
                             fontSize="14px"
                             maxLines={1000}
-                            theme={isThemeDark ? "chaos" : "chrome"}
+                            theme={"chaos"}
                             readOnly={true}
                             value={testCodeForDisplay}
                             setOptions={{

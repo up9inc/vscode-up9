@@ -461,6 +461,10 @@ hr {
 	background: transparent !important;
 }
 
+.ace_editor .ace_identifier {
+	color:rgba(15, 15, 15, 1);
+}
+
 .auth-container {
 	position: absolute;
 	transform: translate(-50%, -50%);
