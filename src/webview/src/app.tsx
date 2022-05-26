@@ -6,7 +6,8 @@ import TestsBrowserComponent from "./components/testsBrowserComponent";
 
 const App: React.FC<{}> = observer(() => {
     return <>
-        {up9AuthStore.isAuthConfigured ? <TestsBrowserComponent /> : <AuthComponent/>}
+        <AuthComponent/>
+        {/* {up9AuthStore.isAuthConfigured ? <TestsBrowserComponent /> : <AuthComponent/>} */}
     </>;
 });
 

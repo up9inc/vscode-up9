@@ -56,14 +56,14 @@ module.exports = {
             chunkFilename: "mainc.css"
         }),
         htmlWebpackPlugin,
-        // // the next configurationdoesn't work in development, but works in build
-        new HTMLInlineCSSWebpackPlugin(),
-        new InlineChunkHtmlPlugin(HtmlWebPackPlugin, [/bundle/]),
+        // the next configurationdoesn't work in development, but works in build
+        // new HTMLInlineCSSWebpackPlugin(),
+        // new InlineChunkHtmlPlugin(HtmlWebPackPlugin, [/bundle/]),
 
         // // this configuration works in development regarding style and css refreshes
-        // new HTMLInlineCSSWebpackPlugin({
-        //     filter: (filename) => false
-        // }),
-        // new InlineChunkHtmlPlugin(HtmlWebPackPlugin, [/runtime/])
+        new HTMLInlineCSSWebpackPlugin({
+            filter: (filename) => false
+        }),
+        new InlineChunkHtmlPlugin(HtmlWebPackPlugin, [/runtime/])
     ]
 };
