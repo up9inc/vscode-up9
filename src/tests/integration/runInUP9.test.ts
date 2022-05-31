@@ -19,7 +19,7 @@ const runTestFileAndGetTerminalOutput = async (extensionContext: vscode.Extensio
     let terminalOutput = "";
 
 
-    const up9Auth = await UP9Auth.getInstance(process.env.UP9_ENV, defaultUP9EnvProtocol, extensionContext);
+    const up9Auth = await UP9Auth.getInstance(process.env.UP9_AUTH_ENV, defaultUP9EnvProtocol, extensionContext);
     await up9Auth.authenticateUsingClientCredentials(process.env.UP9_CLIENT_ID, process.env.UP9_CLIENT_SECRET);
 
     await onRunCodeInCloudCommand(extensionContext, up9Auth, terminalMessage => terminalOutput += terminalMessage);
@@ -29,8 +29,8 @@ const runTestFileAndGetTerminalOutput = async (extensionContext: vscode.Extensio
 
 suite('Run In UP9 Command', () => {
   before(async () => {
-    const up9Env = process.env.UP9_ENV; 
-    const defaultWorkspace = process.env.DEFAULT_WORKSPACE;
+    const up9Env = process.env.UP9_AUTH_ENV;
+      const defaultWorkspace = process.env.DEFAULT_WORKSPACE;
 
     // initialize extension config
     const up9ConfigSection = vscode.workspace.getConfiguration(up9ConfigSectionName);
