@@ -101,6 +101,16 @@ export const getAssertionsCodeForSpan = (span: any, indent: string = ''): string
     return code;
 }
 
-export const getEndpointSchema = (endpoint, workspaceOAS) => {
-    return workspaceOAS?.[endpoint.service]?.paths?.[endpoint.path]?.[endpoint.method.toLowerCase()];
-};
+export const getEndpointSchema = (endpoint, workspaceOAS) => workspaceOAS?.[endpoint.service]?.paths?.[endpoint.path]?.[endpoint.method.toLowerCase()];
+
+
+export const getServiceSchema = (endpoint, workspaceOAS) => {
+    return {
+        ...workspaceOAS?.[endpoint.service],
+        paths: {
+            [endpoint.path]: {
+                [endpoint.method.toLowerCase()]: workspaceOAS?.[endpoint.service]?.paths?.[endpoint.path]?.[endpoint.method.toLowerCase()]
+            }
+        }
+    };
+}

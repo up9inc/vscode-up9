@@ -29,7 +29,7 @@ const runTestFileAndGetTerminalOutput = async (extensionContext: vscode.Extensio
 
 suite('Run In UP9 Command', () => {
   before(async () => {
-    const up9Env = process.env.UP9_ENV; 
+    const up9Env = process.env.UP9_ENV;
     const defaultWorkspace = process.env.DEFAULT_WORKSPACE;
 
     // initialize extension config

@@ -3,6 +3,7 @@ import { Accordion, Table } from "react-bootstrap";
 import AceEditor from "react-ace";
 import { getRequestBodySchemaForView, getResponseBodySchemaForView } from "../utils";
 import { getHeapCodeStatistics } from "v8";
+import { Redoc, RedocStandalone } from "redoc";
 
 export interface EndpointSchemaProps {
     schema: any;

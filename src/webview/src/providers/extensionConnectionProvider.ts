@@ -147,14 +147,16 @@ export const getDebugReply = (apiMessageType: ApiMessageType): Promise < any > =
                         "id": "04bd26e3-19cf-4ccf-b806-387491140a02",
                         "tag": "maximal",
                         "testName": "test_09_get_search",
-                        "variantDisplayName": "status-200 content-text/html  smart test_09_get_search"
+                        "variantDisplayName": "status-200 content-text/html  smart test_09_get_search",
+                        "target": "url.com"
                     },
                     {
                         "code": "    @clear_session({'spanId': 9})\n    def test_09_get_search(self):\n        # GET http://trdemo-client.trdemo/search (endp 9)\n        destination = 'SFO'\n        source = '*'\n        startDate = '2020-11-04'\n        trdemo_client_trdemo = get_http_client('http://trdemo-client.trdemo', authenticate)\n        qstr = '?' + urlencode({'destination': destination, 'endDate': '', 'source': source, 'startDate': startDate})\n        resp = trdemo_client_trdemo.get('/search' + qstr)\n        resp.assert_ok()\n        # resp.assert_status_code(200)\n        # self.assertLess(resp.elapsed.total_seconds(), 0.016)\n\n",
                         "id": "04bd26e3-19cf-4ccf-b806-387491140a02",
                         "tag": "minimal",
                         "testName": "test_09_get_search",
-                        "variantDisplayName": "status-200 content-text/html  skeleton test_09_get_search"
+                        "variantDisplayName": "status-200 content-text/html  skeleton test_09_get_search",
+                        "target": "url.com"
                     },
                     {
                         "code": "    @json_dataset('data/4/dataset_4.json')\n    @clear_session({'spanId': 4})\n    def test_04_get_cart_add(self, data_row):\n        product_id, = data_row\n\n        # GET http://trdemo-client.trdemo/cart/add (endp 4)\n        trdemo_client_trdemo = get_http_client('http://trdemo-client.trdemo', authenticate)\n        qstr = '?' + urlencode({'product_id': product_id})\n        resp = trdemo_client_trdemo.get('/cart/add' + qstr)\n        resp.assert_ok()\n        # resp.assert_status_code(302)\n        # resp.assert_cssselect('p a', expected_value='/cart')\n        # self.assertLess(resp.elapsed.total_seconds(), 0.010)\n\n",
@@ -165,28 +167,32 @@ export const getDebugReply = (apiMessageType: ApiMessageType): Promise < any > =
                         "id": "067905c9-ff41-4fb4-a1d1-a7dcbc7a3f65",
                         "tag": "maximal",
                         "testName": "test_04_get_cart_add",
-                        "variantDisplayName": "status-302 content-text/html  smart test_04_get_cart_add"
+                        "variantDisplayName": "status-302 content-text/html  smart test_04_get_cart_add",
+                        "target": "url.com"
                     },
                     {
                         "code": "    @clear_session({'spanId': 4})\n    def test_04_get_cart_add(self):\n        # GET http://trdemo-client.trdemo/cart/add (endp 4)\n        product_id = 'LY-007'\n        trdemo_client_trdemo = get_http_client('http://trdemo-client.trdemo', authenticate)\n        qstr = '?' + urlencode({'product_id': product_id})\n        resp = trdemo_client_trdemo.get('/cart/add' + qstr)\n        resp.assert_ok()\n        # resp.assert_status_code(302)\n        # resp.assert_cssselect('p a', expected_value='/cart')\n        # self.assertLess(resp.elapsed.total_seconds(), 0.010)\n\n",
                         "id": "067905c9-ff41-4fb4-a1d1-a7dcbc7a3f65",
                         "tag": "minimal",
                         "testName": "test_04_get_cart_add",
-                        "variantDisplayName": "status-302 content-text/html  skeleton test_04_get_cart_add"
+                        "variantDisplayName": "status-302 content-text/html  skeleton test_04_get_cart_add",
+                        "target": "url.com"
                     },
                     {
                         "code": "    @clear_session({'spanId': 12})\n    def test_12_get_flight_____2020_11_04(self):\n        # GET http://trdemo-flights.trdemo/flight/*-*/2020-11-04 (endp 12)\n        trdemo_flights_trdemo = get_http_client('http://trdemo-flights.trdemo', authenticate)\n        resp = trdemo_flights_trdemo.get('/flight/%2A-%2A/2020-11-04')\n        resp.assert_ok()\n        # resp.assert_status_code(200)\n        # resp.assert_jsonpath('$[*].date')\n        # self.assertLess(resp.elapsed.total_seconds(), 0.002)\n\n",
                         "id": "07e85a6b-e7cd-475f-9dc9-9d6e9f63dc1e",
                         "tag": "minimal",
                         "testName": "test_12_get_flight_____2020_11_04",
-                        "variantDisplayName": "status-200 content-application/json  skeleton test_12_get_flight_____2020_11_04"
+                        "variantDisplayName": "status-200 content-application/json  skeleton test_12_get_flight_____2020_11_04",
+                        "target": "url.com"
                     },
                     {
                         "code": "    # authentication-related test\n    @clear_session({'spanId': 6})\n    def test_06_get_login(self):\n        # GET http://trdemo-client.trdemo/login (endp 6)\n        trdemo_client_trdemo = get_http_client('http://trdemo-client.trdemo', dummy_auth)\n        resp = trdemo_client_trdemo.get('/login')\n        resp.assert_ok()\n        # resp.assert_status_code(200)\n        # resp.assert_cssselect('div#logreg-forms h1.h3.font-weight-normal', expected_value=' Select user (temp) ')\n        # resp.assert_cssselect('html head title', expected_value=' TestR Demo app ')\n        # self.assertLess(resp.elapsed.total_seconds(), 0.007)\n\n",
                         "id": "0c92223e-6555-4aca-bd9b-5f1bdc1c82d7",
                         "tag": "minimal",
                         "testName": "test_06_get_login",
-                        "variantDisplayName": "status-200 content-text/html  skeleton test_06_get_login"
+                        "variantDisplayName": "status-200 content-text/html  skeleton test_06_get_login",
+                        "target": "url.com"
                     }
                 ]
             };
@@ -685,8 +691,324 @@ export const getDebugReply = (apiMessageType: ApiMessageType): Promise < any > =
         case ApiMessageType.WorkspacesList:
             response = ["rb-reg", "test", "workspace-b", "super-long-name-that-doesnt-end"];
             break;
-        case ApiMessageType.Swagger:
-          response = null;
+        case ApiMessageType.Swagger: 
+          response = {"http://carts.sock-shop" : {
+              "info": {
+                  "title": "http://carts.sock-shop - someOrgId123 rb-pg-28-03-22 all",
+                  "version": "0.0.5"
+              },
+              "openapi": "3.1.0",
+              "paths": {
+                  "/carts/{customerId}": {
+                      "delete": {
+                          "operationId": "4911cf6c-a9b2-42ac-b1a3-c9b200e4e7f2",
+                          "parameters": [],
+                          "responses": {
+                              "202": {
+                                  "description": "Accepted"
+                              }
+                          },
+                          "summary": "Seen 10 requests",
+                          "tags": [
+                              "carts"
+                          ],
+                          "x-endpoints": [
+                              "4911cf6c-a9b2-42ac-b1a3-c9b200e4e7f2"
+                          ],
+                          "x-kpis": {
+                              "avg_rt": 0.027677186689584455,
+                              "entries": 10,
+                              "err_rate": 0,
+                              "failures": 0,
+                              "first_seen": 1648455591.94203,
+                              "hits_rate": 0.06036464100003668,
+                              "last_active": 1648455755.212222,
+                              "last_seen": 1648455755.212222,
+                              "sessions": 3,
+                              "sum_duration": 165.65989351272583,
+                              "sum_rt": 4.5849997997283936
+                          }
+                      },
+                      "parameters": [
+                          {
+                              "example": "57a98d98e4b00679b4a830b2",
+                              "in": "path",
+                              "name": "customerId",
+                              "required": true,
+                              "schema": {
+                                  "type": "string"
+                              },
+                              "style": "simple"
+                          }
+                      ]
+                  },
+                  "/carts/{customerId}/items": {
+                      "get": {
+                          "operationId": "74adb864-6406-426a-b950-ae23ee3496a7",
+                          "parameters": [
+                              {
+                                  "example": "http:/carts/57a98d98e4b00679b4a830b2/items",
+                                  "in": "header",
+                                  "name": "x-span-name",
+                                  "required": false,
+                                  "schema": {
+                                      "type": "string"
+                                  }
+                              },
+                              {
+                                  "example": "application/json",
+                                  "in": "header",
+                                  "name": "accept",
+                                  "required": false,
+                                  "schema": {
+                                      "type": "string"
+                                  }
+                              }
+                          ],
+                          "responses": {
+                              "200": {
+                                  "content": {
+                                      "application/json": {
+                                          "example": [],
+                                          "schema": {
+                                              "items": {
+                                                  "properties": {
+                                                      "id": {
+                                                          "type": "string"
+                                                      },
+                                                      "itemId": {
+                                                          "type": "string"
+                                                      },
+                                                      "quantity": {
+                                                          "type": "integer"
+                                                      },
+                                                      "unitPrice": {
+                                                          "type": "number"
+                                                      }
+                                                  },
+                                                  "required": [
+                                                      "id",
+                                                      "itemId",
+                                                      "quantity",
+                                                      "unitPrice"
+                                                  ],
+                                                  "type": "object"
+                                              },
+                                              "type": "array"
+                                          }
+                                      }
+                                  },
+                                  "description": "OK"
+                              }
+                          },
+                          "summary": "Seen 3 requests",
+                          "tags": [
+                              "carts"
+                          ],
+                          "x-endpoints": [
+                              "74adb864-6406-426a-b950-ae23ee3496a7"
+                          ],
+                          "x-kpis": {
+                              "avg_rt": 0.01225152099980503,
+                              "entries": 3,
+                              "err_rate": 0,
+                              "failures": 0,
+                              "first_seen": 1648455614.319593,
+                              "hits_rate": 0.019953617180880064,
+                              "last_active": 1648455766.062018,
+                              "last_seen": 1648455766.062018,
+                              "sessions": 3,
+                              "sum_duration": 150.34867978096008,
+                              "sum_rt": 1.8420000076293945
+                          }
+                      },
+                      "parameters": [
+                          {
+                              "example": "57a98d98e4b00679b4a830b2",
+                              "in": "path",
+                              "name": "customerId",
+                              "required": true,
+                              "schema": {
+                                  "type": "string"
+                              },
+                              "style": "simple"
+                          }
+                      ],
+                      "post": {
+                          "operationId": "6b4b60f6-1c49-4a27-abbe-6ef379268207",
+                          "parameters": [
+                              {
+                                  "example": "application/json",
+                                  "in": "header",
+                                  "name": "accept",
+                                  "required": false,
+                                  "schema": {
+                                      "type": "string"
+                                  }
+                              }
+                          ],
+                          "requestBody": {
+                              "content": {
+                                  "application/json": {
+                                      "schema": {
+                                          "properties": {
+                                              "itemId": {
+                                                  "type": "string"
+                                              },
+                                              "unitPrice": {
+                                                  "type": "number"
+                                              }
+                                          },
+                                          "required": [
+                                              "itemId",
+                                              "unitPrice"
+                                          ],
+                                          "type": "object"
+                                      }
+                                  }
+                              },
+                              "required": true
+                          },
+                          "responses": {
+                              "201": {
+                                  "content": {
+                                      "application/json": {
+                                          "example": {
+                                              "id": "62416faa43cd1000062acb55",
+                                              "itemId": "a0a4f044-b040-410d-8ead-4de0446aec7e",
+                                              "quantity": 1,
+                                              "unitPrice": 7.99
+                                          },
+                                          "schema": {
+                                              "properties": {
+                                                  "id": {
+                                                      "type": "string"
+                                                  },
+                                                  "itemId": {
+                                                      "type": "string"
+                                                  },
+                                                  "quantity": {
+                                                      "type": "integer"
+                                                  },
+                                                  "unitPrice": {
+                                                      "type": "number"
+                                                  }
+                                              },
+                                              "required": [
+                                                  "id",
+                                                  "itemId",
+                                                  "quantity",
+                                                  "unitPrice"
+                                              ],
+                                              "type": "object"
+                                          }
+                                      }
+                                  },
+                                  "description": "Created"
+                              }
+                          },
+                          "summary": "Seen 9 requests",
+                          "tags": [
+                              "carts"
+                          ],
+                          "x-endpoints": [
+                              "6b4b60f6-1c49-4a27-abbe-6ef379268207"
+                          ],
+                          "x-kpis": {
+                              "avg_rt": 0.08798750057197613,
+                              "entries": 9,
+                              "err_rate": 0,
+                              "failures": 0,
+                              "first_seen": 1648455593.247119,
+                              "hits_rate": 0.05432817690003301,
+                              "last_active": 1648455760.0452468,
+                              "last_seen": 1648455760.0452468,
+                              "sessions": 3,
+                              "sum_duration": 165.65989351272583,
+                              "sum_rt": 14.575999975204468
+                          }
+                      }
+                  },
+                  "/carts/{customerId}/merge": {
+                      "get": {
+                          "operationId": "484208ad-9d35-4e29-8366-2735512b10f8",
+                          "parameters": [
+                              {
+                                  "examples": {
+                                      "example 1": {
+                                          "value": "bqvdTyV8GfK5IDcLuLwj8U6YN2s_b4Jb"
+                                      },
+                                      "example 2": {
+                                          "value": "BK_C6lFYPM9o0H2PcwwdGlhpdgeoePBn"
+                                      },
+                                      "example 3": {
+                                          "value": "OslLvE3-BLZkD1NET0fPQjV01ACw7vb5"
+                                      },
+                                      "example 4": {
+                                          "value": "qLrs2iFr7loyqRQ2X_eUpTB__CK2yynL"
+                                      }
+                                  },
+                                  "in": "query",
+                                  "name": "sessionId",
+                                  "required": true,
+                                  "schema": {
+                                      "type": "string"
+                                  }
+                              }
+                          ],
+                          "responses": {
+                              "202": {
+                                  "description": "Accepted"
+                              }
+                          },
+                          "summary": "Seen 6 requests",
+                          "tags": [
+                              "carts"
+                          ],
+                          "x-endpoints": [
+                              "484208ad-9d35-4e29-8366-2735512b10f8"
+                          ],
+                          "x-kpis": {
+                              "avg_rt": 0.032615016234651954,
+                              "entries": 6,
+                              "err_rate": 0,
+                              "failures": 0,
+                              "first_seen": 1648455591.120057,
+                              "hits_rate": 0.03621878460002201,
+                              "last_active": 1648455753.050286,
+                              "last_seen": 1648455753.050286,
+                              "sessions": 3,
+                              "sum_duration": 165.65989351272583,
+                              "sum_rt": 5.403000116348267
+                          }
+                      },
+                      "parameters": [
+                          {
+                              "example": "57a98d98e4b00679b4a830b2",
+                              "in": "path",
+                              "name": "customerId",
+                              "required": true,
+                              "schema": {
+                                  "type": "string"
+                              },
+                              "style": "simple"
+                          }
+                      ]
+                  }
+              },
+              "servers": [
+                  {
+                      "url": "http://carts.sock-shop"
+                  }
+              ],
+              "tags": [
+                  {
+                      "name": "carts"
+                  }
+              ],
+              "x-ignoredTarget": false
+          }
+        }
     }
     return Promise.resolve(response);
 }
