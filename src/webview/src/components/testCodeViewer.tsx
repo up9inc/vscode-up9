@@ -126,7 +126,7 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = observer(({workspace, endp
         }
 
         // Same thing for OAS 
-        if (!workspaceOAS && testCodeMode == TestCodeMode.OAS) {
+        if (!workspaceOAS && testCodeMode === TestCodeMode.OAS) {
             setTestCodeMode(TestCodeMode.Test);
         }
     }, [endpointSchema, testCodeMode, workspaceOAS]);
@@ -151,7 +151,6 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = observer(({workspace, endp
         <Container className="test-code-container">
             <Card className="test-row" style={{height: "100%"}}>
                 {testCodeMode === TestCodeMode.OAS && <RedocStandalone spec={serviceSchema}/>}
-                {/*{testCodeMode === TestCodeMode.Schema && <EndpointSchema schema={endpointSchema} isThemeDark={true}/>}*/}
                 {testCodeMode === TestCodeMode.Test && <>
                     <div className="codeLanguageTabs">
                         {/*Add a condition to the active class when more languages added*/}
