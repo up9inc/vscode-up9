@@ -75,9 +75,6 @@ const TestCodeViewer: React.FC<TestCodeViewerProps> = observer(({workspace, endp
             return [null, null];
         }
 
-        console.log('SERVICE SCHEMA:\n\n\n');
-        console.log(getServiceSchema(endpoint, workspaceOAS));
-        console.log('SERVICE SCHEMA \n\n\n\n\n\n\n\n\n');
         return [getEndpointSchema(endpoint, workspaceOAS), getServiceSchema(endpoint, workspaceOAS)];
     }, [endpoint, workspaceOAS]);
 
